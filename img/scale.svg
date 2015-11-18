@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	width="40"
+	height="24"
+	viewBox="0 0 40 24"
+	style="fill:none;stroke:#bbbbbb;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;">
+	<path d="m 2,18 36,0"/>
+	<path d="m 5,14 -4,4 4,4"/>
+	<path d="m 35,14 4,4 -4,4"/>
+	<path d="m 6,4 0,6 6,0"/>
+	<path d="m 10,4 0,10"/>
+	<path d="m 18,14 -4,0 0,-10 4,0 z"/>
+	<path d="m 21,16 0,-6 4,0 0,4 -4,0"/>
+	<path d="m 28,10 4,4"/>
+	<path d="m 32,10 -4,4"/>
+</svg>

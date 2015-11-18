@@ -1,0 +1,15 @@
+<p ng-show="object.loading">Loading...</p>
+<p ng-show="object.drawing && !object.loading">Drawing...</p>
+<p ng-hide="object.drawing || object.loading">Data</p>
+<canvas data-graph></canvas>
+<div class="btnRow">
+	<button on-click="object.draw()">re-draw</button>
+</div>
+<p ng-show="object.loading">Loading...</p>
+<p ng-hide="object.loading">Object information</p>
+<ul class="ObjectInfo">
+	<li ng-repeat="(key, value) in object.info">
+		<div>{{key}}</div>
+		<div>{{value}}</div>
+	</li>
+</ul>

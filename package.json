@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "autoprefixer": "^6.1.0",
+    "browser-sync": "^2.10.0",
+    "html-minifier": "^1.0.0",
+    "jshint": "^2.8.0",
+    "postcss": "^5.0.12",
+    "stylus": "^0.52.4"
+  }
+}
