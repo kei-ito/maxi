@@ -11,6 +11,12 @@
 	<li data-checker="object.bands._2_4" on-click="object.toggleBand('_2_4')">2-4keV</li>
 	<li data-checker="object.bands._4_10" on-click="object.toggleBand('_4_10')">4-10keV</li>
 	<li data-checker="object.bands._10_20" on-click="object.toggleBand('_10_20')">10-20keV</li>
+	<li class="ListItem_Counter">
+		<div>Bin (day)</div>
+		<button on-click="object.decrementBin()">−</button>
+		<input class="Label" type="number" ng-model="object.bin" min="1">
+		<button on-click="object.incrementBin()">＋</button>
+	</li>
 </ul>
 <p ng-show="object.loading">Loading...</p>
 <p ng-hide="object.loading">Object information</p>

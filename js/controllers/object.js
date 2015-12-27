@@ -7,13 +7,13 @@
 		.angular
 		.module('a')
 		.controller('objectCtrl', [
-			'ajax', '$state', 'endpoint', 'transformCSV', 'cache', 'transformList', '$scope', 'nop','copy',
+			'ajax', '$state', 'endpoint', 'transformCSV', 'cache', 'transformList', '$scope', 'nop', 'copy',
 			function (ajax, $state, endpoint, transformCSV, cache, transformList, $scope, nop, copy) {
 				var viewModel = this;
 				var name = viewModel.name = $state.params.name;
-				var url = endpoint + '/' + name + '/' + name + '_orb.txt';
+//				var url = endpoint + '/' + name + '/' + name + '_orb.txt';
 //				var url = endpoint + '/' + name + '/' + name + '_weekbin.txt';
-//				var url = endpoint + '/' + name + '/' + name + '.txt';
+				var url = endpoint + '/' + name + '/' + name + '.txt';
 				var find = function () {
 					cache.list.forEach(function (object) {
 						if (object.JNAME === name) {
@@ -21,22 +21,36 @@
 						}
 					});
 				};
+				var draw = viewModel.draw = function () {
+					viewModel.drawing = true;
+					$scope.$broadcast('data', viewModel.data, {
+						bands: viewModel.bands,
+						bin: viewModel.bin
+					});
+				};
+				viewModel.bin = 7;
+				viewModel.decrementBin = function () {
+					var bin = viewModel.bin;
+					if (1 < bin) {
+						viewModel.bin = bin - 1;
+					}
+					draw();
+				};
+				viewModel.incrementBin = function () {
+					viewModel.bin += 1;
+					draw();
+				};
 				viewModel.bandColors = {
-					_2_20: 'rgba(255,0,0,0.1)',
-					_2_4: 'rgba(0,255,0,0.1)',
-					_4_10: 'rgba(0,0,255,0.1)',
-					_10_20: 'rgba(255,0,255,0.1)'
+					_2_20: 'rgba(255,0,0,1)',
+					_2_4: 'rgba(0,255,0,1)',
+					_4_10: 'rgba(0,0,255,1)',
+					_10_20: 'rgba(255,0,255,1)'
 				};
 				viewModel.bands = copy(viewModel.bandColors);
 				viewModel.toggleBand = function (bandName) {
 					var bands = viewModel.bands;
 					bands[bandName] = bands[bandName] ? null : viewModel.bandColors[bandName];
-				};
-				viewModel.draw = function () {
-					viewModel.drawing = true;
-					$scope.$broadcast('data', viewModel.data, {
-						bands: viewModel.bands
-					});
+					draw();
 				};
 				$scope.$on('drawn', function (ngEvent) {
 					viewModel.drawing = false;

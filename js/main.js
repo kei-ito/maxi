@@ -45,6 +45,7 @@
 		.constant('encodeURIComponent', window.encodeURIComponent)
 		.constant('location', window.location)
 		.constant('copy', angular.copy)
+		.constant('Math', window.Math)
 		.config([
 			'$locationProvider', '$httpProvider', '$stateProvider', '$urlRouterProvider',
 			function ($locationProvider, $httpProvider, $stateProvider, $urlRouterProvider) {
@@ -143,26 +144,14 @@
 			function (parseFloat) {
 				return function (csv) {
 					var data = csv.split(/\r\n|\r|\n/);
-					var min = [];
-					var max = [];
 					data.forEach(function (line, index, data) {
 						line = line.split(',');
 						line.forEach(function (x, i, line) {
-							x = line[i] = parseFloat(x);
-							if (typeof min[i] === 'undefined' || x < min[i]) {
-								min[i] = x;
-							}
-							if (typeof max[i] === 'undefined' || max[i] < x) {
-								max[i] = x;
-							}
+							line[i] = parseFloat(x);
 						});
 						data[index] = line;
 					});
-					return {
-						data: data,
-						min: min,
-						max: max
-					};
+					return data;
 				};
 			}
 		])
