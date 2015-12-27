@@ -15,7 +15,35 @@
 						canvas.height = rect.height;
 						return canvas;
 					};
-					var draw = function (ngEvent, data) {
+					var parseBands = function (bands) {
+						var indexes = [];
+						if (bands._2_20) {
+							indexes.push({
+								index: 1,
+								color: bands._2_20
+							});
+						}
+						if (bands._2_4) {
+							indexes.push({
+								index: 3,
+								color: bands._2_4
+							});
+						}
+						if (bands._4_10) {
+							indexes.push({
+								index: 5,
+								color: bands._4_10
+							});
+						}
+						if (bands._10_20) {
+							indexes.push({
+								index: 7,
+								color: bands._10_20
+							});
+						}
+						return indexes;
+					};
+					var draw = function (ngEvent, data, settings) {
 						var canvas = setSize();
 						var ctx = canvas.getContext('2d');
 						var cw = canvas.width;
@@ -33,6 +61,7 @@
 						var yMin = data.min[1];
 						var yMax = data.max[1];
 						var yDiff = h / (yMax - yMin);
+						var bands = parseBands(settings.bands);
 						ctx.fillStyle = '#000000';
 						ctx.strokeStyle = '#000';
 						ctx.beginPath();
@@ -42,17 +71,19 @@
 						ctx.lineTo(paddingLeft, paddingTop);
 						ctx.closePath();
 						ctx.stroke();
-						ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-						data.data.forEach(function (d, index) {
+						data.data.forEach(function (d) {
 							var x = paddingLeft + (d[0] - xMin) * xDiff;
-							var y = zero - (d[1] - yMin) * yDiff;
-							var e = d[2] * yDiff;
-							ctx.beginPath();
-							ctx.moveTo(x, y + e);
-							ctx.lineTo(x, y - e);
-							ctx.moveTo(x - 1, y);
-							ctx.lineTo(x + 1, y);
-							ctx.stroke();
+							bands.forEach(function (band) {
+								var y = zero - (d[band.index] - yMin) * yDiff;
+								var e = d[band.index + 1] * yDiff;
+								ctx.strokeStyle = band.color;
+								ctx.beginPath();
+								ctx.moveTo(x, y + e);
+								ctx.lineTo(x, y - e);
+								ctx.moveTo(x - 1, y);
+								ctx.lineTo(x + 1, y);
+								ctx.stroke();
+							});
 						});
 						scope.$emit('drawn');
 						return nop(ngEvent);

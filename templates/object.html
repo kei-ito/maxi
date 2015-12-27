@@ -5,6 +5,13 @@
 <div class="btnRow">
 	<button on-click="object.draw()">re-draw</button>
 </div>
+<p>Settings - Press "Re-Draw" to update the graph</p>
+<ul>
+	<li data-checker="object.bands._2_20" on-click="object.toggleBand('_2_20')">2-20keV</li>
+	<li data-checker="object.bands._2_4" on-click="object.toggleBand('_2_4')">2-4keV</li>
+	<li data-checker="object.bands._4_10" on-click="object.toggleBand('_4_10')">4-10keV</li>
+	<li data-checker="object.bands._10_20" on-click="object.toggleBand('_10_20')">10-20keV</li>
+</ul>
 <p ng-show="object.loading">Loading...</p>
 <p ng-hide="object.loading">Object information</p>
 <ul class="ObjectInfo">
