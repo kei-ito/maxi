@@ -10,6 +10,34 @@
 			'ngAnimate',
 			'ui.router'
 		])
+		.constant('localStorage', (function (localStorage, JSON, Date) {
+			var EXPIRES = 43200000;
+			return {
+				setItem: function (key, value) {
+					localStorage.setItem(key, JSON.stringify({
+						data: value,
+						created: new Date().getTime()
+					}));
+				},
+				getItem: function (key) {
+					var current = new Date().getTime();
+					var value = localStorage[key];
+					if (value) {
+						value = JSON.parse(value);
+						if (!value.created || value.created + EXPIRES < current) {
+							value = undefined;
+						}
+					}
+					return value;
+				},
+				removeItem: function (key) {
+					localStorage.removeItem(key);
+				},
+				clear: function () {
+					localStorage.clear();
+				}
+			};
+		})(window.localStorage, window.JSON, window.Date))
 		.constant('encodeURIComponent', window.encodeURIComponent)
 		.constant('location', window.location)
 		.config([
@@ -125,17 +153,23 @@
 						});
 						data[index] = line;
 					});
-					data.min = min;
-					data.max = max;
-					return data;
+					return {
+						data: data,
+						min: min,
+						max: max
+					};
 				};
 			}
 		])
 		.controller('homeCtrl', [
-			'ajax', 'transformList', 'endpoint', 'cache', '$timeout',
-			function (ajax, transformList, endpoint, cache, $timeout) {
+			'ajax', 'transformList', 'endpoint', 'cache', '$timeout', 'localStorage', 'notify',
+			function (ajax, transformList, endpoint, cache, $timeout, localStorage, notify) {
 				var viewModel = this;
 				viewModel.loading = true;
+				viewModel.clearCache = function () {
+					localStorage.clear();
+					notify('Cache Cleared');
+				};
 				$timeout(function () {
 					if (cache.list) {
 						viewModel.list = cache.list;
@@ -153,8 +187,8 @@
 			}
 		])
 		.controller('objectCtrl', [
-			'$http', '$state', 'endpoint', 'transformCSV', 'cache', 'transformList', '$scope', 'nop',
-			function ($http, $state, endpoint, transformCSV, cache, transformList, $scope, nop) {
+			'ajax', '$state', 'endpoint', 'transformCSV', 'cache', 'transformList', '$scope', 'nop',
+			function (ajax, $state, endpoint, transformCSV, cache, transformList, $scope, nop) {
 				var viewModel = this;
 				var name = viewModel.name = $state.params.name;
 				var url = endpoint + '/' + name + '/' + name + '_orb.txt';
@@ -176,7 +210,7 @@
 					return nop(ngEvent);
 				});
 				viewModel.loading = true;
-				$http.get(url, {
+				ajax.get(url, null, {
 					transformResponse: transformCSV
 				}).then(function (result) {
 					viewModel.loading = false;
@@ -186,7 +220,7 @@
 				if (cache.list) {
 					find();
 				} else {
-					$http.get(endpoint, {
+					ajax.get(endpoint, null, {
 						transformResponse: transformList
 					}).then(function (result) {
 						cache.list = result.data;

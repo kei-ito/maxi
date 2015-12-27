@@ -43,7 +43,7 @@
 						ctx.closePath();
 						ctx.stroke();
 						ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-						data.forEach(function (d, index) {
+						data.data.forEach(function (d, index) {
 							var x = paddingLeft + (d[0] - xMin) * xDiff;
 							var y = zero - (d[1] - yMin) * yDiff;
 							var e = d[2] * yDiff;

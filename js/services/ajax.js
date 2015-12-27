@@ -1,16 +1,19 @@
 /* global window */
 (function (window) {
+
 	'use strict';
+
 	window
 		.angular
 		.module('a')
 		.factory('ajax', [
-			'$http', 'token', '$q', '$state', 'File', 'FormData', 'location', 'encodeURIComponent',
-			function ($http, token, $q, $state, File, FormData, location, encodeURIComponent) {
+			'$http', 'token', '$q', '$state', 'File', 'FormData', 'location', 'localStorage', 'encodeURIComponent',
+			function ($http, token, $q, $state, File, FormData, location, localStorage, encodeURIComponent) {
 				var developMode = location.hostname !== 'maxi.wemo.me';
 				function request(options, localOptions) {
 					var deferred = $q.defer();
 					var key;
+					var cache;
 					if (localOptions) {
 						for (key in localOptions) {
 							if (localOptions.hasOwnProperty(key)) {
@@ -21,18 +24,23 @@
 					options.headers = options.headers || {};
 					options.headers['X-Token'] = token.get();
 					if (developMode) {
-						options.params = options.params || {};
-						options.params.url = options.url;
-						options.url = '/api';
+						options.url = '/api?url=' + encodeURIComponent(options.url);
 					}
-					$http(options).then(function (result) {
-						deferred.resolve(result);
-					}, function (result) {
-						if (result.status === 401) {
-							$state.go('home');
-						}
-						deferred.reject(result);
-					});
+					key = options.url;
+					cache = localStorage.getItem(key);
+					if (cache) {
+						deferred.resolve(cache);
+					} else {
+						$http(options).then(function (result) {
+							localStorage.setItem(key, result.data);
+							deferred.resolve(result);
+						}, function (result) {
+							if (result.status === 401) {
+								$state.go('home');
+							}
+							deferred.reject(result);
+						});
+					}
 					return deferred.promise;
 				}
 				function get(url, params, options) {
@@ -91,4 +99,5 @@
 				};
 			}
 		]);
+
 })(window);
