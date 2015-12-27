@@ -5,8 +5,9 @@
 		.angular
 		.module('a')
 		.factory('ajax', [
-			'$http', 'token', '$q', '$state', 'File', 'FormData',
-			function ($http, token, $q, $state, File, FormData) {
+			'$http', 'token', '$q', '$state', 'File', 'FormData', 'location', 'encodeURIComponent',
+			function ($http, token, $q, $state, File, FormData, location, encodeURIComponent) {
+				var developMode = location.hostname !== 'maxi.wemo.me';
 				function request(options, localOptions) {
 					var deferred = $q.defer();
 					var key;
@@ -19,6 +20,11 @@
 					}
 					options.headers = options.headers || {};
 					options.headers['X-Token'] = token.get();
+					if (developMode) {
+						options.params = options.params || {};
+						options.params.url = options.url;
+						options.url = '/api';
+					}
 					$http(options).then(function (result) {
 						deferred.resolve(result);
 					}, function (result) {

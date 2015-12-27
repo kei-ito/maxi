@@ -10,6 +10,8 @@
 			'ngAnimate',
 			'ui.router'
 		])
+		.constant('encodeURIComponent', window.encodeURIComponent)
+		.constant('location', window.location)
 		.config([
 			'$locationProvider', '$httpProvider', '$stateProvider', '$urlRouterProvider',
 			function ($locationProvider, $httpProvider, $stateProvider, $urlRouterProvider) {
@@ -130,8 +132,8 @@
 			}
 		])
 		.controller('homeCtrl', [
-			'$http', 'transformList', 'endpoint', 'cache', '$timeout',
-			function ($http, transformList, endpoint, cache, $timeout) {
+			'ajax', 'transformList', 'endpoint', 'cache', '$timeout',
+			function (ajax, transformList, endpoint, cache, $timeout) {
 				var viewModel = this;
 				viewModel.loading = true;
 				$timeout(function () {
@@ -140,7 +142,7 @@
 						viewModel.loading = false;
 					} else {
 						viewModel.loading = true;
-						$http.get(endpoint, {
+						ajax.get(endpoint, null, {
 							transformResponse: transformList
 						}).then(function (result) {
 							viewModel.loading = false;
