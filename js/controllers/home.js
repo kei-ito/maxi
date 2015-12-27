@@ -6,7 +6,7 @@
 	window
 		.angular
 		.module('a')
-		.controller('objectCtrl', [
+		.controller('homeCtrl', [
 			'ajax', 'transformList', 'endpoint', 'cache', '$timeout', 'localStorage', 'notify',
 			function (ajax, transformList, endpoint, cache, $timeout, localStorage, notify) {
 				var viewModel = this;
