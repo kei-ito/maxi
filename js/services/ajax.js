@@ -7,8 +7,8 @@
 		.angular
 		.module('a')
 		.factory('ajax', [
-			'$http', 'endpoint', 'token', '$q', '$state', 'File', 'FormData', 'localStorage', 'encodeURIComponent',
-			function ($http, endpoint, token, $q, $state, File, FormData, localStorage, encodeURIComponent) {
+			'$http', 'endpoint', 'token', '$q', '$state', 'File', 'FormData', 'localStorage',
+			function ($http, endpoint, token, $q, $state, File, FormData, localStorage) {
 				function request(options, localOptions, useCache) {
 					var deferred = $q.defer();
 					var key;
@@ -24,6 +24,7 @@
 					options.headers['X-Token'] = token.get();
 					key = options.url;
 					options.url = endpoint + options.url;
+					console.log(options.url);
 					cache = useCache && localStorage.getItem(key);
 					if (cache) {
 						deferred.resolve(cache);
