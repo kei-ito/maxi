@@ -24,7 +24,6 @@
 					options.headers['X-Token'] = token.get();
 					key = options.url;
 					options.url = endpoint + options.url;
-					console.log(options.url);
 					cache = useCache && localStorage.getItem(key);
 					if (cache) {
 						deferred.resolve(cache);
