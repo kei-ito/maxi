@@ -2,10 +2,7 @@
 <p ng-show="object.drawing && !object.loading">Drawing...</p>
 <p ng-hide="object.drawing || object.loading">Data</p>
 <canvas data-graph></canvas>
-<div class="btnRow">
-	<button on-click="object.draw()">re-draw</button>
-</div>
-<p>Settings - Press "Re-Draw" to update the graph</p>
+<p>Options</p>
 <ul>
 	<li data-checker="object.bands._2_20" on-click="object.toggleBand('_2_20')">2-20keV</li>
 	<li data-checker="object.bands._2_4" on-click="object.toggleBand('_2_4')">2-4keV</li>

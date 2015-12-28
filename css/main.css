@@ -85,7 +85,7 @@ input {
   border: none;
   border-radius: 0;
   background-size: 100% 2px, 100% 2px;
-  background-image: -webkit-linear-gradient(90deg, transparent, transparent 50%, #ddd 50%), -webkit-linear-gradient(90deg, #ddd, #ddd 50%, transparent 50%);
+  background-image: -webkit-linear-gradient(bottom, transparent, transparent 50%, #ddd 50%), -webkit-linear-gradient(bottom, #ddd, #ddd 50%, transparent 50%);
   background-image: linear-gradient(0deg, transparent, transparent 50%, #ddd 50%), linear-gradient(0deg, #ddd, #ddd 50%, transparent 50%);
   background-repeat: no-repeat;
   background-position: top, bottom;
@@ -218,7 +218,7 @@ li {
       -ms-flex-align: center;
           align-items: center;
   background-size: 16px 1px, 100% 2px;
-  background-image: -webkit-linear-gradient(90deg, #fff, #fff), -webkit-linear-gradient(90deg, transparent, transparent 50%, #ddd 50%);
+  background-image: -webkit-linear-gradient(bottom, #fff, #fff), -webkit-linear-gradient(bottom, transparent, transparent 50%, #ddd 50%);
   background-image: linear-gradient(0deg, #fff, #fff), linear-gradient(0deg, transparent, transparent 50%, #ddd 50%);
   background-position: left top, top;
 }
@@ -237,7 +237,7 @@ li:first-child {
 }
 li:last-child {
   background-size: 16px 1px, 100% 2px, 100% 2px;
-  background-image: -webkit-linear-gradient(90deg, #fff, #fff), -webkit-linear-gradient(90deg, transparent, transparent 50%, #ddd 50%), -webkit-linear-gradient(90deg, #ddd, #ddd 50%, transparent 50%);
+  background-image: -webkit-linear-gradient(bottom, #fff, #fff), -webkit-linear-gradient(bottom, transparent, transparent 50%, #ddd 50%), -webkit-linear-gradient(bottom, #ddd, #ddd 50%, transparent 50%);
   background-image: linear-gradient(0deg, #fff, #fff), linear-gradient(0deg, transparent, transparent 50%, #ddd 50%), linear-gradient(0deg, #ddd, #ddd 50%, transparent 50%);
   background-position: left top, top, bottom;
 }
@@ -482,7 +482,7 @@ textarea {
   border: none;
   border-radius: 0;
   background-size: 100% 2px, 100% 2px;
-  background-image: -webkit-linear-gradient(90deg, transparent, transparent 50%, #ddd 50%), -webkit-linear-gradient(90deg, #ddd, #ddd 50%, transparent 50%);
+  background-image: -webkit-linear-gradient(bottom, transparent, transparent 50%, #ddd 50%), -webkit-linear-gradient(bottom, #ddd, #ddd 50%, transparent 50%);
   background-image: linear-gradient(0deg, transparent, transparent 50%, #ddd 50%), linear-gradient(0deg, #ddd, #ddd 50%, transparent 50%);
   background-repeat: no-repeat;
   background-position: top, bottom;
@@ -510,7 +510,7 @@ pre {
   border: none;
   border-radius: 0;
   background-size: 100% 2px, 100% 2px;
-  background-image: -webkit-linear-gradient(90deg, transparent, transparent 50%, #ddd 50%), -webkit-linear-gradient(90deg, #ddd, #ddd 50%, transparent 50%);
+  background-image: -webkit-linear-gradient(bottom, transparent, transparent 50%, #ddd 50%), -webkit-linear-gradient(bottom, #ddd, #ddd 50%, transparent 50%);
   background-image: linear-gradient(0deg, transparent, transparent 50%, #ddd 50%), linear-gradient(0deg, #ddd, #ddd 50%, transparent 50%);
   background-repeat: no-repeat;
   background-position: top, bottom;
@@ -687,7 +687,7 @@ button:active {
 .PageCover>.PageCoverContent>*>li {
   padding: 0;
   background-size: 100% 2px;
-  background-image: -webkit-linear-gradient(90deg, transparent, transparent 50%, #ddd 50%);
+  background-image: -webkit-linear-gradient(bottom, transparent, transparent 50%, #ddd 50%);
   background-image: linear-gradient(0deg, transparent, transparent 50%, #ddd 50%);
   background-position: top;
 }
@@ -898,7 +898,7 @@ button:active {
   background-color: #f6f6f7;
   color: #000;
   background-size: 100% 2px;
-  background-image: -webkit-linear-gradient(90deg, #a7a7aa, #a7a7aa 50%, transparent 50%);
+  background-image: -webkit-linear-gradient(bottom, #a7a7aa, #a7a7aa 50%, transparent 50%);
   background-image: linear-gradient(0deg, #a7a7aa, #a7a7aa 50%, transparent 50%);
   background-position: bottom;
 }
@@ -1157,6 +1157,13 @@ button:active {
   padding-right: 44px;
 }
 .ListItem_Counter>.Label {
+  -webkit-flex-basis: 88px;
+      -ms-flex-preferred-size: 88px;
+          flex-basis: 88px;
+  -webkit-box-flex: 0.1;
+  -webkit-flex-grow: 0.1;
+      -ms-flex-positive: 0.1;
+          flex-grow: 0.1;
   text-align: center;
 }
 .ListItem_Counter>button:last-child,

@@ -14,6 +14,48 @@
 			'ngAnimate',
 			'ui.router'
 		])
+		.constant('throttle', (function (setTimeout) {
+			return function (fn, delay, thisArg) {
+				var timer;
+				var scheduled;
+				var execute = function (args) {
+					fn.apply(thisArg, args);
+					scheduled = false;
+				};
+				var call = function () {
+					var args = arguments;
+					if (timer) {
+						scheduled = true;
+					} else {
+						execute(args);
+						timer = setTimeout(function () {
+							if (scheduled) {
+								execute(args);
+							}
+							timer = false;
+						}, delay);
+					}
+				};
+				return call;
+			};
+		})(window.setTimeout))
+		.constant('debounce', (function (setTimeout, clearTimeout) {
+			return function (fn, delay, thisArg) {
+				var timer;
+				var execute = function (args) {
+					fn.apply(thisArg, args);
+				};
+				var call = function () {
+					var args = arguments;
+					clearTimeout(timer);
+					timer = setTimeout(function () {
+						execute(args);
+						timer = false;
+					}, delay);
+				};
+				return call;
+			};
+		})(window.setTimeout, window.clearTimeout))
 		.constant('localStorage', (function (localStorage, JSON, Date) {
 			var EXPIRES = 43200000;
 			return {
@@ -156,9 +198,12 @@
 			}
 		])
 		.run([
-			'ngBody',
-			function (ngBody) {
+			'$window', '$rootScope', 'ngBody', 'debounce',
+			function ($window, $rootScope, ngBody, debounce) {
 				ngBody.addClass('started');
+				$window.addEventListener('resize', debounce(function () {
+					$rootScope.$broadcast('resize');
+				}, 200));
 			}
 		]);
 

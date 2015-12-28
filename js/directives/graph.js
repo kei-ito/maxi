@@ -11,8 +11,8 @@
 					var canvas = element[0];
 					var setSize = function () {
 						var rect = canvas.getBoundingClientRect();
-						canvas.width = rect.width;
-						canvas.height = rect.height;
+						canvas.width = rect.width * 2;
+						canvas.height = rect.height * 2;
 						return canvas;
 					};
 					var parseBands = function (bands) {
@@ -86,43 +86,99 @@
 						binnedData.max = max;
 						return binnedData;
 					};
+					var lastReceivedData;
+					var lastReceivedSettings;
 					var draw = function (ngEvent, data, settings) {
-						data = binning(data, settings.bin);
+						lastReceivedData = data = data ? binning(data, settings.bin) : lastReceivedData;
+						lastReceivedSettings = settings = settings || lastReceivedSettings;
+						var bands = parseBands(settings.bands);
+						var xMin = data.min[0];
+						var xMax = data.max[0];
+						var yMin;
+						var yMax;
+						bands.forEach(function (band) {
+							var min = data.min[band.index];
+							var max = data.max[band.index];
+							if (!yMin || min < yMin) {
+								yMin = min;
+							}
+							if (!yMax || yMax < max) {
+								yMax = max;
+							}
+						});
+						yMin = Math.min(0, yMin);
+						var grid = {
+							xScale: xMax - xMin,
+							y: 0,
+							yMin: 0,
+							yMainMin: 0,
+							yDigits: Math.round(Math.log(yMax) / Math.LN10 - 0.2) - 1
+						};
+						grid.yScale = Math.pow(10, grid.yDigits);
+						grid.yDigits = Math.min(0, grid.yDigits);
+						var paddingTop = 20;
+						var innerPadding = 10;
+						var paddingRight = 20;
+						var paddingBottom = 30;
+						var paddingLeft = 60 - 24 * grid.yDigits;
 						var canvas = setSize();
 						var ctx = canvas.getContext('2d');
 						var cw = canvas.width;
 						var ch = canvas.height;
-						var paddingTop = 30;
-						var paddingRight = 30;
-						var paddingInnerRight = 10;
-						var paddingBottom = 30;
-						var paddingLeft = 30;
-						var paddingInnerLeft = 10;
 						var w = cw - paddingLeft - paddingRight;
-						var h = ch - paddingBottom - paddingBottom;
-						var zero = ch - paddingTop;
-						var xMin = data.min[0];
-						var xMax = data.max[0];
-						var xDiff = (w - paddingInnerLeft - paddingInnerRight) / (xMax - xMin);
-						var yMin = Math.min(data.min[1] - data.min[2], data.min[3] - data.min[4], data.min[5] - data.min[6], data.min[7] - data.min[8]);
-						var yMax = Math.max(data.max[1] + data.max[2], data.max[3] + data.max[4], data.max[5] + data.max[6], data.max[7] + data.max[8]);
-						var yDiff = h / (yMax - yMin);
-						var bands = parseBands(settings.bands);
+						var h = ch - paddingBottom - paddingTop;
+						var xDiff = (w - 2 * innerPadding) / (xMax - xMin);
+						var yDiff = (h - 2 * innerPadding) / (yMax - yMin);
+						ctx.lineWidth = 1;
 						ctx.fillStyle = '#000000';
-						ctx.strokeStyle = '#000';
+						ctx.strokeStyle = '#000000';
+						ctx.font = '400 22px sans-serif';
+						ctx.textBaseline = 'middle';
+						ctx.clearRect(0, 0, cw, ch);
+						ctx.save();
+						ctx.transform(1, 0, 0, -1, 0, ch);
 						ctx.beginPath();
-						ctx.moveTo(paddingLeft, paddingTop + h);
-						ctx.lineTo(paddingLeft + w, paddingTop + h);
-						ctx.lineTo(paddingLeft + w, paddingTop);
-						ctx.lineTo(paddingLeft, paddingTop);
+						ctx.moveTo(paddingLeft, paddingBottom + h);
+						ctx.lineTo(paddingLeft + w, paddingBottom + h);
+						ctx.lineTo(paddingLeft + w, paddingBottom);
+						ctx.lineTo(paddingLeft, paddingBottom);
 						ctx.closePath();
 						ctx.stroke();
+						while (yMin < grid.yMin) {
+							grid.yMin -= grid.yScale;
+						}
+						grid.yMin += grid.yScale;
+						while (yMin < grid.yMainMin) {
+							grid.yMainMin -= grid.yScale * 5;
+						}
+						grid.yMainMin += grid.yScale * 5;
+						ctx.strokeStyle = '#eeeeee';
+						ctx.textAlign = 'right';
+						for (grid.y = grid.yMin; grid.y < yMax; grid.y += grid.yScale) {
+							grid.yy = paddingBottom + innerPadding + (grid.y - yMin) * yDiff;
+							ctx.beginPath();
+							ctx.moveTo(paddingLeft, grid.yy);
+							ctx.lineTo(paddingLeft + w, grid.yy);
+							ctx.stroke();
+						}
+						ctx.strokeStyle = '#aaaaaa';
+						for (grid.y = grid.yMainMin; grid.y < yMax; grid.y += grid.yScale * 5) {
+							grid.yy = paddingBottom + innerPadding + (grid.y - yMin) * yDiff;
+							ctx.beginPath();
+							ctx.moveTo(paddingLeft, grid.yy);
+							ctx.lineTo(paddingLeft + w, grid.yy);
+							ctx.stroke();
+							ctx.transform(1, 0, 0, -1, 0, ch);
+							ctx.fillText((Math.round(grid.y / grid.yScale) * grid.yScale).toFixed(-grid.yDigits), paddingLeft - 5, ch - grid.yy);
+							ctx.transform(1, 0, 0, -1, 0, ch);
+						}
+						ctx.lineWidth = 2;
 						data.forEach(function (d) {
-							var x = paddingLeft + paddingInnerLeft + (d[0] - xMin) * xDiff;
-							var minX = paddingLeft + paddingInnerLeft + (d.min - xMin) * xDiff;
-							var maxX = paddingLeft + paddingInnerLeft + (d.max - xMin) * xDiff;
+							var x = paddingLeft + innerPadding + (d[0] - xMin) * xDiff;
+							var minX = paddingLeft + innerPadding + (d.min - xMin) * xDiff;
+							var maxX = paddingLeft + innerPadding + (d.max - xMin) * xDiff;
 							bands.forEach(function (band) {
-								var y = zero - (d[band.index] - yMin) * yDiff;
+								var y = paddingBottom + innerPadding + (d[band.index] - yMin) * yDiff;
 								var e = d[band.index + 1] * yDiff;
 								ctx.strokeStyle = band.color;
 								ctx.beginPath();
@@ -133,10 +189,17 @@
 								ctx.stroke();
 							});
 						});
+						ctx.restore();
+						ctx.rotate(-0.5 * Math.PI);
+						ctx.textAlign = 'center';
+						ctx.fillText('counts cm  s', -0.5 * ch, 29);
+						ctx.font = '400 16px sans-serif';
+						ctx.fillText('-2  -1', -0.5 * ch + 60, 15);
 						scope.$emit('drawn');
 						return nop(ngEvent);
 					};
 					scope.$on('data', draw);
+					scope.$on('resize', draw);
 				}
 				return {
 					restrict: 'A',

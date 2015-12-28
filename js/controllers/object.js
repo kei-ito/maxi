@@ -11,8 +11,6 @@
 			function (ajax, $state, endpoint, transformCSV, cache, transformList, $scope, nop, copy) {
 				var viewModel = this;
 				var name = viewModel.name = $state.params.name;
-//				var url = endpoint + '/' + name + '/' + name + '_orb.txt';
-//				var url = endpoint + '/' + name + '/' + name + '_weekbin.txt';
 				var url = endpoint + '/' + name + '/' + name + '.txt';
 				var find = function () {
 					cache.list.forEach(function (object) {
@@ -21,14 +19,18 @@
 						}
 					});
 				};
-				var draw = viewModel.draw = function () {
+				var draw = function () {
+					var data = viewModel.data;
+					if (!data) {
+						return;
+					}
 					viewModel.drawing = true;
-					$scope.$broadcast('data', viewModel.data, {
+					$scope.$broadcast('data', data, {
 						bands: viewModel.bands,
 						bin: viewModel.bin
 					});
 				};
-				viewModel.bin = 7;
+				viewModel.bin = 21;
 				viewModel.decrementBin = function () {
 					var bin = viewModel.bin;
 					if (1 < bin) {
@@ -52,6 +54,7 @@
 					bands[bandName] = bands[bandName] ? null : viewModel.bandColors[bandName];
 					draw();
 				};
+				$scope.$watch('object.bin', draw);
 				$scope.$on('drawn', function (ngEvent) {
 					viewModel.drawing = false;
 					return nop(ngEvent);
@@ -62,7 +65,7 @@
 				}).then(function (result) {
 					viewModel.loading = false;
 					viewModel.data = result.data;
-					viewModel.draw();
+					draw();
 				});
 				if (cache.list) {
 					find();
