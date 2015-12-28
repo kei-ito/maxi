@@ -9,7 +9,7 @@
 		.factory('ajax', [
 			'$http', 'token', '$q', '$state', 'File', 'FormData', 'location', 'localStorage', 'encodeURIComponent',
 			function ($http, token, $q, $state, File, FormData, location, localStorage, encodeURIComponent) {
-				var developMode = location.hostname !== 'maxi.wemo.me';
+				var developMode = ['maxi.wemo.me', 'kei-ito.github.io'].indexOf(location.hostname) < 0;
 				function request(options, localOptions, useCache) {
 					var deferred = $q.defer();
 					var key;
