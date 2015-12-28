@@ -43,10 +43,10 @@
 					draw();
 				};
 				viewModel.bandColors = {
-					_2_20: 'rgba(255,0,0,1)',
-					_2_4: 'rgba(0,153,0,1)',
-					_4_10: 'rgba(0,0,255,1)',
-					_10_20: 'rgba(255,0,255,1)'
+					_2_20: 'rgb(255,40,0)',
+					_2_4: 'rgb(53,161,107)',
+					_4_10: 'rgb(0,65,255)',
+					_10_20: 'rgb(154,0,121)'
 				};
 				viewModel.bands = copy(viewModel.bandColors);
 				viewModel.toggleBand = function (bandName) {

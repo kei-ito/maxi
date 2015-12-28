@@ -1183,3 +1183,8 @@ button:active {
   text-align: center;
   height: 100%;
 }
+footer {
+  margin-top: 44px;
+  text-align: center;
+  line-height: 1.5;
+}

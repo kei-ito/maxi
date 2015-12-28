@@ -20,25 +20,29 @@
 						if (bands._2_20) {
 							indexes.push({
 								index: 1,
-								color: bands._2_20
+								color: bands._2_20,
+								title: '2-20keV'
 							});
 						}
 						if (bands._2_4) {
 							indexes.push({
 								index: 3,
-								color: bands._2_4
+								color: bands._2_4,
+								title: '2-4keV'
 							});
 						}
 						if (bands._4_10) {
 							indexes.push({
 								index: 5,
-								color: bands._4_10
+								color: bands._4_10,
+								title: '4-10keV'
 							});
 						}
 						if (bands._10_20) {
 							indexes.push({
 								index: 7,
-								color: bands._10_20
+								color: bands._10_20,
+								title: '10-20keV'
 							});
 						}
 						return indexes;
@@ -297,21 +301,94 @@
 						ctx.lineWidth = 2;
 						data.forEach(function (d) {
 							var x = paddingLeft + innerPadding + (d[0] - xMin) * xDiff;
-							var minX = paddingLeft + innerPadding + (d.min - xMin) * xDiff;
-							var maxX = paddingLeft + innerPadding + (d.max - xMin) * xDiff;
-							bands.forEach(function (band) {
+							//var minX = paddingLeft + innerPadding + (d.min - xMin) * xDiff;
+							//var maxX = paddingLeft + innerPadding + (d.max - xMin) * xDiff;
+							bands.forEach(function (band, index) {
 								var y = paddingBottom + innerPadding + (d[band.index] - yMin) * yDiff;
 								var e = d[band.index + 1] * yDiff;
-								ctx.strokeStyle = band.color;
+								var size = 5;
+								ctx.strokeStyle = ctx.fillStyle = band.color;
 								ctx.beginPath();
 								ctx.moveTo(x, y + e);
 								ctx.lineTo(x, y - e);
-								ctx.moveTo(minX, y);
-								ctx.lineTo(maxX, y);
+								//ctx.moveTo(minX, y);
+								//ctx.lineTo(maxX, y);
 								ctx.stroke();
+								ctx.beginPath();
+								switch (index) {
+									case 0:
+										ctx.arc(x, y, size, 0, Math.PI * 2);
+										break;
+									case 1:
+										ctx.moveTo(x - size, y - size);
+										ctx.lineTo(x - size, y + size);
+										ctx.lineTo(x + size, y + size);
+										ctx.lineTo(x + size, y - size);
+										break;
+									case 2:
+										size *= Math.sqrt(2);
+										ctx.moveTo(x, y + size);
+										ctx.lineTo(x - size, y - size);
+										ctx.lineTo(x + size, y - size);
+										break;
+									case 3:
+										size *= Math.sqrt(2);
+										ctx.moveTo(x - size, y);
+										ctx.lineTo(x, y - size);
+										ctx.lineTo(x + size, y);
+										ctx.lineTo(x, y + size);
+										break;
+								}
+								ctx.closePath();
+								ctx.fill();
 							});
 						});
 						ctx.restore();
+						ctx.lineWidth = 3;
+						ctx.textAlign = 'left';
+						bands.forEach(function (band, index) {
+							var size = 6;
+							var plotSize;
+							var split = w < 620;
+							var x = paddingLeft + size * 5 + 140 * (split ? index % 2 : index);
+							var y = paddingTop + h - size * (split && 1 < index ? 8 : 3);
+							ctx.strokeStyle = ctx.fillStyle = band.color;
+							ctx.beginPath();
+							ctx.moveTo(x - size * 3, y);
+							ctx.lineTo(x + size * 3, y);
+							ctx.stroke();
+							ctx.beginPath();
+							switch (index) {
+								case 0:
+									plotSize = size;
+									ctx.arc(x, y, plotSize, 0, Math.PI * 2);
+									break;
+								case 1:
+									plotSize = size;
+									ctx.moveTo(x - plotSize, y - plotSize);
+									ctx.lineTo(x - plotSize, y + plotSize);
+									ctx.lineTo(x + plotSize, y + plotSize);
+									ctx.lineTo(x + plotSize, y - plotSize);
+									break;
+								case 2:
+									plotSize = size * Math.sqrt(2);
+									ctx.moveTo(x, y - plotSize);
+									ctx.lineTo(x - plotSize, y + plotSize);
+									ctx.lineTo(x + plotSize, y + plotSize);
+									break;
+								case 3:
+									plotSize = size * Math.sqrt(2);
+									ctx.moveTo(x - plotSize, y);
+									ctx.lineTo(x, y - plotSize);
+									ctx.lineTo(x + plotSize, y);
+									ctx.lineTo(x, y + plotSize);
+									break;
+							}
+							ctx.closePath();
+							ctx.fill();
+							ctx.fillText(band.title, x + size * 4, y);
+						});
+						ctx.fillStyle = '#000000';
 						ctx.rotate(-0.5 * Math.PI);
 						ctx.textAlign = 'center';
 						ctx.fillText('counts cm  s', -0.5 * ch, 29);

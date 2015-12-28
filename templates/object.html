@@ -4,10 +4,10 @@
 <canvas data-graph></canvas>
 <p>Options</p>
 <ul>
-	<li data-checker="object.bands._2_20" on-click="object.toggleBand('_2_20')">2-20keV</li>
-	<li data-checker="object.bands._2_4" on-click="object.toggleBand('_2_4')">2-4keV</li>
-	<li data-checker="object.bands._4_10" on-click="object.toggleBand('_4_10')">4-10keV</li>
-	<li data-checker="object.bands._10_20" on-click="object.toggleBand('_10_20')">10-20keV</li>
+	<li data-checker="object.bands._2_20" on-click="object.toggleBand('_2_20')" style="color:rgb(255,40,0)">2-20keV</li>
+	<li data-checker="object.bands._2_4" on-click="object.toggleBand('_2_4')" style="color:rgb(53,161,107)">2-4keV</li>
+	<li data-checker="object.bands._4_10" on-click="object.toggleBand('_4_10')" style="color:rgb(0,65,255)">4-10keV</li>
+	<li data-checker="object.bands._10_20" on-click="object.toggleBand('_10_20')" style="color:rgb(154,0,121)">10-20keV</li>
 	<li class="ListItem_Counter">
 		<div>Bin (day)</div>
 		<button on-click="object.decrementBin()">−</button>
@@ -23,3 +23,6 @@
 		<div>{{value}}</div>
 	</li>
 </ul>
+<footer>
+	This page includes data available from <a ng-href="http://www.maxi.jaxa.jp/obs/agn_etc/data/{{object.name}}">http://www.maxi.jaxa.jp/obs/agn_etc/data/{{object.name}}</a>
+</footer>
