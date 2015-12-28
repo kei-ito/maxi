@@ -17,7 +17,7 @@
 			return [
 				'https://b8glyuhwhl.execute-api.ap-northeast-1.amazonaws.com/maxi_data',
 				'https://qaixecha8g.execute-api.ap-northeast-1.amazonaws.com/maxi_data_github',
-				'/api?url=' + encodeURIComponent('https://b8glyuhwhl.execute-api.ap-northeast-1.amazonaws.com/maxi_data')
+				'/api?url=https://b8glyuhwhl.execute-api.ap-northeast-1.amazonaws.com/maxi_data'
 			][index];
 		})(window.location, window.encodeURIComponent))
 		.constant('parseFloat', window.parseFloat)
