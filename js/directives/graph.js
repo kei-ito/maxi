@@ -389,6 +389,8 @@
 							ctx.fillText(band.title, x + size * 4, y);
 						});
 						ctx.fillStyle = '#000000';
+						ctx.textAlign = 'right';
+						ctx.fillText('UTC', cw - paddingRight, ch - paddingBottom + 30);
 						ctx.rotate(-0.5 * Math.PI);
 						ctx.textAlign = 'center';
 						ctx.fillText('counts cm  s', -0.5 * ch, 29);

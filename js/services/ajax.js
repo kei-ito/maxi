@@ -10,7 +10,7 @@
 			'$http', 'token', '$q', '$state', 'File', 'FormData', 'location', 'localStorage', 'encodeURIComponent',
 			function ($http, token, $q, $state, File, FormData, location, localStorage, encodeURIComponent) {
 				var developMode = location.hostname !== 'maxi.wemo.me';
-				function request(options, localOptions) {
+				function request(options, localOptions, useCache) {
 					var deferred = $q.defer();
 					var key;
 					var cache;
@@ -27,7 +27,7 @@
 						options.url = '/api?url=' + encodeURIComponent(options.url);
 					}
 					key = options.url;
-					cache = localStorage.getItem(key);
+					cache = useCache && localStorage.getItem(key);
 					if (cache) {
 						deferred.resolve(cache);
 					} else {
@@ -43,12 +43,12 @@
 					}
 					return deferred.promise;
 				}
-				function get(url, params, options) {
+				function get(url, params, options, useCache) {
 					return request({
 						url: url,
 						method: 'GET',
 						params: params
-					}, options);
+					}, options, useCache);
 				}
 				function post(url, data, options) {
 					return request({

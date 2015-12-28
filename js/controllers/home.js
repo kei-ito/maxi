@@ -23,7 +23,7 @@
 						viewModel.loading = true;
 						ajax.get(endpoint, null, {
 							transformResponse: transformList
-						}).then(function (result) {
+						}, true).then(function (result) {
 							viewModel.loading = false;
 							viewModel.list = cache.list = result.data;
 						});
