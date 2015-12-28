@@ -7,9 +7,8 @@
 		.angular
 		.module('a')
 		.factory('ajax', [
-			'$http', 'token', '$q', '$state', 'File', 'FormData', 'location', 'localStorage', 'encodeURIComponent',
-			function ($http, token, $q, $state, File, FormData, location, localStorage, encodeURIComponent) {
-				var developMode = ['maxi.wemo.me', 'kei-ito.github.io'].indexOf(location.hostname) < 0;
+			'$http', 'endpoint', 'token', '$q', '$state', 'File', 'FormData', 'localStorage', 'encodeURIComponent',
+			function ($http, endpoint, token, $q, $state, File, FormData, localStorage, encodeURIComponent) {
 				function request(options, localOptions, useCache) {
 					var deferred = $q.defer();
 					var key;
@@ -23,10 +22,8 @@
 					}
 					options.headers = options.headers || {};
 					options.headers['X-Token'] = token.get();
-					if (developMode) {
-						options.url = '/api?url=' + encodeURIComponent(options.url);
-					}
 					key = options.url;
+					options.url = endpoint + encodeURIComponent(options.url);
 					cache = useCache && localStorage.getItem(key);
 					if (cache) {
 						deferred.resolve(cache);

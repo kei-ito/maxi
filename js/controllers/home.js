@@ -7,8 +7,8 @@
 		.angular
 		.module('a')
 		.controller('homeCtrl', [
-			'ajax', 'transformList', 'endpoint', 'cache', '$timeout', 'localStorage', 'notify',
-			function (ajax, transformList, endpoint, cache, $timeout, localStorage, notify) {
+			'ajax', 'transformList', 'cache', '$timeout', 'localStorage', 'notify',
+			function (ajax, transformList, cache, $timeout, localStorage, notify) {
 				var viewModel = this;
 				viewModel.loading = true;
 				viewModel.clearCache = function () {
@@ -21,7 +21,7 @@
 						viewModel.loading = false;
 					} else {
 						viewModel.loading = true;
-						ajax.get(endpoint, null, {
+						ajax.get('/', null, {
 							transformResponse: transformList
 						}, true).then(function (result) {
 							viewModel.loading = false;

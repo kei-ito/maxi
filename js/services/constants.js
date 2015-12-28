@@ -9,7 +9,17 @@
 				$scope.$digest();
 			}
 		})
-		.constant('endpoint', 'https://b8glyuhwhl.execute-api.ap-northeast-1.amazonaws.com/maxi_data')
+		.constant('endpoint', (function (location, encodeURIComponent) {
+			var index = ['maxi.wemo.me', 'kei-ito.github.io'].indexOf(location.hostname);
+			if (index < 0) {
+				index = 2;
+			}
+			return [
+				'https://b8glyuhwhl.execute-api.ap-northeast-1.amazonaws.com/maxi_data',
+				'https://qaixecha8g.execute-api.ap-northeast-1.amazonaws.com/maxi_data_github',
+				'/api?url=' + encodeURIComponent('https://b8glyuhwhl.execute-api.ap-northeast-1.amazonaws.com/maxi_data')
+			][index];
+		})(window.location, window.encodeURIComponent))
 		.constant('parseFloat', window.parseFloat)
 		.constant('cache', {})
 		.constant('equals', angular.equals)

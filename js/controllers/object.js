@@ -7,11 +7,11 @@
 		.angular
 		.module('a')
 		.controller('objectCtrl', [
-			'ajax', '$state', 'endpoint', 'transformCSV', 'cache', 'transformList', '$scope', 'nop', 'copy',
-			function (ajax, $state, endpoint, transformCSV, cache, transformList, $scope, nop, copy) {
+			'ajax', '$state', 'transformCSV', 'cache', 'transformList', '$scope', 'nop', 'copy',
+			function (ajax, $state, transformCSV, cache, transformList, $scope, nop, copy) {
 				var viewModel = this;
 				var name = viewModel.name = $state.params.name;
-				var url = endpoint + '/' + name + '/' + name + '.txt';
+				var url = '/' + name + '/' + name + '.txt';
 				var find = function () {
 					cache.list.forEach(function (object) {
 						if (object.JNAME === name) {
@@ -70,9 +70,9 @@
 				if (cache.list) {
 					find();
 				} else {
-					ajax.get(endpoint, null, {
+					ajax.get('/', null, {
 						transformResponse: transformList
-					}).then(function (result) {
+					}, true).then(function (result) {
 						cache.list = result.data;
 						find();
 					});
