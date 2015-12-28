@@ -5,8 +5,8 @@
 		.angular
 		.module('a')
 		.directive('graph', [
-			'nop', 'Math',
-			function (nop, Math) {
+			'nop', 'Math', 'mjd2date', 'date2mjd', 'Date',
+			function (nop, Math, mjd2date, date2mjd, Date) {
 				function link(scope, element, attrs) {
 					var canvas = element[0];
 					var setSize = function () {
@@ -48,7 +48,7 @@
 						var min = [];
 						var max = [];
 						var currentBin;
-						data.forEach(function (item, index) {
+						data.forEach(function (item) {
 							var x = item[0];
 							var id = Math.floor(x / bin);
 							if (!currentBin || currentBin.id !== id) {
@@ -86,6 +86,109 @@
 						binnedData.max = max;
 						return binnedData;
 					};
+					var getDateGrid = function (min, max, n) {
+						var scale = (max - min) / n;
+						var offset;
+						var main = [];
+						var sub = [];
+						var y;
+						var m;
+						var d;
+						var date;
+						var initialize;
+						var increment;
+						var subIncrement;
+						min = mjd2date(min);
+						max = mjd2date(max);
+						offset = -min.getTimezoneOffset();
+						if (360 < scale) {
+							initialize = function () {
+								y = min.getUTCFullYear();
+								m = 0;
+								d = 1;
+							};
+							increment = function () {
+								y += 1;
+							};
+							subIncrement = function () {
+								m += 6;
+							};
+						} else if (180 < scale) {
+							initialize = function () {
+								y = min.getUTCFullYear();
+								m = 0;
+								d = 1;
+							};
+							increment = function () {
+								m += 6;
+							};
+							subIncrement = function () {
+								m += 1;
+							};
+						} else if (60 < scale) {
+							initialize = function () {
+								y = min.getUTCFullYear();
+								m = min.getUTCMonth();
+								d = 1;
+							};
+							increment = function () {
+								m += 1;
+							};
+							subIncrement = function () {
+								m += 0.5;
+							};
+						} else if (20 < scale) {
+							initialize = function () {
+								y = min.getUTCFullYear();
+								m = min.getUTCMonth();
+								d = min.getUTCDate();
+							};
+							increment = function () {
+								d += 20;
+							};
+							subIncrement = function () {
+								d += 5;
+							};
+						} else {
+							initialize = function () {
+								y = min.getUTCFullYear();
+								m = min.getUTCMonth();
+								d = min.getUTCDate();
+							};
+							increment = function () {
+								d += 5;
+							};
+							subIncrement = function () {
+								d += 1;
+							};
+						}
+						initialize();
+						date = new Date(y, m, d, 0, offset);
+						while (date < min) {
+							subIncrement();
+							date = new Date(y, m, d, 0, offset);
+						}
+						while (date < max) {
+							sub.push(date);
+							subIncrement();
+							date = new Date(y, m, d, 0, offset);
+						}
+						initialize();
+						date = new Date(y, m, d, 0, offset);
+						while (date < min) {
+							increment();
+							date = new Date(y, m, d, 0, offset);
+						}
+						while (date < max) {
+							main.push(date);
+							increment();
+							date = new Date(y, m, d, 0, offset);
+						}
+						return {
+							main: main,
+							sub: sub
+						};
+					};
 					var lastReceivedData;
 					var lastReceivedSettings;
 					var draw = function (ngEvent, data, settings) {
@@ -108,7 +211,6 @@
 						});
 						yMin = Math.min(0, yMin);
 						var grid = {
-							xScale: xMax - xMin,
 							y: 0,
 							yMin: 0,
 							yMainMin: 0,
@@ -119,7 +221,7 @@
 						var paddingTop = 20;
 						var innerPadding = 10;
 						var paddingRight = 20;
-						var paddingBottom = 30;
+						var paddingBottom = 70;
 						var paddingLeft = 60 - 24 * grid.yDigits;
 						var canvas = setSize();
 						var ctx = canvas.getContext('2d');
@@ -152,8 +254,16 @@
 							grid.yMainMin -= grid.yScale * 5;
 						}
 						grid.yMainMin += grid.yScale * 5;
-						ctx.strokeStyle = '#eeeeee';
-						ctx.textAlign = 'right';
+						ctx.strokeStyle = '#dddddd';
+						ctx.textAlign = 'center';
+						grid.x = getDateGrid(xMin, xMax, w / 300);
+						grid.x.sub.forEach(function (d) {
+							var x = paddingLeft + innerPadding + (date2mjd(d) - xMin) * xDiff;
+							ctx.beginPath();
+							ctx.moveTo(x, paddingBottom);
+							ctx.lineTo(x, paddingBottom + h);
+							ctx.stroke();
+						});
 						for (grid.y = grid.yMin; grid.y < yMax; grid.y += grid.yScale) {
 							grid.yy = paddingBottom + innerPadding + (grid.y - yMin) * yDiff;
 							ctx.beginPath();
@@ -162,6 +272,18 @@
 							ctx.stroke();
 						}
 						ctx.strokeStyle = '#aaaaaa';
+						grid.x.main.forEach(function (d) {
+							var x = paddingLeft + innerPadding + (date2mjd(d) - xMin) * xDiff;
+							ctx.beginPath();
+							ctx.moveTo(x, paddingBottom);
+							ctx.lineTo(x, paddingBottom + h);
+							ctx.stroke();
+							ctx.transform(1, 0, 0, -1, 0, ch);
+							ctx.fillText(d.getFullYear(), x, paddingTop + h + 20);
+							ctx.fillText((d.getMonth() + 1) + '.' + d.getDate(), x, paddingTop + h + 45);
+							ctx.transform(1, 0, 0, -1, 0, ch);
+						});
+						ctx.textAlign = 'right';
 						for (grid.y = grid.yMainMin; grid.y < yMax; grid.y += grid.yScale * 5) {
 							grid.yy = paddingBottom + innerPadding + (grid.y - yMin) * yDiff;
 							ctx.beginPath();

@@ -39,6 +39,14 @@
 				return call;
 			};
 		})(window.setTimeout))
+		.constant('mjd2date', function (x) {
+			var d = new window.Date();
+			d.setTime(86400000 * (x - 40587));
+			return d;
+		})
+		.constant('date2mjd', function (d) {
+			return 40587 + d.getTime() / 86400000;
+		})
 		.constant('debounce', (function (setTimeout, clearTimeout) {
 			return function (fn, delay, thisArg) {
 				var timer;
