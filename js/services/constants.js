@@ -13,6 +13,8 @@
 			var index = ['maxi.wemo.me', 'kei-ito.github.io'].indexOf(location.hostname);
 			if (index < 0) {
 				index = 2;
+			} else if (index === 1 && !/^https/.test(location.protocol)) {
+				location.protocol = 'https:';
 			}
 			return [
 				'https://b8glyuhwhl.execute-api.ap-northeast-1.amazonaws.com/maxi_data',
