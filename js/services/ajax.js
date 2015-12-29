@@ -23,7 +23,13 @@
 					options.headers = options.headers || {};
 					options.headers['X-Token'] = token.get();
 					key = options.url;
-					options.url = endpoint + options.url;
+					if (typeof endpoint === 'string') {
+						options.url = endpoint + options.url;
+					} else {
+						options.params = options.params || {};
+						options.params.url = endpoint.url + options.url;
+						options.url = endpoint.path;
+					}
 					cache = useCache && localStorage.getItem(key);
 					if (cache) {
 						deferred.resolve(cache);
