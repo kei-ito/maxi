@@ -4,6 +4,7 @@
 	var glob = require('glob');
 	var fs = require('fs');
 	var AWS = require('aws-sdk');
+	var mime = require('mime');
 	var s3 = new AWS.S3({
 		accessKeyId: process.env.AWS_ACCESS_KEY_ID,
 		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -37,7 +38,8 @@
 								Bucket: 'maxi.wemo.me',
 								Key: file,
 								Body: body,
-								ACL: 'public-read'
+								ACL: 'public-read',
+								ContentType: mime.lookup(file)
 							}, callback);
 						}
 					], callback);
