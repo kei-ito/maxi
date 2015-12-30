@@ -14,6 +14,7 @@
 		function (callback) {
 			var patterns = [
 				'*.html',
+				'favicon.ico',
 				'js/**/*.js',
 				'css/**/*.css',
 				'img/**/*.svg'
