@@ -1,0 +1,22 @@
+:root {
+    --fontSans: Computer Modern Sans, sans-serif;
+    --fontSerif: Computer Modern Serif, Times, serif;
+    --fontMonospace: Computer Modern Typewriter Light, Monaco, monospace;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+}
+
+h1 {
+    font-size: 130%;
+}
+
+h2 {
+    font-size: 110%;
+}
+
+h3 {
+    font-size: 100%;
+}

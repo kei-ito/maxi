@@ -13,7 +13,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lib/
-      Handler: index.indexHandler
+      Handler: index.handler
       Events:
         Index:
           # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -25,12 +25,12 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lib/
-      Handler: index.objectHandler
+      Handler: object.handler
       Events:
         Object:
           Type: Api
           Properties:
-            Path: /{id}
+            Path: /objects/{objectId}
             Method: get
 
 Outputs:

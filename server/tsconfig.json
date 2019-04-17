@@ -1,17 +1,8 @@
 {
+    "extends": "../tsconfig.json",
     "compilerOptions": {
-        "target": "esnext",
         "module": "commonjs",
         "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "strict": true,
-        "removeComments": true,
-        "declaration": true,
-        "sourceMap": true,
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
         "outDir": "./lib"
     },
     "include": [
