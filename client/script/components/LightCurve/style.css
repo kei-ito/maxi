@@ -1,4 +1,48 @@
-.canvas {
-    width: 100%;
-    height: 50vh;
+.svg {
+    display: block;
+    margin: 0 auto;
+    border: solid 1px blue;
+    break-inside: avoid;
+    transform: matrix(1,0,0,-1,0,0);
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.object:nth-child(7n+0) {
+    stroke: rgb(255, 0, 0);
+}
+
+.object:nth-child(7n+1) {
+    stroke: rgb(255, 153, 0);
+}
+
+.object:nth-child(7n+2) {
+    stroke: rgb(139, 214, 0);
+}
+
+.object:nth-child(7n+3) {
+    stroke: rgb(255, 153, 0);
+}
+
+.object:nth-child(7n+4) {
+    stroke: rgb(179, 255, 0);
+}
+
+.object:nth-child(7n+5) {
+    stroke: rgb(0, 255, 85);
+}
+
+.object:nth-child(7n+6) {
+    stroke: rgb(4, 0, 255);
+}
+
+.yLabel {
+    fill: currentColor;
+    stroke: none;
+    /* transform: `matrix(1,0,0,-1,${margin[3] * -0.5},${areaHeight * 0.5})`, */
+    transform: rotate(90deg);
 }

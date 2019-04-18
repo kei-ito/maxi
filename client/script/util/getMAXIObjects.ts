@@ -1,9 +1,10 @@
 import {APIBaseURL} from './constants';
 import {createError} from './createError';
 import {IMAXIObject, IMAXIObjectSource} from '../types';
+import {normalizeSearchText} from './normalizeSearchText';
 
 export const getMAXIObjects = async (): Promise<Array<IMAXIObject>> => {
-    const response = await fetch(`${APIBaseURL}`);
+    const response = await fetch(`${new URL('objects', APIBaseURL)}`);
     if (response.status !== 200) {
         throw createError(
             'FETCH_OBJECTS',
@@ -22,7 +23,7 @@ export const getMAXIObjects = async (): Promise<Array<IMAXIObject>> => {
             Dec: Number(Dec),
             L: Number(L),
             B: Number(B),
-            hash: params.join(',').toLowerCase(),
+            hash: normalizeSearchText(params.join('')),
         };
     });
 };

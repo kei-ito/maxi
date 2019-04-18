@@ -1,4 +1,4 @@
-export interface IError<TData> extends Error {
+export interface IError<TData = any> extends Error {
     code: string,
     data: TData,
 }
@@ -28,31 +28,37 @@ export interface IMAXIObject {
     hash: string,
 }
 
-export type IMAXIObjectBin = [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
+export type IMAXILightCurveBin = [
+    number, // MJD
+    number, // Flux  (2-20keV)
+    number, // Error (2-20keV)
+    number, // Flux  (2-4keV)
+    number, // Error (2-4keV)
+    number, // Flux  (4-10keV)
+    number, // Error (4-10keV)
+    number, // Flux  (10-20keV)
+    number, // Error (10-20keV)
 ];
 
-export type IMAXIObjectData = Array<IMAXIObjectBin>;
+export type IMAXILightCurveData = Array<IMAXILightCurveBin>;
+
+export interface IMAXIBinnedLightCurveData {
+    bins: IMAXILightCurveData,
+    minX: number,
+    maxX: number,
+    rangeX: number,
+    minY: number,
+    maxY: number,
+    rangeY: number,
+}
 
 export type IFont = 'Sans' | 'Serif' | 'Monospace';
 
-export const AvailableFonts: Array<IFont> = ['Serif', 'Sans', 'Monospace'];
-
 export interface IPreferences {
+    binSize: number,
     font: IFont,
+    scale: number,
 }
-
-export const getDefaultPreferences = (): IPreferences => ({
-    font: 'Serif',
-});
 
 export enum Modes {
     Default,

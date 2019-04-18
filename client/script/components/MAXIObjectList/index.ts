@@ -4,6 +4,7 @@ import {classnames} from '../../util/classnames';
 import {iterate} from '../../util/iterate';
 import {Loading} from '../Loading/index';
 import classes from './style.css';
+import {normalizeSearchText} from '../../util/normalizeSearchText';
 
 export interface IMAXIObjectListProps {
     loading: boolean,
@@ -19,14 +20,11 @@ export const createHeading = (
     key: number,
 ) => createElement(
     'tr',
-    {
-        key,
-        className: classes.thr,
-    },
+    {key},
     ...['ID', 'Name', 'RA', 'Dec', 'L', 'B', 'Category']
     .map((label) => createElement(
         'th',
-        {className: classnames(classes.cell, classes.th)},
+        null,
         label,
     )),
 );
@@ -34,9 +32,9 @@ export const createHeading = (
 export const getModeFromEvent = (
     event: PointerEvent | KeyboardEvent,
 ): Modes => {
-    if (event.shiftKey) {
-        return Modes.Range;
-    }
+    // if (event.shiftKey) {
+    //     return Modes.Range;
+    // }
     if (event.metaKey || event.ctrlKey) {
         return Modes.Append;
     }
@@ -56,33 +54,30 @@ export const MAXIObjectList = (
         rows.push(createElement(
             'tr',
             {
-                className: classnames(
-                    classes.tr,
-                    isSelected && classes.selected,
-                ),
-                key: rows.length,
-                tabIndex: 100 + index,
-                onClick: (event: PointerEvent<HTMLTableRowElement>) => {
+                'key': rows.length,
+                'tabIndex': 100 + index,
+                'onClick': (event: PointerEvent<HTMLTableRowElement>) => {
                     event.preventDefault();
                     props.onSelect(object, getModeFromEvent(event));
                 },
-                onKeyDown: (event: KeyboardEvent<HTMLTableRowElement>) => {
+                'onKeyDown': (event: KeyboardEvent<HTMLTableRowElement>) => {
                     if (event.key === 'Enter') {
                         props.onSelect(object, getModeFromEvent(event));
                     }
                 },
+                'data-selected': isSelected ? '' : null,
             },
-            createElement('td', {className: classnames(classes.cell,  classes.id)}, object.id),
+            createElement('td', {className: classes.id}, object.id),
             createElement(
                 'td',
-                {className: classnames(classes.cell, classes.name)},
+                {className: classes.name},
                 object.name,
             ),
-            createElement('td', {className: classnames(classes.cell, classes.number)}, object.RA.toFixed(3)),
-            createElement('td', {className: classnames(classes.cell, classes.number)}, object.Dec.toFixed(3)),
-            createElement('td', {className: classnames(classes.cell, classes.number)}, object.L.toFixed(3)),
-            createElement('td', {className: classnames(classes.cell, classes.number)}, object.B.toFixed(3)),
-            createElement('td', {className: classnames(classes.cell)}, object.category),
+            createElement('td', {className: classes.number}, object.RA.toFixed(3)),
+            createElement('td', {className: classes.number}, object.Dec.toFixed(3)),
+            createElement('td', {className: classes.number}, object.L.toFixed(3)),
+            createElement('td', {className: classes.number}, object.B.toFixed(3)),
+            createElement('td', null, object.category),
         ));
     });
     return createElement(
@@ -103,7 +98,8 @@ export const MAXIObjectList = (
                     type: 'text',
                     defaultValue: searchKeywords,
                     onChange: (event) => {
-                        setSearchKeywords(event.currentTarget.value.toLowerCase());
+                        const newSearchKeywords = normalizeSearchText(event.currentTarget.value);
+                        setSearchKeywords(newSearchKeywords);
                     },
                 },
             ),
@@ -114,7 +110,7 @@ export const MAXIObjectList = (
             props.loading && Loading({message: 'Loading objects...'}),
             createElement(
                 'table',
-                {className: classes.table},
+                null,
                 createElement('tbody', {children: rows}),
             ),
         ),
