@@ -6,7 +6,7 @@
         "build:server:cleanup": "rimraf server/lib",
         "build:server:tsc": "tsc --project server/tsconfig.json",
         "build:server": "run-s build:server:cleanup build:server:tsc",
-        "dev:server:tsc": "tsc --project server/tsconfig.json --watch",
+        "dev:server:tsc": "tsc --project server/tsconfig.json --watch --preserveWatchOutput",
         "dev:server": "run-p dev:server:*",
         "dev:start-server": "sam local start-api --region ap-northeast-1 --template server/template.yaml",
         "dev": "run-p dev:server dev:client"

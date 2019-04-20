@@ -1,3 +1,4 @@
+import {URL} from 'url';
 import {APIGatewayProxyHandler} from 'aws-lambda';
 import {request} from './util/request';
 import {asString} from './util/streamReader';
@@ -7,7 +8,8 @@ import {getTableFromHTML} from './util/getTableFromHTML';
 import {stringifyTable} from './util/stringifyTable';
 import {ITableLike} from './types';
 import {createErrorResponse} from './util/createErrorResponse';
-import {generateCORSHeaders} from './util/generateCORSHeaders';
+import {generateCommonHeaders} from './util/generateCommonHeaders';
+import {getTitleFromHTML} from './util/getTitleFromHTML';
 
 const removeHeading = <TType>(
     table: ITableLike<TType>,
@@ -28,8 +30,9 @@ const fillIdAndName = (
     ];
 };
 
-export const handler: APIGatewayProxyHandler = async (event, _context) => {
-    const response = await request('http://maxi.riken.jp/pubdata/v3/', asString);
+export const handler: APIGatewayProxyHandler = async (event, context) => {
+    const sourceURL = new URL('http://maxi.riken.jp/pubdata/v3/');
+    const response = await request(sourceURL, asString);
     if (response.statusCode !== 200) {
         return createErrorResponse(response);
     }
@@ -42,7 +45,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         statusCode: 200,
         headers: {
             ...filterHeadersForAPIGateway(response.headers),
-            ...generateCORSHeaders(event),
+            ...generateCommonHeaders(event, context, {
+                'x-source-title': getTitleFromHTML(response.body),
+                'x-source-url': `${sourceURL}`,
+            }),
             'content-length': body.length,
             'content-type': 'application/json; charset=utf-8',
             'cache-control': 'max-age=43200',

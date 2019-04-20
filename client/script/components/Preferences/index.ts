@@ -1,18 +1,20 @@
-import {createElement, FormEvent, useState, useEffect} from 'react';
+import {createElement, useState, useEffect, HTMLAttributes} from 'react';
 import {IPreferences} from '../../types';
 import {AvailableFonts} from '../../util/constants';
 import {filterBinSize, filterFont, filterScale} from '../../util/getDefaultPreferences';
 
-export interface IPreferencesProps {
+interface IPreferencesProps {
     preferences: IPreferences,
     onChange: (newPreferences: IPreferences) => void,
 }
 
-export interface IPreferencesFormElement extends HTMLFormElement {
+interface IPreferencesFormElement extends HTMLFormElement {
     font: HTMLInputElement,
     binSize: HTMLInputElement,
     scale: HTMLInputElement,
 }
+
+interface IPreferencesFormElementProps extends HTMLAttributes<IPreferencesFormElement> {}
 
 export const Preferences = (
     props: IPreferencesProps,
@@ -24,10 +26,10 @@ export const Preferences = (
         }, 300);
         return () => clearTimeout(timer);
     }, [preferences]);
-    return createElement(
+    return createElement<IPreferencesFormElementProps, IPreferencesFormElement>(
         'form',
         {
-            onChange: (event: FormEvent<IPreferencesFormElement>) => {
+            onChange: (event) => {
                 const formElement = event.currentTarget;
                 const font = filterFont(formElement.font.value);
                 formElement.font.value = font;

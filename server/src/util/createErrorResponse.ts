@@ -4,11 +4,15 @@ import {filterHeadersForAPIGateway} from './filterHeadersForAPIGateway';
 
 export const createErrorResponse = (
     response: http.IncomingMessage
-): APIGatewayProxyResult => ({
-    statusCode: response.statusCode || 500,
-    headers: {
-        ...filterHeadersForAPIGateway(response.headers),
-        'content-length': 0,
-    },
-    body: '',
-});
+): APIGatewayProxyResult => {
+    const body = `${response.statusCode} ${response.statusMessage}`;
+    console.log(response);
+    return {
+        statusCode: response.statusCode || 500,
+        headers: {
+            ...filterHeadersForAPIGateway(response.headers),
+            'content-length': body.length,
+        },
+        body,
+    };
+};

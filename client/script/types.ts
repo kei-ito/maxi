@@ -3,7 +3,11 @@ export interface IError<TData = any> extends Error {
     data: TData,
 }
 
-export type IMAXIObjectSource = [
+export interface IForEachable<TValue, TKey = string | number> {
+    forEach: (fn: (value: TValue, key: TKey) => void) => void,
+}
+
+export type IObjectSource = [
     string,
     string,
     string,
@@ -13,7 +17,7 @@ export type IMAXIObjectSource = [
     string,
 ];
 
-export interface IMAXIObject {
+export interface IObject {
     id: string,
     name: string,
     category: string,
@@ -28,7 +32,16 @@ export interface IMAXIObject {
     hash: string,
 }
 
-export type IMAXILightCurveBin = [
+export interface IResponseData {
+    sourceTitle: string | null,
+    sourceURL: string | null,
+    createdAt: Date,
+    elapsedSeconds: number,
+}
+
+export interface IObjectMap extends Map<string, IObject>, IResponseData {}
+
+export type ILightCurveBin = [
     number, // MJD
     number, // Flux  (2-20keV)
     number, // Error (2-20keV)
@@ -40,10 +53,23 @@ export type IMAXILightCurveBin = [
     number, // Error (10-20keV)
 ];
 
-export type IMAXILightCurveData = Array<IMAXILightCurveBin>;
+export interface ILightCurveData extends Array<ILightCurveBin>, IResponseData {}
 
-export interface IMAXIBinnedLightCurveData {
-    bins: IMAXILightCurveData,
+export type IBinnedLightCurveBin = [
+    number, // start MJD
+    number, // end MJD
+    number, // Flux  (2-20keV)
+    number, // Error (2-20keV)
+    number, // Flux  (2-4keV)
+    number, // Error (2-4keV)
+    number, // Flux  (4-10keV)
+    number, // Error (4-10keV)
+    number, // Flux  (10-20keV)
+    number, // Error (10-20keV)
+];
+
+export interface IBinnedLightCurveData {
+    bins: Array<IBinnedLightCurveBin>,
     minX: number,
     maxX: number,
     rangeX: number,

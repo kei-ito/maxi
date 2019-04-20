@@ -1,13 +1,13 @@
 import {useRef, useEffect, createElement, useState} from 'react';
 import classes from './style.css';
-// import {IMAXIObjectData, IMAXIObjectBin} from '../../types';
-import {IPreferences, IMAXIBinnedLightCurveData} from '../../types';
+// import {IObjectData, IObjectBin} from '../../types';
+import {IPreferences, IBinnedLightCurveData} from '../../types';
 import {ensureArray} from '../../util/ensureArray';
 
 export interface ILightCurveProps {
     preferences: IPreferences,
     object: string | Array<string>,
-    cache: Map<string, IMAXIBinnedLightCurveData>,
+    cache: Map<string, IBinnedLightCurveData>,
 }
 
 export const LightCurveCanvas = (

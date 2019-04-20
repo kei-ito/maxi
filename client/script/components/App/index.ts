@@ -1,34 +1,34 @@
 import {useState, createElement, useEffect, Fragment} from 'react';
-import {MAXIObjectList} from '../MAXIObjectList/index';
-import {getMAXIObjects} from '../../util/getMAXIObjects';
-import {alertError} from '../../util/alertError';
-import {IMAXIObject, Modes, IMAXILightCurveData, IError, IMAXIBinnedLightCurveData} from '../../types';
-import {Preferences} from '../Preferences/index';
-import {getItemsBetween} from '../../util/getItemsBetween';
-import {LightCurve} from '../LightCurve/index';
+import {getObjectMap} from '../../util/getObjectMap';
+import {Modes, ILightCurveData, IError, IBinnedLightCurveData, IObjectMap} from '../../types';
 import {getLightCurveData} from '../../util/getData';
 import {getBinnedLightCurveData} from '../../util/getBinnedLightCurveData';
 import {useCache} from '../../util/useCache';
-import {ensureArray} from '../../util/ensureArray';
 import {getDefaultPreferences} from '../../util/getDefaultPreferences';
 import {URLParameterKey} from '../../util/constants';
+import {ObjectList} from '../ObjectList/index';
+import {Preferences} from '../Preferences/index';
+import {LightCurve} from '../LightCurve/index';
+import {SearchForm} from '../SearchForm/index';
+import {normalizeSearchText} from '../../util/normalizeSearchText';
+import {isString} from '../../util/isString';
 
 export const App = () => {
     const [errors, setErrors] = useState<Array<IError | Error>>([]);
     const [preferences, setPreferences] = useState(getDefaultPreferences());
-    const [objects, setObjects] = useState(new Map<string, IMAXIObject>());
+    const [objectMap, setObjectMap] = useState<IObjectMap | null>(null);
+    const [searchWords, setSearchWords] = useState('');
     const [selected, setSelected] = useState<Array<string>>([]);
-    const [lastSelection, setLastSelection] = useState<string | null>(null);
     const [loading, setLoading] = useState(-1);
-    const lightCurveCache = useCache<IMAXILightCurveData>({
+    const onError = (error: Error) => {
+        setErrors(errors.concat(error));
+    };
+    const lightCurveCache = useCache<ILightCurveData>({
         keys: selected,
         getter: getLightCurveData,
-        onError: (error) => {
-            alertError(error);
-            setErrors(errors.concat(error));
-        },
+        onError,
     });
-    const binnedLightCurveCache = useCache<IMAXIBinnedLightCurveData>({
+    const binnedLightCurveCache = useCache<IBinnedLightCurveData>({
         keys: selected,
         getter: (objectId) => {
             const rawData = lightCurveCache.get(objectId);
@@ -37,34 +37,27 @@ export const App = () => {
             }
             return null;
         },
-        onError: (error) => {
-            alertError(error);
-            setErrors(errors.concat(error));
-        },
+        onError,
         dependencies: [preferences.binSize, lightCurveCache],
     });
 
     useEffect(() => {
-        if (loading === -1 && objects.size === 0) {
+        if (loading === -1 && !objectMap) {
             setLoading(1);
-            getMAXIObjects()
-            .then((newObjects) => {
-                const newMap = new Map(objects);
-                for (const object of newObjects) {
-                    newMap.set(object.id, object);
-                }
+            getObjectMap()
+            .then((newObjectMap) => {
                 const urlParameters = new URLSearchParams(location.search);
                 const requestedObjects = urlParameters.get(URLParameterKey.selected);
                 if (requestedObjects) {
                     setSelected(
                         requestedObjects.trim().split(/\s*,\s*/)
-                        .filter((objectId) => newMap.has(objectId)),
+                        .filter((objectId) => newObjectMap.has(objectId)),
                     );
                 }
-                setObjects(newMap);
+                setObjectMap(newObjectMap);
                 setLoading(0);
             })
-            .catch(alertError);
+            .catch(onError);
         }
     }, []);
 
@@ -82,6 +75,14 @@ export const App = () => {
         }
     }, [selected, preferences, loading]);
 
+    const plots: Array<Array<string | null>> = [selected];
+
+    if (1 < selected.length) {
+        selected.forEach((_, index1) => {
+            plots.push(selected.map((objectId, index2) => index1 === index2 ? objectId : null));
+        });
+    }
+
     return createElement(
         Fragment,
         null,
@@ -93,49 +94,83 @@ export const App = () => {
         createElement(
             'article',
             null,
-            createElement('h1', null, 'Object selector'),
-            createElement(MAXIObjectList, {
-                loading: loading !== 0,
-                objects,
-                selected,
-                onSelect: (object, mode) => {
-                    const newSelected = new Set(selected);
-                    let targetObjects: Array<IMAXIObject> = [];
-                    if (mode === Modes.Range && lastSelection) {
-                        targetObjects = getItemsBetween(lastSelection, object.id, objects.values());
-                    } else {
-                        targetObjects = [object];
-                        if (mode === Modes.Default) {
+            createElement('h1', null, [
+                'Object selector',
+                objectMap
+                ? `(${objectMap.size} object${objectMap.size === 0 ? '' : 's'})`
+                : '(Loading...)',
+            ].join(' ')),
+            createElement(
+                'figure',
+                null,
+                createElement(
+                    SearchForm,
+                    {
+                        label: 'Search for:',
+                        placeholder: 'All (Click here to change)',
+                        defaultValue: '',
+                        onChange: (words) => {
+                            setSearchWords(normalizeSearchText(words));
+                        },
+                    },
+                ),
+                createElement(ObjectList, {
+                    loading: loading !== 0,
+                    searchWords,
+                    objectMap,
+                    selected,
+                    onSelect: (object, mode) => {
+                        const newSelected = new Set(selected);
+                        const targetObjects = [object];
+                        if (mode !== Modes.Append) {
                             newSelected.clear();
                         }
-                    }
-                    if (newSelected.has(object.id)) {
-                        for (const {id} of targetObjects) {
-                            newSelected.delete(id);
+                        if (newSelected.has(object.id)) {
+                            for (const {id} of targetObjects) {
+                                newSelected.delete(id);
+                            }
+                        } else {
+                            for (const {id} of targetObjects) {
+                                newSelected.add(id);
+                            }
                         }
-                    } else {
-                        for (const {id} of targetObjects) {
-                            newSelected.add(id);
-                        }
-                    }
-                    setSelected(Array.from(newSelected).slice(-9));
-                    setLastSelection(object.id);
-                },
-            }),
-            createElement('h1', null, `Light curve of the selected${selected.length === 1 ? '' : ` ${selected.length}`} object${selected.length === 1 ? '' : 's'}`),
-            ...(1 < selected.length ? [selected, ...selected] : selected)
-            .map((object, index) => createElement(
+                        setSelected(Array.from(newSelected).slice(-9));
+                    },
+                }),
+                createElement(
+                    'figcaption',
+                    null,
+                    'List of available objects ',
+                    createElement('a', {href: '#List'}, '[1]'),
+                    '.',
+                ),
+            ),
+            createElement('h1', null, `Light curves for the selected${selected.length === 1 ? '' : ` ${selected.length}`} object${selected.length === 1 ? '' : 's'}`),
+            ...plots.map((objects) => createElement(
                 'figure',
                 null,
                 createElement(LightCurve, {
                     preferences,
-                    object,
+                    objects,
                     cache: binnedLightCurveCache,
                 }),
                 createElement(
                     'figcaption',
                     null,
-                    `Fig.${index + 1} Light curve of ${ensureArray(object).join(', ')}. 1 bin = ${preferences.binSize} day${preferences.binSize === 1 ? '' : 's'}.`,
+                    'Light curve for ',
+                    ...objects
+                    .filter(isString)
+                    .map((objectId, index) => createElement(
+                        Fragment,
+                        null,
+                        `${index === 0 ? '' : ', '}${objectId} `,
+                        createElement(
+                            'a',
+                            {href: `#Source-${objectId}`},
+                            `[${selected.indexOf(objectId) + 2}]`,
+                        ),
+                    )),
+                    '.',
                 ),
             )),
             createElement('h1', null, 'Preferences'),
@@ -144,15 +179,50 @@ export const App = () => {
                 onChange: setPreferences,
             }),
             createElement('h1', null, 'References'),
-            ...(
-                errors.length === 0
-                ? []
-                : [createElement('h1', null, 'Errors')].concat(
-                    ...errors.map((error) => [
-                        createElement('h2', null, error.message),
-                        createElement('pre', null, error.stack),
-                    ]),
-                )
+            createElement(
+                'ol',
+                null,
+                objectMap && createElement(
+                    'li',
+                    {id: 'List'},
+                    `${objectMap.sourceTitle}, `,
+                    createElement(
+                        'a',
+                        {
+                            href: objectMap.sourceURL,
+                            target: '_blank',
+                        },
+                        objectMap.sourceURL,
+                    ),
+                ),
+                ...selected.map((objectId) => {
+                    const data = lightCurveCache.get(objectId);
+                    if (!data) {
+                        return null;
+                    }
+                    return createElement(
+                        'li',
+                        {id: `Source-${objectId}`},
+                        `${data.sourceTitle}, `,
+                        createElement(
+                            'a',
+                            {
+                                href: data.sourceURL,
+                                target: '_blank',
+                            },
+                            data.sourceURL,
+                        ),
+                    );
+                }),
+            ),
+            0 < errors.length && createElement(
+                Fragment,
+                null,
+                createElement('h1', null, 'Errors'),
+                ...errors.map((error) => [
+                    createElement('h2', null, error.message),
+                    createElement('pre', null, error.stack),
+                ]),
             ),
         ),
     );

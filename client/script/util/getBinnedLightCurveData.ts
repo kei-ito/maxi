@@ -1,4 +1,4 @@
-import {IMAXILightCurveData, IMAXILightCurveBin, IMAXIBinnedLightCurveData} from '../types';
+import {ILightCurveBin, IBinnedLightCurveData, IBinnedLightCurveBin} from '../types';
 import {getBinId} from './getBinId';
 
 export const accumulateAB = (
@@ -22,8 +22,9 @@ export const getBin = (
     B4_10: number,
     A10_20: number,
     B10_20: number,
-): IMAXILightCurveBin => [
-    (leftMJD + rightMJD) * 0.5,
+): IBinnedLightCurveBin => [
+    leftMJD || (rightMJD - 1),
+    rightMJD,
     B2_20 / A2_20,
     A2_20 ** -0.5,
     B2_4 / A2_4,
@@ -35,10 +36,10 @@ export const getBin = (
 ];
 
 export const getBinnedLightCurveData = async (
-    data: IMAXILightCurveData,
+    data: Array<ILightCurveBin>,
     binSize: number,
-): Promise<IMAXIBinnedLightCurveData> => {
-    const bins: IMAXILightCurveData = [];
+): Promise<IBinnedLightCurveData> => {
+    const bins: Array<IBinnedLightCurveBin> = [];
     let minX = Infinity;
     let maxX = 0;
     let minY = Infinity;
@@ -56,10 +57,10 @@ export const getBinnedLightCurveData = async (
         B10_20: number,
     ) => {
         const newBin = getBin(leftMJD, rightMJD, A2_20, B2_20, A2_4, B2_4, A4_10, B4_10, A10_20, B10_20);
-        minX = Math.min(minX, leftMJD);
-        maxX = Math.max(maxX, rightMJD);
-        minY = Math.min(minY, newBin[1] - newBin[2]);
-        maxY = Math.max(maxY, newBin[1] + newBin[2]);
+        minX = Math.min(minX, newBin[0]);
+        maxX = Math.max(maxX, newBin[1]);
+        minY = Math.min(minY, newBin[2] - newBin[3]);
+        maxY = Math.max(maxY, newBin[2] + newBin[3]);
         bins.push(newBin);
     };
     const {length} = data;
@@ -76,9 +77,9 @@ export const getBinnedLightCurveData = async (
     let currentBinId: number = -1;
     for (let index = 1; index < length; index++) {
         const bin = data[index];
-        const binId = getBinId(rightMJD, binSize);
-        rightMJD = bin[0];
+        const binId = getBinId(bin[0], binSize);
         if (binId === currentBinId) {
+            rightMJD = bin[0] + 0.5;
             [A2_20, B2_20]   = accumulateAB(bin[1], bin[2], A2_20, B2_20);
             [A2_4, B2_4]     = accumulateAB(bin[3], bin[4], A2_4, B2_4);
             [A4_10, B4_10]   = accumulateAB(bin[5], bin[6], A4_10, B4_10);
@@ -87,12 +88,13 @@ export const getBinnedLightCurveData = async (
             if (0 <= currentBinId) {
                 addBin(leftMJD, rightMJD, A2_20, B2_20, A2_4, B2_4, A4_10, B4_10, A10_20, B10_20);
             }
+            currentBinId = binId;
+            leftMJD = bin[0] - 0.5;
+            rightMJD = leftMJD + 1;
             [A2_20, B2_20]   = accumulateAB(bin[1], bin[2], 0, 0);
             [A2_4, B2_4]     = accumulateAB(bin[3], bin[4], 0, 0);
             [A4_10, B4_10]   = accumulateAB(bin[5], bin[6], 0, 0);
             [A10_20, B10_20] = accumulateAB(bin[7], bin[8], 0, 0);
-            leftMJD = rightMJD;
-            currentBinId = binId;
         }
     }
     addBin(leftMJD, rightMJD, A2_20, B2_20, A2_4, B2_4, A4_10, B4_10, A10_20, B10_20);

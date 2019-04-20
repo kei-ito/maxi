@@ -1,0 +1,35 @@
+.container {
+    position: relative;
+    height: 200px;
+    max-height: 40vh;
+    width: 100%;
+    overflow: auto;
+    border: solid currentColor 1px;
+    border-width: 1px 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+td.id {
+    font-family: var(--fontMonospace);
+}
+
+td.number {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+@media print {
+    .container {
+        display: block;
+        height: auto;
+    }
+    .tableWrap {
+        max-height: none;
+    }
+    .tableWrap tr:not([data-selected]) {
+        display: none;
+    }
+    .tableWrap tr:first-child {
+        display: table-row;
+    }
+}

@@ -7,9 +7,10 @@ import {filterHeadersForAPIGateway} from './util/filterHeadersForAPIGateway';
 import {stringifyTable} from './util/stringifyTable';
 import {ssv2js} from './util/xsvToJSON';
 import {createErrorResponse} from './util/createErrorResponse';
-import {generateCORSHeaders} from './util/generateCORSHeaders';
+import {generateCommonHeaders} from './util/generateCommonHeaders';
+import {getTitleFromHTML} from './util/getTitleFromHTML';
 
-export const handler: APIGatewayProxyHandler = async (event, _context) => {
+export const handler: APIGatewayProxyHandler = async (event, context) => {
     const objectId = event.pathParameters && event.pathParameters.objectId;
     if (!objectId) {
         return {
@@ -18,7 +19,8 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         };
     }
     const baseURL = new URL(`http://maxi.riken.jp/star_data/${objectId}/`);
-    const response1 = await request(new URL(`${objectId}.html`, baseURL), asString);
+    const sourceURL = new URL(`${objectId}.html`, baseURL);
+    const response1 = await request(sourceURL, asString);
     if (response1.statusCode !== 200) {
         return createErrorResponse(response1);
     }
@@ -33,7 +35,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         statusCode: 200,
         headers: {
             ...filterHeadersForAPIGateway(response2.headers),
-            ...generateCORSHeaders(event),
+            ...generateCommonHeaders(event, context, {
+                'x-source-title': getTitleFromHTML(response1.body),
+                'x-source-url': `${sourceURL}`,
+            }),
             'content-length': body.length,
             'content-type': 'application/json; charset=utf-8',
             'cache-control': 'max-age=43200',

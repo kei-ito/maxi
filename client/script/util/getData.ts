@@ -1,10 +1,11 @@
 import {APIBaseURL} from './constants';
 import {createError} from './createError';
-import {IMAXILightCurveData} from '../types';
+import {ILightCurveData, ILightCurveBin} from '../types';
+import {extractResponseData} from './extractResponseData';
 
 export const getLightCurveData = async (
     objectId: string,
-): Promise<IMAXILightCurveData> => {
+): Promise<ILightCurveData> => {
     const response = await fetch(`${new URL(`objects/${objectId}`, APIBaseURL)}`);
     if (response.status !== 200) {
         throw createError(
@@ -13,6 +14,6 @@ export const getLightCurveData = async (
             response,
         );
     }
-    const data = await response.json() as IMAXILightCurveData;
-    return data;
+    const data = await response.json() as Array<ILightCurveBin>;
+    return Object.assign(data, extractResponseData(response));
 };

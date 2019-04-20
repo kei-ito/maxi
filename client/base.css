@@ -26,7 +26,7 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2em 0 1em 0;
+    padding: 2em 0 1.5em 0;
 }
 
 header h1 {
@@ -59,7 +59,7 @@ h3 {
 article {
     width: 94%;
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0 auto 4em auto;
     counter-reset: h1;
 }
 
@@ -172,4 +172,22 @@ td,th {
 
 th {
     padding: 0.7ex 1ex 0.5ex 1ex;
+}
+
+figure {
+    overflow: hidden;
+    counter-increment: figure;
+}
+
+figcaption::before {
+    content: 'Fig.' counter(figure) ' ';
+}
+
+a {
+    word-break: break-all;
+}
+
+text {
+    fill: currentColor;
+    stroke: none;
 }

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const url_1 = require("url");
 const request_1 = require("./util/request");
 const streamReader_1 = require("./util/streamReader");
 const getMatchedStrings_1 = require("./util/getMatchedStrings");
@@ -7,7 +8,8 @@ const filterHeadersForAPIGateway_1 = require("./util/filterHeadersForAPIGateway"
 const getTableFromHTML_1 = require("./util/getTableFromHTML");
 const stringifyTable_1 = require("./util/stringifyTable");
 const createErrorResponse_1 = require("./util/createErrorResponse");
-const generateCORSHeaders_1 = require("./util/generateCORSHeaders");
+const generateCommonHeaders_1 = require("./util/generateCommonHeaders");
+const getTitleFromHTML_1 = require("./util/getTitleFromHTML");
 const removeHeading = (table) => table.slice(1);
 const fillIdAndName = (row) => {
     const [id, name] = getMatchedStrings_1.getMatchedStrings(row[1], /href="([\w+-]*?)\/[^>]*>([^<]*?)</g);
@@ -21,8 +23,9 @@ const fillIdAndName = (row) => {
         row[5],
     ];
 };
-exports.handler = async (event, _context) => {
-    const response = await request_1.request('http://maxi.riken.jp/pubdata/v3/', streamReader_1.asString);
+exports.handler = async (event, context) => {
+    const sourceURL = new url_1.URL('http://maxi.riken.jp/pubdata/v3/');
+    const response = await request_1.request(sourceURL, streamReader_1.asString);
     if (response.statusCode !== 200) {
         return createErrorResponse_1.createErrorResponse(response);
     }
@@ -33,7 +36,10 @@ exports.handler = async (event, _context) => {
     const body = stringifyTable_1.stringifyTable(removeHeading(table).map(fillIdAndName));
     return {
         statusCode: 200,
-        headers: Object.assign({}, filterHeadersForAPIGateway_1.filterHeadersForAPIGateway(response.headers), generateCORSHeaders_1.generateCORSHeaders(event), { 'content-length': body.length, 'content-type': 'application/json; charset=utf-8', 'cache-control': 'max-age=43200' }),
+        headers: Object.assign({}, filterHeadersForAPIGateway_1.filterHeadersForAPIGateway(response.headers), generateCommonHeaders_1.generateCommonHeaders(event, context, {
+            'x-source-title': getTitleFromHTML_1.getTitleFromHTML(response.body),
+            'x-source-url': `${sourceURL}`,
+        }), { 'content-length': body.length, 'content-type': 'application/json; charset=utf-8', 'cache-control': 'max-age=43200' }),
         body,
     };
 };

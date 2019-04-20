@@ -20,9 +20,8 @@ export const useCache = <TValue, TKey = string>(
                 Promise.resolve(props.getter(key))
                 .then((value) => {
                     if (value !== null) {
-                        const newCache = new Map(cache);
-                        newCache.set(key, value);
-                        updateCache(newCache);
+                        cache.set(key, value);
+                        updateCache(new Map(cache));
                     }
                 })
                 .catch(props.onError)
@@ -32,9 +31,11 @@ export const useCache = <TValue, TKey = string>(
             }
         }
     }, [props.keys, clearCount]);
-    useEffect(() => {
-        cache.clear();
-        setClearCount(clearCount + 1);
-    }, props.dependencies || []);
+    if (props.dependencies) {
+        useEffect(() => {
+            cache.clear();
+            setClearCount(clearCount + 1);
+        }, props.dependencies);
+    }
     return cache;
 };
