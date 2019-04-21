@@ -1,9 +1,48 @@
 import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment} from 'react';
 import classes from './style.css';
-// import {IObjectData, IObjectBin} from '../../types';
 import {IPreferences, IBinnedLightCurveData} from '../../types';
 import {isString} from '../../util/isString';
 import {getTicks} from '../../util/getTicks';
+import {getDateTicks} from '../../util/getDateTicks';
+import {mjdToDate, dateToMJD} from '../../util/mjd';
+import {classnames} from '../../util/classnames';
+
+export const createTextPositionFixer = (
+    index: number,
+    length: number,
+    margin: [number, number, number, number],
+) => {
+    if (index === 0) {
+        return (element: SVGTextElement | null) => {
+            if (!element) {
+                return;
+            }
+            const parent = element.parentElement;
+            if (!parent) {
+                return;
+            }
+            const x = Number(element.getAttribute('data-x'));
+            const minX = margin[3] + element.getBoundingClientRect().width * 0.5;
+            element.setAttribute('x', `${Math.max(x, minX)}`);
+        };
+    }
+    if (index === length - 1) {
+        return (element: SVGTextElement | null) => {
+            if (!element) {
+                return;
+            }
+            const parent = element.parentElement;
+            if (!parent) {
+                return;
+            }
+            const x = Number(element.getAttribute('data-x'));
+            const right = x + element.getBoundingClientRect().width * 0.5;
+            const d = parent.getBoundingClientRect().width - right;
+            element.setAttribute('x', `${Math.min(x, x + d)}`);
+        };
+    }
+    return null;
+};
 
 export interface ILightCurveProps {
     preferences: IPreferences,
@@ -17,6 +56,7 @@ export const LightCurve = (
     const svgRef = useRef<HTMLCanvasElement>(null);
     const [width, setWidth] = useState(1);
     const [height, setHeight] = useState(1);
+    const [dx, setDx] = useState(0);
 
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -59,8 +99,8 @@ export const LightCurve = (
         if (isString(id)) {
             const data = props.cache.get(id);
             if (data) {
-                minX = Math.min(minX, data.minX);
-                maxX = Math.max(maxX, data.maxX);
+                minX = Math.min(minX, data.minX) + dx;
+                maxX = Math.max(maxX, data.maxX) + dx;
                 minY = Math.min(minY, data.minY);
                 maxY = Math.max(maxY, data.maxY);
                 plots.push({id, data, index});
@@ -68,7 +108,7 @@ export const LightCurve = (
         }
     });
 
-    const margin = [10, 10, 40, 40];
+    const margin: [number, number, number, number] = [18, 0.5, 18, 45];
     const areaWidth = width - margin[1] - margin[3];
     const areaHeight = height - margin[2] - margin[0];
     const rangeX = maxX - minX;
@@ -79,6 +119,17 @@ export const LightCurve = (
     const y0 = height - margin[2];
     const X = (mjd: number) => x0 + scaleX * (mjd - minX);
     const Y = (flux: number) => y0 - scaleY * (flux - minY);
+    const isReady = 0 < scaleX && 0 < scaleY;
+
+    const xTicks = isReady ? getTicks(minX, maxX, areaWidth / 160) : null;
+    const xDateTicks = isReady ? getDateTicks(mjdToDate(minX), mjdToDate(maxX), areaWidth / 160) : null;
+    const yTicks = isReady ? getTicks(minY, maxY, areaHeight / 100) : null;
+
+    const left = X(minX);
+    const right = X(maxX);
+    const top = Y(maxY);
+    const bottom = Y(minY);
+    const centerY = (top + bottom) * 0.5;
 
     return createElement(
         'svg',
@@ -88,63 +139,128 @@ export const LightCurve = (
             className: classes.svg,
             ref: svgRef,
             viewBox: `0 0 ${width} ${height}`,
+            onWheel: (event) => {
+                if (event.shiftKey) {
+                    setDx(dx + event.deltaY);
+                }
+            },
         },
-        0 < scaleX * scaleY && createElement(
+        isReady && createElement(
             Fragment,
             null,
             createElement(
-                'path',
-                {d: `M${X(minX)},${Y(maxY)}V${Y(minY)}H${X(maxX)}`},
+                'text',
+                {
+                    className: classnames(classes.alignTop, classes.alignCenter),
+                    x: 3,
+                    y: centerY,
+                    transform: `rotate(-90, 3,${centerY})`,
+                },
+                'Photons cm',
+                createElement('tspan', {dy: -3}, '-2'),
+                createElement('tspan', {dy: +3}, ' s'),
+                createElement('tspan', {dy: -3}, '-1'),
             ),
             createElement(
-                'text',
+                'path',
                 {
-                    x: X((maxX + minX) * 0.5),
-                    y: Y(minY),
-                    className: classes.yLabel,
+                    d: [
+                        `M${left},${bottom}`,
+                        ...(yTicks ? yTicks.sub.map((flux, index) => {
+                            const tickSize = (index - yTicks.stepOffset) % yTicks.step === 0 ? 10 : 5;
+                            return `V${Y(flux)}h${tickSize}h${-tickSize}`;
+                        }) : []),
+                        `V${top}`,
+                        ...(xDateTicks ? xDateTicks.sub.map((date, index) => {
+                            const tickSize = (index - xDateTicks.stepOffset) % xDateTicks.step === 0 ? 10 : 5;
+                            return `H${X(dateToMJD(date))}v${tickSize}v${-tickSize}`;
+                        }) : []),
+                        `H${right}`,
+                        `V${bottom}`,
+                        ...(xTicks ? xTicks.sub.map((mjd, index) => {
+                            const tickSize = (index - xTicks.stepOffset) % xTicks.step === 0 ? 10 : 5;
+                            return `H${X(mjd)}v${-tickSize}v${tickSize}`;
+                        }).reverse() : []),
+                        'z',
+                    ].join(''),
                 },
-                `Count ${width}x${height}`
             ),
-            ...getTicks(minX, maxX).map((mjd) => createElement(
-                'text',
-                {
-                    x: X(mjd),
-                    y: Y(minY) + margin[2] * 0.5,
-                },
-                `${mjd.toFixed(0)}`,
-            )),
+        ),
+        yTicks && createElement(
+            Fragment,
+            null,
+            ...yTicks.main.map((flux) => {
+                return createElement(
+                    'text',
+                    {
+                        className: classnames(classes.alignMiddle, classes.alignRight),
+                        x: left - 4,
+                        y: Y(flux),
+                    },
+                    `${flux.toFixed(1)}`,
+                );
+            }),
+        ),
+        xTicks && createElement(
+            Fragment,
+            null,
+            ...xTicks.main.map((mjd, index) => {
+                const x = X(mjd);
+                return createElement(
+                    'text',
+                    {
+                        'data-x': x,
+                        'className': classnames(classes.alignTop, classes.alignCenter),
+                        'x': x,
+                        'y': bottom + 4,
+                        'ref': createTextPositionFixer(index, xTicks.main.length, margin),
+                    },
+                    `${mjd.toFixed(0)}`,
+                );
+            }),
+        ),
+        xDateTicks && createElement(
+            Fragment,
+            null,
+            ...xDateTicks.main.map((date, index) => {
+                const x = X(dateToMJD(date));
+                return createElement(
+                    'text',
+                    {
+                        'data-x': x,
+                        'className': classnames(classes.alignBottom, classes.alignCenter),
+                        'x': x,
+                        'y': top - 4,
+                        'ref': createTextPositionFixer(index, xDateTicks.main.length, margin),
+                    },
+                    `${xDateTicks.toString(date)}`,
+                );
+            }),
         ),
         ...plots.map(({id, data, index}) => {
             const elements: Array<ReactSVGElement> = [];
-            data.bins.forEach(([leftMJD, rightMJD, flux, error]) => {
-                const xL = X(leftMJD);
-                const xR = X(rightMJD);
+            data.bins.forEach((bin) => {
+                const xL = X(bin[0]);
+                const xR = X(bin[1]);
                 const x = (xL + xR) * 0.5;
-                const y = Y(flux);
-                const e = error * scaleY;
-                elements.push(createElement(
-                    'path',
-                    {
-                        key: elements.length,
-                        d: `M${x},${y - e}V${y + e}`,
-                    },
-                ));
-                elements.push(createElement(
-                    'path',
-                    {
-                        key: elements.length,
-                        d: `M${xL},${y}H${xR}`,
-                    },
-                ));
-                // elements.push(createElement(
-                //     'circle',
-                //     {
-                //         key: elements.length,
-                //         cx: x,
-                //         cy: y,
-                //         r: 1,
-                //     },
-                // ));
+                for (let index = 2; index < 9; index += 2) {
+                    const y = Y(bin[index]);
+                    const e = bin[index + 1] * scaleY;
+                    elements.push(createElement(
+                        'path',
+                        {
+                            key: elements.length,
+                            d: `M${x},${y - e}V${y + e}`,
+                        },
+                    ));
+                    elements.push(createElement(
+                        'path',
+                        {
+                            key: elements.length,
+                            d: `M${xL},${y}H${xR}`,
+                        },
+                    ));
+                }
             });
             return createElement(
                 'g',

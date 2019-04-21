@@ -98,14 +98,6 @@ figure {
     margin: 1em auto;
 }
 
-canvas {
-    width: 100%;
-}
-
-figcaption {
-    margin-top: 0.5em;
-}
-
 table {
     width: 100%;
     margin: 0 auto;
@@ -177,6 +169,18 @@ th {
 figure {
     overflow: hidden;
     counter-increment: figure;
+}
+
+figure+figure {
+    margin-top: 2em;
+}
+
+canvas {
+    width: 100%;
+}
+
+figcaption {
+    margin-top: 0.8em;
 }
 
 figcaption::before {

@@ -91,3 +91,27 @@ export enum Modes {
     Append,
     Range,
 };
+
+export interface ITickData {
+    step: number,
+    stepOffset: number,
+    subScale: number,
+    firstSub: number,
+    mainScale: number,
+    firstMain: number,
+}
+
+export interface ITicks {
+    step: number,
+    stepOffset: number,
+    sub: Array<number>,
+    main: Array<number>,
+}
+
+export interface IDateTicks {
+    step: number,
+    stepOffset: number,
+    sub: Array<Date>,
+    main: Array<Date>,
+    toString: (date: Date) => string,
+}

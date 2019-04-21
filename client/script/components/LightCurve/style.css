@@ -1,5 +1,6 @@
 .svg {
     display: block;
+    width: 100%;
     margin: 0 auto;
     font-size: 90%;
     break-inside: avoid;
@@ -7,9 +8,31 @@
     stroke-linecap: round;
     stroke-linejoin: round;
     fill: none;
+    box-sizing: border-box;
+}
+
+.alignBottom {
+    dominant-baseline: baseline;
+}
+
+.alignMiddle {
+    dominant-baseline: middle;
+}
+
+.alignTop {
+    dominant-baseline: hanging;
+}
+
+.alignLeft {
+    text-anchor: start;
+}
+
+.alignCenter {
     text-anchor: middle;
-    dominant-baseline: alphabetic;
-    background-color: rgb(151, 255, 250);
+}
+
+.alignRight {
+    text-anchor: end;
 }
 
 .object[data-color='0'] {
