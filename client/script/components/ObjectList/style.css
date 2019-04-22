@@ -18,6 +18,10 @@ td.number {
     font-variant-numeric: tabular-nums;
 }
 
+.loading {
+    top: 30px;
+}
+
 @media print {
     .container {
         display: block;

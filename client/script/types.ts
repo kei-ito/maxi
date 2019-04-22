@@ -73,9 +73,9 @@ export interface IBinnedLightCurveData {
     minX: number,
     maxX: number,
     rangeX: number,
-    minY: number,
-    maxY: number,
-    rangeY: number,
+    minY: [number, number, number, number],
+    maxY: [number, number, number, number],
+    rangeY: [number, number, number, number],
 }
 
 export type IFont = 'Sans' | 'Serif' | 'Monospace';
@@ -85,12 +85,6 @@ export interface IPreferences {
     font: IFont,
     scale: number,
 }
-
-export enum Modes {
-    Default,
-    Append,
-    Range,
-};
 
 export interface ITickData {
     step: number,
@@ -115,3 +109,23 @@ export interface IDateTicks {
     main: Array<Date>,
     toString: (date: Date) => string,
 }
+
+export enum Mode {
+    Default,
+    Append,
+    Range,
+};
+
+export enum Band {
+    $2_20 = 0,
+    $2_4 = 1,
+    $4_10 = 2,
+    $10_20 = 3,
+};
+
+export const BandTitles = {
+    [Band.$2_20]: '2-20keV',
+    [Band.$2_4]: '2-4keV',
+    [Band.$4_10]: '4-10keV',
+    [Band.$10_20]: '10-20keV',
+};

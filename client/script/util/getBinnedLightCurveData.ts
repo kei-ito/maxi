@@ -42,8 +42,8 @@ export const getBinnedLightCurveData = async (
     const bins: Array<IBinnedLightCurveBin> = [];
     let minX = Infinity;
     let maxX = 0;
-    let minY = Infinity;
-    let maxY = 0;
+    const minY: [number, number, number, number] = [Infinity, Infinity, Infinity, Infinity];
+    const maxY: [number, number, number, number] = [0, 0, 0, 0];
     const addBin = (
         leftMJD: number,
         rightMJD: number,
@@ -59,8 +59,12 @@ export const getBinnedLightCurveData = async (
         const newBin = getBin(leftMJD, rightMJD, A2_20, B2_20, A2_4, B2_4, A4_10, B4_10, A10_20, B10_20);
         minX = Math.min(minX, newBin[0]);
         maxX = Math.max(maxX, newBin[1]);
-        minY = Math.min(minY, newBin[2] - newBin[3]);
-        maxY = Math.max(maxY, newBin[2] + newBin[3]);
+        for (let index = 0; index < 4; index++) {
+            const flux = newBin[index * 2 + 2];
+            const error = newBin[index * 2 + 3];
+            minY[index] = Math.min(minY[index], flux - error);
+            maxY[index] = Math.max(maxY[index], flux + error);
+        }
         bins.push(newBin);
     };
     const {length} = data;
@@ -105,6 +109,11 @@ export const getBinnedLightCurveData = async (
         rangeX: maxX - minX,
         minY,
         maxY,
-        rangeY: maxY - minY,
+        rangeY: [
+            maxY[0] - minY[0],
+            maxY[1] - minY[1],
+            maxY[2] - minY[2],
+            maxY[3] - minY[3],
+        ],
     };
 };

@@ -35,35 +35,35 @@
     text-anchor: end;
 }
 
-.object[data-color='0'] {
-    stroke: rgb(255, 0, 0);
+[data-band='2-20keV']>.plot {
+    stroke: black;
 }
 
-.object[data-color='1'] {
-    stroke: rgb(255, 153, 0);
+[data-band='2-4keV']>.plot {
+    stroke: red;
 }
 
-.object[data-color='2'] {
-    stroke: rgb(139, 214, 0);
+[data-band='4-10keV']>.plot {
+    stroke: green;
 }
 
-.object[data-color='3'] {
-    stroke: rgb(255, 153, 0);
-}
-
-.object[data-color='4'] {
-    stroke: rgb(179, 255, 0);
-}
-
-.object[data-color='5'] {
-    stroke: rgb(0, 255, 85);
-}
-
-.object[data-color='6'] {
-    stroke: rgb(4, 0, 255);
+[data-band='10-20keV']>.plot {
+    stroke: blue;
 }
 
 .yLabel {
     fill: currentColor;
     stroke: none;
+}
+
+.cursorLine {
+    stroke: currentColor;
+    opacity: 0.3;
+}
+
+.cursorText {
+    font-size: 80%;
+    pointer-events: none;
+    fill: currentColor;
+    opacity: 0.5;
 }

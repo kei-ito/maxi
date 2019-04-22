@@ -1,5 +1,5 @@
 import {createElement, PointerEvent, KeyboardEvent} from 'react';
-import {IObject, Modes, IObjectMap} from '../../types';
+import {IObject, Mode, IObjectMap} from '../../types';
 import {Loading} from '../Loading/index';
 import classes from './style.css';
 
@@ -10,7 +10,7 @@ export interface IObjectMapProps {
     searchWords: string,
     onSelect: (
         object: IObject,
-        mode: Modes,
+        mode: Mode,
     ) => void,
 }
 
@@ -29,14 +29,14 @@ export const createHeading = (
 
 export const getModeFromEvent = (
     event: PointerEvent | KeyboardEvent,
-): Modes => {
+): Mode => {
     if (event.shiftKey) {
-        return Modes.Range;
+        return Mode.Range;
     }
     if (event.metaKey || event.ctrlKey) {
-        return Modes.Append;
+        return Mode.Append;
     }
-    return Modes.Default;
+    return Mode.Default;
 };
 
 export const ObjectList = (
@@ -82,7 +82,10 @@ export const ObjectList = (
     return createElement(
         'div',
         {className: classes.container},
-        props.loading && Loading({message: 'Loading objects...'}),
+        props.loading && Loading({
+            message: 'Loading objects...',
+            htmlProps: {className: classes.loading},
+        }),
         createElement(
             'table',
             null,

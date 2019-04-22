@@ -1,6 +1,6 @@
-import {useState, createElement, useEffect, Fragment} from 'react';
+import {useState, createElement, useEffect, Fragment, useReducer} from 'react';
 import {getObjectMap} from '../../util/getObjectMap';
-import {Modes, ILightCurveData, IError, IBinnedLightCurveData, IObjectMap} from '../../types';
+import {Mode, ILightCurveData, IError, IBinnedLightCurveData, IObjectMap, Band} from '../../types';
 import {getLightCurveData} from '../../util/getData';
 import {getBinnedLightCurveData} from '../../util/getBinnedLightCurveData';
 import {useCache} from '../../util/useCache';
@@ -11,18 +11,20 @@ import {Preferences} from '../Preferences/index';
 import {LightCurve} from '../LightCurve/index';
 import {SearchForm} from '../SearchForm/index';
 import {normalizeSearchText} from '../../util/normalizeSearchText';
-import {isString} from '../../util/isString';
 
 export const App = () => {
-    const [errors, setErrors] = useState<Array<IError | Error>>([]);
+    const [errors, onError] = useReducer(
+        (
+            errors: Array<IError | Error>,
+            newError: IError | Error,
+        ) => errors.concat(newError),
+        [],
+    );
     const [preferences, setPreferences] = useState(getDefaultPreferences());
     const [objectMap, setObjectMap] = useState<IObjectMap | null>(null);
     const [searchWords, setSearchWords] = useState('');
     const [selected, setSelected] = useState<Array<string>>([]);
     const [loading, setLoading] = useState(-1);
-    const onError = (error: Error) => {
-        setErrors(errors.concat(error));
-    };
     const lightCurveCache = useCache<ILightCurveData>({
         keys: selected,
         getter: getLightCurveData,
@@ -75,14 +77,6 @@ export const App = () => {
         }
     }, [selected, preferences, loading]);
 
-    const plots: Array<Array<string | null>> = [selected];
-
-    if (1 < selected.length) {
-        selected.forEach((_, index1) => {
-            plots.push(selected.map((objectId, index2) => index1 === index2 ? objectId : null));
-        });
-    }
-
     return createElement(
         Fragment,
         null,
@@ -122,7 +116,7 @@ export const App = () => {
                     onSelect: (object, mode) => {
                         const newSelected = new Set(selected);
                         const targetObjects = [object];
-                        if (mode !== Modes.Append) {
+                        if (mode !== Mode.Append) {
                             newSelected.clear();
                         }
                         if (newSelected.has(object.id)) {
@@ -134,7 +128,7 @@ export const App = () => {
                                 newSelected.add(id);
                             }
                         }
-                        setSelected(Array.from(newSelected).slice(-9));
+                        setSelected(Array.from(newSelected));
                     },
                 }),
                 createElement(
@@ -146,21 +140,20 @@ export const App = () => {
                 ),
             ),
             createElement('h1', null, `Light curves for the selected${selected.length === 1 ? '' : ` ${selected.length}`} object${selected.length === 1 ? '' : 's'}`),
-            ...plots.map((objects) => createElement(
+            createElement(
                 'figure',
                 null,
                 createElement(LightCurve, {
                     preferences,
-                    objects,
+                    objects: selected,
+                    objectMap,
                     cache: binnedLightCurveCache,
                 }),
                 createElement(
                     'figcaption',
                     null,
                     'Light curve for ',
-                    ...objects
-                    .filter(isString)
-                    .map((objectId, index) => createElement(
+                    ...selected.map((objectId, index) => createElement(
                         Fragment,
                         null,
                         `${index === 0 ? '' : ', '}${objectId} `,
@@ -172,7 +165,7 @@ export const App = () => {
                     )),
                     '.',
                 ),
-            )),
+            ),
             createElement('h1', null, 'Preferences'),
             createElement(Preferences, {
                 preferences,
