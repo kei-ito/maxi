@@ -1,3 +1,20 @@
+<a name="1.1.3"></a>
+## [1.1.3](https://github.com/kei-ito/maxi/compare/v1.1.2...v1.1.3) (2019-04-23)
+
+
+### Bug Fixes
+
+* check NaN ([1e019b6](https://github.com/kei-ito/maxi/commit/1e019b6))
+
+
+### Features
+
+* add a link to GitHub ([7a426e1](https://github.com/kei-ito/maxi/commit/7a426e1))
+* add rolling bin ([#4](https://github.com/kei-ito/maxi/issues/4)) ([aa54957](https://github.com/kei-ito/maxi/commit/aa54957))
+* store min and max in URL ([#5](https://github.com/kei-ito/maxi/issues/5)) ([b8590bf](https://github.com/kei-ito/maxi/commit/b8590bf))
+
+
+
 <a name="1.1.2"></a>
 ## [1.1.2](https://github.com/kei-ito/maxi/compare/v1.1.1...v1.1.2) (2019-04-23)
 
