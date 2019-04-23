@@ -26,10 +26,12 @@ jobs:
       - attach_workspace: {at: .}
       - run: npm run lint
   package:
-    docker: [{image: "amazonlinux:2017.03.1.20170812"}]
+    docker: [{image: "circleci/node:lts"}]
     steps:
       - attach_workspace:
           at: .
+      - run: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+      - run: pip3 install awscli --upgrade --user
       - run: aws s3 mb "s3://$BUCKET"
   deploy:
     docker: [{image: "circleci/node:lts"}]
