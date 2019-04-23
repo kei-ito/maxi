@@ -106,6 +106,8 @@ export type IFont = 'Sans' | 'Serif' | 'Monospace';
 
 export interface IPreferences {
     binSize: number,
+    minMJD: number,
+    maxMJD: number,
     // font: IFont,
     // scale: number,
 }

@@ -11,6 +11,7 @@ interface ILightCurveProps {
     objects: Array<string>,
     objectMap: IObjectMap | null,
     cache: Map<string, IRollingAverageData>,
+    setPreferences: (newPreferences: Partial<IPreferences>) => void,
 }
 
 interface IMargin {
@@ -73,44 +74,37 @@ export const LightCurve = (
     props: ILightCurveProps,
 ) => {
     const svgRef = useRef<HTMLCanvasElement>(null);
-    const [mjdRange, setMJDRange] = useState<[number, number]>([Infinity, 0]);
     const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.9);
     const [xTicks, setXTicks] = useState<{mjd: ITicks, date: IDateTicks} | null>(null);
     const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
+    const [mjdMinMax, setMinMaxMJD] = useState([props.preferences.minMJD, props.preferences.maxMJD]);
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
-    const [minOffsetMJD, setMinOffsetMJD] = useState(0);
-    const [maxOffsetMJD, setMaxOffsetMJD] = useState(0);
     const objectCount = props.objects.length;
     const areaWidth = svgWidth - margin.left - margin.right;
     const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * objectCount - margin.gap + margin.bottom;
-    const minMJD = mjdRange[0] + minOffsetMJD;
-    const maxMJD = mjdRange[1] + maxOffsetMJD;
-    const rangeMJD = maxMJD - minMJD;
+    const rangeMJD = mjdMinMax[1] - mjdMinMax[0];
     const scaleX = areaWidth / rangeMJD;
     const isReady = 0 < scaleX;
     const left = margin.left;
     const right = left + areaWidth;
-    const X = (mjd: number) => left + scaleX * (mjd - minMJD);
-    const xToMJD = (x: number) => minMJD + (x - margin.left) * rangeMJD / areaWidth;
+    const X = (mjd: number) => left + scaleX * (mjd - mjdMinMax[0]);
+    const xToMJD = (x: number) => mjdMinMax[0] + (x - margin.left) * rangeMJD / areaWidth;
 
     useEffect(() => {
-        let minMJD = Infinity;
-        let maxMJD = 0;
-        props.objects.forEach((id) => {
-            const data = props.cache.get(id);
-            if (data) {
-                minMJD = Math.min(minMJD, data.minX) + minOffsetMJD;
-                maxMJD = Math.max(maxMJD, data.maxX) + maxOffsetMJD;
-            }
-        });
-        setMJDRange([minMJD, maxMJD]);
-    }, [props.objects, props.cache]);
-
-    useEffect(() => {
-        const mjd = getTicks(minMJD, maxMJD, areaWidth / 160);
-        const date = getDateTicks(mjdToDate(minMJD), mjdToDate(maxMJD), areaWidth / 160);
+        const mjd = getTicks(mjdMinMax[0], mjdMinMax[1], areaWidth / 160);
+        const date = getDateTicks(mjdToDate(mjdMinMax[0]), mjdToDate(mjdMinMax[1]), areaWidth / 160);
         setXTicks(mjd && date ? {mjd, date} : null);
-    }, [minMJD, maxMJD]);
+    }, [mjdMinMax]);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            props.setPreferences({
+                minMJD: mjdMinMax[0],
+                maxMJD: mjdMinMax[1],
+            });
+        }, 800);
+        return () => clearTimeout(timeoutId);
+    }, [mjdMinMax]);
 
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -139,22 +133,25 @@ export const LightCurve = (
     }, []);
 
     useEffect(() => {
+        let dMin = 0;
+        let dMax = 0;
         const onWheel = (event: WheelEvent) => {
             const svgElement = svgRef.current;
             if (svgElement) {
                 const rect = svgElement.getBoundingClientRect();
                 const x = event.clientX - rect.left;
                 if (left <= x && x <= right) {
+                    const dy = event.deltaY / scaleX;
                     if (event.ctrlKey) {
-                        const dy = event.deltaY / scaleX;
                         const r = (x - left) / areaWidth;
-                        setMinOffsetMJD(minOffsetMJD + dy * -r);
-                        setMaxOffsetMJD(maxOffsetMJD + dy * (1 - r));
+                        dMin += dy * -r;
+                        dMax += dy * (1 - r);
+                        setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[1] + dMax]);
                         event.preventDefault();
                     } else if (event.shiftKey) {
-                        const dy = event.deltaY / scaleX;
-                        setMinOffsetMJD(minOffsetMJD + dy);
-                        setMaxOffsetMJD(maxOffsetMJD + dy);
+                        dMin += dy;
+                        dMax += dy;
+                        setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[1] + dMax]);
                         event.preventDefault();
                     }
                 }
@@ -174,18 +171,21 @@ export const LightCurve = (
                     removeEventListener('mouseup', onMouseUp);
                     removeEventListener('mousemove', onMouseMove);
                 };
+                const dMin0 = dMin;
+                const dMax0 = dMax;
                 const onMouseMove = (event: MouseEvent) => {
                     const x2 = event.clientX - x0;
                     const y2 = event.clientY;
                     const dy = y2 - y1;
-                    const scale = 1.01 ** dy;
+                    const scale = 1.005 ** dy;
                     const L2 = x2 / areaWidth;
                     const R2 = 1 - L2;
                     const dL = L1 * scale - L2;
                     const dR = R1 * scale - R2;
-                    const newRangeMJD = rangeMJD / scale;
-                    setMinOffsetMJD(minOffsetMJD + newRangeMJD * dL);
-                    setMaxOffsetMJD(maxOffsetMJD - newRangeMJD * dR);
+                    const newRangeMJD = (rangeMJD - dMin0 + dMax0) / scale;
+                    dMin = dMin0 + newRangeMJD * dL;
+                    dMax = dMax0 + newRangeMJD * -dR;
+                    setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[1] + dMax]);
                 };
                 addEventListener('mouseup', onMouseUp, {passive: true});
                 addEventListener('mousemove', onMouseMove, {passive: true});
@@ -205,6 +205,8 @@ export const LightCurve = (
                 const x1 = (x11 + x12) / 2;
                 const L1 = x1 / areaWidth;
                 const R1 = 1 - L1;
+                const dMin0 = dMin;
+                const dMax0 = dMax;
                 const onTouchEnd = (event: TouchEvent) => {
                     if (event.touches.length <= 1) {
                         removeEventListener('touchmove', onTouchEnd);
@@ -235,9 +237,10 @@ export const LightCurve = (
                         const scale = distance2 / distance1;
                         const dL = L1 * scale - L2;
                         const dR = R1 * scale - R2;
-                        const newRangeMJD = rangeMJD / scale;
-                        setMinOffsetMJD(minOffsetMJD + newRangeMJD * dL);
-                        setMaxOffsetMJD(maxOffsetMJD - newRangeMJD * dR);
+                        const newRangeMJD = (rangeMJD - dMin0 + dMax0) / scale;
+                        dMin = dMin0 + newRangeMJD * dL;
+                        dMax = dMax0 + newRangeMJD * -dR;
+                        setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[0] + dMax]);
                     } else {
                         onTouchEnd(event);
                     }
@@ -259,7 +262,7 @@ export const LightCurve = (
                 svg.removeEventListener('touchstart', onTouchStart);
             }
         };
-    }, [svgRef, minMJD, maxMJD]);
+    }, [svgRef, areaWidth]);
 
     return createElement(
         'svg',

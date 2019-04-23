@@ -1,10 +1,10 @@
 import {useState, createElement, useEffect, Fragment, useReducer} from 'react';
 import {getObjectMap} from '../../util/getObjectMap';
-import {Mode, ILightCurveData, IError, IObjectMap, IRollingAverageData} from '../../types';
+import {Mode, ILightCurveData, IError, IObjectMap, IRollingAverageData, IPreferences} from '../../types';
 import {getLightCurveData} from '../../util/getData';
 import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
-import {getDefaultPreferences} from '../../util/getDefaultPreferences';
+import {getDefaultPreferences, filterBinSize, filterMaxMJD, filterMinMJD} from '../../util/getDefaultPreferences';
 import {URLParameterKey} from '../../util/constants';
 import {ObjectList} from '../ObjectList/index';
 import {Preferences} from '../Preferences/index';
@@ -20,7 +20,17 @@ export const App = () => {
         ) => errors.concat(newError),
         [],
     );
-    const [preferences, setPreferences] = useState(getDefaultPreferences());
+    const [preferences, setPreferences] = useReducer(
+        (
+            currentPreferences: IPreferences,
+            nextPreferences: Partial<IPreferences>,
+        ): IPreferences => ({
+            binSize: filterBinSize(nextPreferences.binSize || currentPreferences.binSize),
+            minMJD: filterMinMJD(nextPreferences.minMJD || currentPreferences.minMJD),
+            maxMJD: filterMaxMJD(nextPreferences.maxMJD || currentPreferences.maxMJD),
+        }),
+        getDefaultPreferences(),
+    );
     const [objectMap, setObjectMap] = useState<IObjectMap | null>(null);
     const [searchWords, setSearchWords] = useState('');
     const [selected, setSelected] = useState<Array<string>>([]);
@@ -75,6 +85,8 @@ export const App = () => {
             const selectedObjectsCSV = selected.join(',');
             urlParameters.set(URLParameterKey.selected, selectedObjectsCSV);
             urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
+            urlParameters.set(URLParameterKey.minMJD, preferences.minMJD.toFixed(0));
+            urlParameters.set(URLParameterKey.maxMJD, preferences.maxMJD.toFixed(0));
             const url = new URL(location.href);
             url.search = `${urlParameters}`;
             history.replaceState(null, selectedObjectsCSV, `${url}`);
@@ -159,6 +171,7 @@ export const App = () => {
                     objects: selected,
                     objectMap,
                     cache: rollingAverageCache,
+                    setPreferences,
                 }),
                 createElement(
                     'figcaption',
