@@ -23,7 +23,7 @@ Resources:
           # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Type: Api
           Properties:
-            Path: lib/objects
+            Path: /objects
             Method: get
   ObjectFunction:
     Type: AWS::Serverless::Function
