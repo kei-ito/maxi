@@ -4,7 +4,7 @@ export const getAB = (
     flux: number,
     error: number,
 ) => {
-    const s = 1 / (error ** 2);
+    const s = error === 0 ? 0 : 1 / (error ** 2);
     return [s, flux * s];
 };
 
