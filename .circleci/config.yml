@@ -1,4 +1,6 @@
-version: 2
+version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@0.1.1
 jobs:
   build:
     docker: [{image: "circleci/node:lts"}]
@@ -30,6 +32,7 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - aws-cli/install
       - run: aws s3 mb "s3://$BUCKET"
   deploy:
     docker: [{image: "circleci/node:lts"}]
