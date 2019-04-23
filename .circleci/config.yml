@@ -69,12 +69,13 @@ workflows:
           filters:
             branches: {ignore: master}
             tags: {ignore: /.*/}
-      - lint: {requires: [onDevelopBranch]}
-      - build-server: {requires: [onDevelopBranch]}
+      - setup: {requires: [onDevelopBranch]}
+      - lint: {requires: [setup]}
+      - build-server: {requires: [setup]}
       - test-server: {requires: [build-server]}
       - package-server: {requires: [test-server]}
       - deploy-server: {requires: [package-server]}
-      - build-client: {requires: [onDevelopBranch]}
+      - build-client: {requires: [setup]}
   # release:
   #   jobs:
   #     - isTagged:
