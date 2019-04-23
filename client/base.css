@@ -1,6 +1,6 @@
 :root {
-    --fontSans: Computer Modern Sans, sans-serif;
     --fontSerif: Computer Modern Serif, Times, serif;
+    --fontSans: Computer Modern Sans, sans-serif;
     --fontMonospace: Computer Modern Typewriter Light, Monaco, monospace;
     height: 100%;
 }

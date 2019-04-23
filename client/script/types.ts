@@ -114,14 +114,14 @@ export enum Mode {
     Default,
     Append,
     Range,
-};
+}
 
 export enum Band {
     $2_20 = 0,
     $2_4 = 1,
     $4_10 = 2,
     $10_20 = 3,
-};
+}
 
 export const BandTitles = {
     [Band.$2_20]: '2-20keV',
