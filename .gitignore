@@ -4,3 +4,4 @@ dist
 .aws-sam
 .cache
 server/lib
+output-template.yml
