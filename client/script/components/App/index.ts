@@ -55,6 +55,12 @@ export const App = () => {
                         requestedObjects.trim().split(/\s*,\s*/)
                         .filter((objectId) => newObjectMap.has(objectId)),
                     );
+                } else {
+                    const newObjects: Array<string> = [];
+                    newObjectMap.forEach((_, objectId) => {
+                        newObjects.push(objectId);
+                    });
+                    setSelected(newObjects.slice(0, 1));
                 }
                 setObjectMap(newObjectMap);
                 setLoading(0);

@@ -24,7 +24,7 @@ export const getDefaultPreferences = (): IPreferences => {
     const searchParameters = new URLSearchParams(location.search);
     return {
         binSize: filterBinSize(searchParameters.get(URLParameterKey.binSize)),
-        font: filterFont(searchParameters.get(URLParameterKey.font)),
-        scale: filterScale(searchParameters.get(URLParameterKey.scale)),
+        // font: filterFont(searchParameters.get(URLParameterKey.font)),
+        // scale: filterScale(searchParameters.get(URLParameterKey.scale)),
     };
 };
