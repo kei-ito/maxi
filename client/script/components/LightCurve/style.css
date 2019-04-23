@@ -51,6 +51,11 @@
     stroke: blue;
 }
 
+.plot.average {
+    stroke-width: 2;
+    opacity: 0.2;
+}
+
 .yLabel {
     fill: currentColor;
     stroke: none;

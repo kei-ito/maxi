@@ -97,6 +97,12 @@
                                 "requireLast": false
                             }
                         }
+                    ],
+                    "@typescript-eslint/no-use-before-define": [
+                        "error",
+                        {
+                            "variables": false
+                        }
                     ]
                 }
             },

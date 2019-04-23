@@ -5,26 +5,24 @@ import classes from './style.css';
 
 interface IPreferencesProps {
     preferences: IPreferences,
-    onChange: (newPreferences: IPreferences) => void,
+    onChange: (newPreferences: Partial<IPreferences>) => void,
 }
 
 interface IPreferencesFormElement extends HTMLFormElement {
     binSize: HTMLInputElement,
 }
 
-interface IPreferencesFormElementProps extends HTMLAttributes<IPreferencesFormElement> {}
-
 export const Preferences = (
     props: IPreferencesProps,
 ) => {
-    const [preferences, setPreferences] = useState(props.preferences);
+    const [preferences, setPreferences] = useState<Partial<IPreferences>>(props.preferences);
     useEffect(() => {
         const timer = setTimeout(() => {
             props.onChange(preferences);
         }, 300);
         return () => clearTimeout(timer);
     }, [preferences]);
-    return createElement<IPreferencesFormElementProps, IPreferencesFormElement>(
+    return createElement<HTMLAttributes<IPreferencesFormElement>, IPreferencesFormElement>(
         'form',
         {
             className: classes.form,

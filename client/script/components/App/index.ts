@@ -1,10 +1,10 @@
 import {useState, createElement, useEffect, Fragment, useReducer} from 'react';
 import {getObjectMap} from '../../util/getObjectMap';
-import {Mode, ILightCurveData, IError, IBinnedLightCurveData, IObjectMap, Band} from '../../types';
+import {Mode, ILightCurveData, IError, IObjectMap, IRollingAverageData, IPreferences} from '../../types';
 import {getLightCurveData} from '../../util/getData';
-import {getBinnedLightCurveData} from '../../util/getBinnedLightCurveData';
+import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
-import {getDefaultPreferences} from '../../util/getDefaultPreferences';
+import {getDefaultPreferences, filterBinSize, filterMaxMJD, filterMinMJD} from '../../util/getDefaultPreferences';
 import {URLParameterKey} from '../../util/constants';
 import {ObjectList} from '../ObjectList/index';
 import {Preferences} from '../Preferences/index';
@@ -20,7 +20,17 @@ export const App = () => {
         ) => errors.concat(newError),
         [],
     );
-    const [preferences, setPreferences] = useState(getDefaultPreferences());
+    const [preferences, setPreferences] = useReducer(
+        (
+            currentPreferences: IPreferences,
+            nextPreferences: Partial<IPreferences>,
+        ): IPreferences => ({
+            binSize: filterBinSize(nextPreferences.binSize || currentPreferences.binSize),
+            minMJD: filterMinMJD(nextPreferences.minMJD || currentPreferences.minMJD),
+            maxMJD: filterMaxMJD(nextPreferences.maxMJD || currentPreferences.maxMJD),
+        }),
+        getDefaultPreferences(),
+    );
     const [objectMap, setObjectMap] = useState<IObjectMap | null>(null);
     const [searchWords, setSearchWords] = useState('');
     const [selected, setSelected] = useState<Array<string>>([]);
@@ -30,12 +40,12 @@ export const App = () => {
         getter: getLightCurveData,
         onError,
     });
-    const binnedLightCurveCache = useCache<IBinnedLightCurveData>({
+    const rollingAverageCache = useCache<IRollingAverageData>({
         keys: selected,
         getter: (objectId) => {
             const rawData = lightCurveCache.get(objectId);
             if (rawData) {
-                return getBinnedLightCurveData(rawData, preferences.binSize);
+                return getRollingAverage(rawData, preferences.binSize);
             }
             return null;
         },
@@ -75,6 +85,8 @@ export const App = () => {
             const selectedObjectsCSV = selected.join(',');
             urlParameters.set(URLParameterKey.selected, selectedObjectsCSV);
             urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
+            urlParameters.set(URLParameterKey.minMJD, preferences.minMJD.toFixed(0));
+            urlParameters.set(URLParameterKey.maxMJD, preferences.maxMJD.toFixed(0));
             const url = new URL(location.href);
             url.search = `${urlParameters}`;
             history.replaceState(null, selectedObjectsCSV, `${url}`);
@@ -158,7 +170,8 @@ export const App = () => {
                     preferences,
                     objects: selected,
                     objectMap,
-                    cache: binnedLightCurveCache,
+                    cache: rollingAverageCache,
+                    setPreferences,
                 }),
                 createElement(
                     'figcaption',
@@ -204,6 +217,16 @@ export const App = () => {
                         ),
                     );
                 }),
+                createElement(
+                    'li',
+                    {id: 'Source-GitHub'},
+                    'Source code of this app, ',
+                    createElement(
+                        'a',
+                        {href: 'https://github.com/kei-ito/maxi', target: '_blank'},
+                        'https://github.com/kei-ito/maxi',
+                    ),
+                ),
             ),
             0 < errors.length && createElement(
                 Fragment,
