@@ -82,8 +82,8 @@ export type IFont = 'Sans' | 'Serif' | 'Monospace';
 
 export interface IPreferences {
     binSize: number,
-    font: IFont,
-    scale: number,
+    // font: IFont,
+    // scale: number,
 }
 
 export interface ITickData {

@@ -1,7 +1,7 @@
 import {createElement, useState, useEffect, HTMLAttributes} from 'react';
 import {IPreferences} from '../../types';
-import {AvailableFonts} from '../../util/constants';
-import {filterBinSize, filterFont, filterScale} from '../../util/getDefaultPreferences';
+import {filterBinSize} from '../../util/getDefaultPreferences';
+import classes from './style.css';
 
 interface IPreferencesProps {
     preferences: IPreferences,
@@ -9,9 +9,7 @@ interface IPreferencesProps {
 }
 
 interface IPreferencesFormElement extends HTMLFormElement {
-    font: HTMLInputElement,
     binSize: HTMLInputElement,
-    scale: HTMLInputElement,
 }
 
 interface IPreferencesFormElementProps extends HTMLAttributes<IPreferencesFormElement> {}
@@ -29,50 +27,28 @@ export const Preferences = (
     return createElement<IPreferencesFormElementProps, IPreferencesFormElement>(
         'form',
         {
+            className: classes.form,
             onChange: (event) => {
                 const formElement = event.currentTarget;
-                const font = filterFont(formElement.font.value);
-                formElement.font.value = font;
                 const binSize = filterBinSize(formElement.binSize.value);
-                formElement.font.value = `${binSize}`;
-                const scale = filterScale(formElement.scale.value);
-                formElement.font.value = `${scale}`;
+                formElement.binSize.value = `${binSize}`;
                 setPreferences({
-                    font,
                     binSize,
-                    scale,
                 });
             },
         },
-        createElement('h2', null, 'Fonts'),
-        ...AvailableFonts.map((font) => createElement(
-            'input',
-            {
-                type: 'radio',
-                name: 'font',
-                value: font,
-                defaultChecked: preferences.font === font,
-            },
-        )),
+        createElement('label', {htmlFor: 'binSize'}, 'Bin size: '),
         createElement(
             'input',
             {
+                id: 'binSize',
                 type: 'number',
                 name: 'binSize',
-                min: 0,
-                max: 30,
+                min: 1,
+                max: 100,
                 defaultValue: preferences.binSize,
             },
         ),
-        createElement(
-            'input',
-            {
-                type: 'number',
-                name: 'scale',
-                min: 1,
-                max: 10,
-                defaultValue: preferences.scale,
-            },
-        ),
+        `day${preferences.binSize === 1 ? '' : 's'}.`,
     );
 };

@@ -59,7 +59,8 @@ h3 {
 article {
     width: 94%;
     max-width: 1200px;
-    margin: 0 auto 4em auto;
+    margin: 0 auto;
+    padding-bottom: 4em;
     counter-reset: h1;
 }
 
@@ -194,4 +195,21 @@ a {
 text {
     fill: currentColor;
     stroke: none;
+}
+
+input {
+    font: inherit;
+}
+
+input[type=text],
+input[type=number] {
+    min-width: 50px;
+    border: none;
+    border-bottom: solid currentColor 1px;
+    border-radius: 0;
+    appearance: none;
+}
+
+input[type=number] {
+    text-align: right;
 }

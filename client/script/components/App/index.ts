@@ -69,8 +69,6 @@ export const App = () => {
             const selectedObjectsCSV = selected.join(',');
             urlParameters.set(URLParameterKey.selected, selectedObjectsCSV);
             urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
-            urlParameters.set(URLParameterKey.scale, preferences.scale.toFixed(4));
-            urlParameters.set(URLParameterKey.font, preferences.font);
             const url = new URL(location.href);
             url.search = `${urlParameters}`;
             history.replaceState(null, selectedObjectsCSV, `${url}`);
@@ -80,19 +78,13 @@ export const App = () => {
     return createElement(
         Fragment,
         null,
-        createElement(
-            'header',
-            null,
-            createElement('h1', null, 'MAXI GSC Data Viewer'),
-        ),
+        createElement('header', null, createElement('h1', null, 'MAXI GSC Data Viewer')),
         createElement(
             'article',
             null,
             createElement('h1', null, [
                 'Object selector',
-                objectMap
-                ? `(${objectMap.size} object${objectMap.size === 0 ? '' : 's'})`
-                : '(Loading...)',
+                objectMap ? `(${objectMap.size} object${objectMap.size === 0 ? '' : 's'})` : '(Loading...)',
             ].join(' ')),
             createElement(
                 'figure',
@@ -103,9 +95,7 @@ export const App = () => {
                         label: 'Search for:',
                         placeholder: 'All (Click here to change)',
                         defaultValue: '',
-                        onChange: (words) => {
-                            setSearchWords(normalizeSearchText(words));
-                        },
+                        onChange: (words) => setSearchWords(normalizeSearchText(words)),
                     },
                 ),
                 createElement(ObjectList, {
@@ -141,6 +131,21 @@ export const App = () => {
             ),
             createElement('h1', null, `Light curves for the selected${selected.length === 1 ? '' : ` ${selected.length}`} object${selected.length === 1 ? '' : 's'}`),
             createElement(
+                'ul',
+                null,
+                createElement('li', null, 'Drag horizontally to move the range.'),
+                createElement('li', null, 'Drag vertically to change the scale.'),
+                createElement('li', null, 'For a touch device, Pinch with 2 fingers to change the range.'),
+                createElement(
+                    'li',
+                    null,
+                    createElement(Preferences, {
+                        preferences,
+                        onChange: setPreferences,
+                    }),
+                ),
+            ),
+            createElement(
                 'figure',
                 null,
                 createElement(LightCurve, {
@@ -166,11 +171,6 @@ export const App = () => {
                     '.',
                 ),
             ),
-            createElement('h1', null, 'Preferences'),
-            createElement(Preferences, {
-                preferences,
-                onChange: setPreferences,
-            }),
             createElement('h1', null, 'References'),
             createElement(
                 'ol',
@@ -181,29 +181,20 @@ export const App = () => {
                     `${objectMap.sourceTitle}, `,
                     createElement(
                         'a',
-                        {
-                            href: objectMap.sourceURL,
-                            target: '_blank',
-                        },
+                        {href: objectMap.sourceURL, target: '_blank'},
                         objectMap.sourceURL,
                     ),
                 ),
                 ...selected.map((objectId) => {
                     const data = lightCurveCache.get(objectId);
-                    if (!data) {
-                        return null;
-                    }
                     return createElement(
                         'li',
                         {id: `Source-${objectId}`},
-                        `${data.sourceTitle}, `,
+                        `${data ? data.sourceTitle : objectId}, `,
                         createElement(
                             'a',
-                            {
-                                href: data.sourceURL,
-                                target: '_blank',
-                            },
-                            data.sourceURL,
+                            {href: data && data.sourceURL, target: '_blank'},
+                            data ? data.sourceURL : 'Loading...',
                         ),
                     );
                 }),

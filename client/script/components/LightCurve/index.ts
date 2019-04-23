@@ -163,29 +163,32 @@ export const LightCurve = (
         const onMouseDown = (event: MouseEvent) => {
             const svgElement = svgRef.current;
             if (svgElement) {
+                event.preventDefault();
                 const rect = svgElement.getBoundingClientRect();
-                const x0 = event.clientX;
-                const x = x0 - rect.left;
-                if (left <= x && x <= right) {
-                    event.preventDefault();
-                    const r = (x - left) / areaWidth;
-                    const y0 = event.clientY;
-                    const onMouseUp = () => {
-                        removeEventListener('mouseup', onMouseUp);
-                        removeEventListener('mousemove', onMouseMove);
-                    };
-                    const onMouseMove = (event: MouseEvent) => {
-                        const dx = x0 - event.clientX;
-                        const dy = y0 - event.clientY;
-                        const newRangeX = rangeMJD * (1.01 ** dy);
-                        const dh = newRangeX * dx / areaWidth;
-                        const dv = newRangeX - rangeMJD;
-                        setMinOffsetMJD(minOffsetMJD + dh - dv * r);
-                        setMaxOffsetMJD(maxOffsetMJD + dh + dv * (1 - r));
-                    };
-                    addEventListener('mouseup', onMouseUp, {passive: true});
-                    addEventListener('mousemove', onMouseMove, {passive: true});
-                }
+                const x0 = rect.left + margin.left;
+                const x1 = event.clientX - x0;
+                const y1 = event.clientY;
+                const L1 = x1 / areaWidth;
+                const R1 = 1 - L1;
+                const onMouseUp = () => {
+                    removeEventListener('mouseup', onMouseUp);
+                    removeEventListener('mousemove', onMouseMove);
+                };
+                const onMouseMove = (event: MouseEvent) => {
+                    const x2 = event.clientX - x0;
+                    const y2 = event.clientY;
+                    const dy = y2 - y1;
+                    const scale = 1.01 ** dy;
+                    const L2 = x2 / areaWidth;
+                    const R2 = 1 - L2;
+                    const dL = L1 * scale - L2;
+                    const dR = R1 * scale - R2;
+                    const newRangeMJD = rangeMJD / scale;
+                    setMinOffsetMJD(minOffsetMJD + newRangeMJD * dL);
+                    setMaxOffsetMJD(maxOffsetMJD - newRangeMJD * dR);
+                };
+                addEventListener('mouseup', onMouseUp, {passive: true});
+                addEventListener('mousemove', onMouseMove, {passive: true});
             }
         };
         const onTouchStart = (event: TouchEvent) => {
@@ -363,14 +366,11 @@ export const LightCurve = (
                             {
                                 key: 'yTitle',
                                 className: classnames(classes.alignTop, classes.alignCenter),
-                                x: 3,
+                                x: 4,
                                 y: centerY,
                                 transform: `rotate(-90, 3,${centerY})`,
                             },
-                            'Photons cm',
-                            createElement('tspan', {dy: -3}, '-2'),
-                            createElement('tspan', {dy: +3}, ' s'),
-                            createElement('tspan', {dy: -3}, '-1'),
+                            'Photons cm\u207B\u00B2 s\u207B\u00B9',
                         ),
                         createElement(
                             'rect',
@@ -391,7 +391,7 @@ export const LightCurve = (
                                 key: 'title',
                                 className: classnames(classes.alignTop, classes.alignLeft),
                                 x: left + mainTickSize + 4,
-                                y: top + mainTickSize + 4,
+                                y: top + mainTickSize + 3,
                             },
                             `${object.name} (${object.id}) ${bandTitle}`,
                         ));
