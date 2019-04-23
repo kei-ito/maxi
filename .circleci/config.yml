@@ -48,10 +48,10 @@ jobs:
       - attach_workspace:
           at: .
       - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $BUCKET
-      - run: aws cloudformation deploy \
-              --template-file server/output-template.yml \
-              --stack-name maxiapp-server \
-              --capabilities CAPABILITY_IAM \
+      - run: aws cloudformation deploy
+              --template-file server/output-template.yml
+              --stack-name maxiapp-server
+              --capabilities CAPABILITY_IAM
               --no-fail-on-empty-changeset
   build-client:
     docker: [{image: "circleci/node:lts"}]
