@@ -217,6 +217,16 @@ export const App = () => {
                         ),
                     );
                 }),
+                createElement(
+                    'li',
+                    {id: 'Source-GitHub'},
+                    'Source code of this app, ',
+                    createElement(
+                        'a',
+                        {href: 'https://github.com/kei-ito/maxi', target: '_blank'},
+                        'https://github.com/kei-ito/maxi',
+                    ),
+                ),
             ),
             0 < errors.length && createElement(
                 Fragment,
