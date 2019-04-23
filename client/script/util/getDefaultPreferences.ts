@@ -5,7 +5,7 @@ import {isAvailableFont} from './isAvailableFont';
 
 export const filterBinSize = (
     binSize: string | number | null,
-) => clamp((binSize && Math.round(Number(binSize))) || 7, 1, 30);
+) => clamp((binSize && Math.round(Number(binSize))) || 7, 1, 100);
 
 export const filterFont = (
     font: string | null,

@@ -1,6 +1,6 @@
-import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment, useReducer} from 'react';
+import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment} from 'react';
 import classes from './style.css';
-import {IPreferences, IBinnedLightCurveData, Band, BandTitles, IObjectMap, ITicks, IDateTicks} from '../../types';
+import {IPreferences, Band, BandTitles, IObjectMap, ITicks, IDateTicks, IRollingAverageData} from '../../types';
 import {getTicks} from '../../util/getTicks';
 import {getDateTicks} from '../../util/getDateTicks';
 import {mjdToDate, dateToMJD} from '../../util/mjd';
@@ -10,7 +10,7 @@ interface ILightCurveProps {
     preferences: IPreferences,
     objects: Array<string>,
     objectMap: IObjectMap | null,
-    cache: Map<string, IBinnedLightCurveData>,
+    cache: Map<string, IRollingAverageData>,
 }
 
 interface IMargin {
@@ -355,8 +355,8 @@ export const LightCurve = (
                 null,
                 ...props.objects.map((id, objectIndex) => {
                     const index = objectCount * band + objectIndex;
-                    const fluxIndex = band * 2 + 2;
-                    const errorIndex = band * 2 + 3;
+                    const fluxIndex = band * 2 + 3;
+                    const errorIndex = band * 2 + 4;
                     const bottom = margin.top + areaHeight * (index + 1) + margin.gap * index;
                     const top = bottom - areaHeight;
                     const centerY = (top + bottom) * 0.5;
@@ -433,6 +433,30 @@ export const LightCurve = (
                                 )),
                             );
                         }
+                        let previousBinEndMJD = -1;
+                        const rollingAverageD = data.bins.map((bin) => {
+                            const x = X(bin[0]);
+                            const y = Y(bin[fluxIndex]);
+                            const jump = previousBinEndMJD < bin[1];
+                            previousBinEndMJD = bin[2];
+                            if (left <= x && x <= right) {
+                                return `${jump ? 'M' : 'L'}${x},${y}`;
+                            }
+                            return '';
+                        }).join('');
+                        if (rollingAverageD) {
+                            elements.push(
+                                createElement(
+                                    'path',
+                                    {
+                                        className: classnames(classes.plot, classes.average),
+                                        key: 'average',
+                                        d: `M${rollingAverageD.slice(1)}`,
+                                    },
+                                ),
+                            );
+                        }
+                        previousBinEndMJD = -1;
                         elements.push(
                             createElement(
                                 'path',
@@ -440,9 +464,13 @@ export const LightCurve = (
                                     className: classes.plot,
                                     key: 'plot',
                                     d: data.bins.map((bin) => {
-                                        const xL = X(bin[0]);
-                                        const xR = X(bin[1]);
-                                        const x = (xL + xR) * 0.5;
+                                        if (bin[1] < previousBinEndMJD) {
+                                            return '';
+                                        }
+                                        previousBinEndMJD = bin[2];
+                                        const x = X(bin[0]);
+                                        const xL = X(bin[1]);
+                                        const xR = X(bin[2]);
                                         const y = Y(bin[fluxIndex]);
                                         const e = bin[errorIndex] * scaleY;
                                         const fragments: Array<string> = [];

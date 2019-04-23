@@ -1,8 +1,8 @@
 import {useState, createElement, useEffect, Fragment, useReducer} from 'react';
 import {getObjectMap} from '../../util/getObjectMap';
-import {Mode, ILightCurveData, IError, IBinnedLightCurveData, IObjectMap, Band} from '../../types';
+import {Mode, ILightCurveData, IError, IObjectMap, IRollingAverageData} from '../../types';
 import {getLightCurveData} from '../../util/getData';
-import {getBinnedLightCurveData} from '../../util/getBinnedLightCurveData';
+import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
 import {getDefaultPreferences} from '../../util/getDefaultPreferences';
 import {URLParameterKey} from '../../util/constants';
@@ -30,12 +30,12 @@ export const App = () => {
         getter: getLightCurveData,
         onError,
     });
-    const binnedLightCurveCache = useCache<IBinnedLightCurveData>({
+    const rollingAverageCache = useCache<IRollingAverageData>({
         keys: selected,
         getter: (objectId) => {
             const rawData = lightCurveCache.get(objectId);
             if (rawData) {
-                return getBinnedLightCurveData(rawData, preferences.binSize);
+                return getRollingAverage(rawData, preferences.binSize);
             }
             return null;
         },
@@ -158,7 +158,7 @@ export const App = () => {
                     preferences,
                     objects: selected,
                     objectMap,
-                    cache: binnedLightCurveCache,
+                    cache: rollingAverageCache,
                 }),
                 createElement(
                     'figcaption',

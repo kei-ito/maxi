@@ -55,21 +55,45 @@ export type ILightCurveBin = [
 
 export interface ILightCurveData extends Array<ILightCurveBin>, IResponseData {}
 
-export type IBinnedLightCurveBin = [
-    number, // start MJD
-    number, // end MJD
-    number, // Flux  (2-20keV)
-    number, // Error (2-20keV)
-    number, // Flux  (2-4keV)
-    number, // Error (2-4keV)
-    number, // Flux  (4-10keV)
-    number, // Error (4-10keV)
-    number, // Flux  (10-20keV)
-    number, // Error (10-20keV)
+export type IWindowEntry = [
+    number, // MJD
+    number, // A  (2-20keV)
+    number, // B (2-20keV)
+    number, // A  (2-4keV)
+    number, // B (2-4keV)
+    number, // A  (4-10keV)
+    number, // B (4-10keV)
+    number, // A  (10-20keV)
+    number, // B (10-20keV)
 ];
 
-export interface IBinnedLightCurveData {
-    bins: Array<IBinnedLightCurveBin>,
+export type IWindowSum = [
+    number, // A  (2-20keV)
+    number, // B (2-20keV)
+    number, // A  (2-4keV)
+    number, // B (2-4keV)
+    number, // A  (4-10keV)
+    number, // B (4-10keV)
+    number, // A  (10-20keV)
+    number, // B (10-20keV)
+];
+
+export type IRollingAverageBin = [
+    number, // MJD
+    number, // windowStartMJD
+    number, // windowEndMJD
+    number, // A  (2-20keV)
+    number, // B (2-20keV)
+    number, // A  (2-4keV)
+    number, // B (2-4keV)
+    number, // A  (4-10keV)
+    number, // B (4-10keV)
+    number, // A  (10-20keV)
+    number, // B (10-20keV)
+];
+
+export interface IRollingAverageData {
+    bins: Array<IRollingAverageBin>,
     minX: number,
     maxX: number,
     rangeX: number,
