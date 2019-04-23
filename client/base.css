@@ -1,0 +1,215 @@
+:root {
+    --fontSerif: Computer Modern Serif, Times, serif;
+    --fontSans: Computer Modern Sans, sans-serif;
+    --fontMonospace: Computer Modern Typewriter Light, Monaco, monospace;
+    height: 100%;
+}
+
+body {
+    --fontSize: 16px;
+    font-family: var(--fontSerif);
+    font-size: var(--fontSize);
+    font-weight: 400;
+    color: #333333;
+    min-height: 100%;
+    margin: 0 auto;
+    counter-reset: h1;
+}
+
+@media (max-width: 700px) {
+    body {
+        --fontSize: 14px;
+    }
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em 0 1.5em 0;
+}
+
+header h1 {
+    margin: 0 auto;
+    font-size: 140%;
+}
+
+h1 {
+    margin: 2rem auto 0.5rem auto;
+    font-size: 130%;
+}
+
+h1:first-child {
+    margin-top: 0;
+}
+
+h2 {
+    margin: 1rem auto 0.5rem auto;
+    font-size: 110%;
+    counter-increment: h2;
+    counter-reset: h3;
+}
+
+h3 {
+    margin: 1rem auto 0.5rem auto;
+    font-size: 100%;
+    counter-increment: h3;
+}
+
+article {
+    width: 94%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 4em;
+    counter-reset: h1;
+}
+
+article h1 {
+    counter-increment: h1;
+    counter-reset: h2;
+}
+
+article h2 {
+    counter-increment: h2;
+    counter-reset: h3;
+}
+
+article h3 {
+    counter-increment: h3;
+    counter-reset: h4;
+}
+
+article h1::before {
+    content: counter(h1) '. ';
+}
+
+article h2::before {
+    content: counter(h1) '.' counter(h2) '. ';
+}
+
+article h3::before {
+    content: counter(h1) '.' counter(h2) '.' counter(h3) '. ';
+}
+
+figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 1em auto;
+}
+
+table {
+    width: 100%;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+tr {
+    position: relative;
+    cursor: pointer;
+    outline: 0;
+}
+
+tr:first-child>td,
+tr:first-child>th {
+    z-index: 1;
+    position: sticky;
+    top: 0;
+}
+
+tr:first-child>::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-bottom: solid currentColor 1px;
+    pointer-events: none;
+}
+
+td:first-child,th:first-child {
+    z-index: 2;
+    position: sticky;
+    left: 0;
+}
+
+tr:first-child>:first-child {
+    z-index: 3;
+}
+
+tr[tabindex]:hover>td,
+tr[tabindex]:hover>th {
+    background-color: rgb(236, 236, 236);
+}
+
+tr:nth-child(2n)[data-selected]>td,
+tr:nth-child(2n)[data-selected]>th {
+    background-color: rgb(255, 227, 184);
+}
+
+tr:nth-child(2n+1)[data-selected]>td,
+tr:nth-child(2n+1)[data-selected]>th {
+    background-color: rgb(255, 208, 137);
+}
+
+td,th {
+    --backgroundColor: white;
+    padding: 1ex 1ex 0.8ex 1ex;
+    line-height: 1.2;
+    vertical-align: top;
+    font-size: var(--fontSize);
+    transition: background-color 0.1s;
+    background-color: var(--backgroundColor);
+}
+
+th {
+    padding: 0.7ex 1ex 0.5ex 1ex;
+}
+
+figure {
+    overflow: hidden;
+    counter-increment: figure;
+}
+
+figure+figure {
+    margin-top: 2em;
+}
+
+canvas {
+    width: 100%;
+}
+
+figcaption {
+    margin-top: 0.8em;
+}
+
+figcaption::before {
+    content: 'Fig.' counter(figure) ' ';
+}
+
+a {
+    word-break: break-all;
+}
+
+text {
+    fill: currentColor;
+    stroke: none;
+}
+
+input {
+    font: inherit;
+}
+
+input[type=text],
+input[type=number] {
+    min-width: 50px;
+    border: none;
+    border-bottom: solid currentColor 1px;
+    border-radius: 0;
+    appearance: none;
+}
+
+input[type=number] {
+    text-align: right;
+}

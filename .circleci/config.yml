@@ -1,0 +1,108 @@
+version: 2.1
+jobs:
+  onDevelopBranch:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - run: if [[ -z $CIRCLE_BRANCH || $CIRCLE_BRANCH == "master" ]]; then exit 1; fi
+  onMasterBranch:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - run: if [[ $CIRCLE_BRANCH != "master" ]]; then exit 1; fi
+  isTagged:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - run: if [[ -z $CIRCLE_TAG ]]; then exit 1; fi
+  setup:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "package-lock.json" }}
+            - dependencies-
+      - run: npm ci
+      - save_cache:
+          paths: [node_modules]
+          key: dependencies-{{ checksum "package-lock.json" }}
+      - persist_to_workspace: {root: ., paths: [.]}
+  lint:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: npm run lint
+  build-server:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: npm run build:server
+      - run: git diff --exit-code
+      - persist_to_workspace: {root: ., paths: [.]}
+  test-server:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: npm test
+  deploy-server:
+    docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $BUCKET
+      - run: aws cloudformation deploy
+              --template-file server/output-template.yml
+              --stack-name maxiapp-server
+              --capabilities CAPABILITY_IAM
+              --no-fail-on-empty-changeset
+  build-client:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: npm run build:client
+      - run: git diff --exit-code
+      - persist_to_workspace: {root: ., paths: [.]}
+  test-client:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: echo "TBW"
+  deploy-client:
+    docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: aws s3 cp dist/ s3://maxi.wemo.me/ --recursive
+workflows:
+  version: 2
+  run-tests:
+    jobs:
+      - onDevelopBranch:
+          filters: {branches: {ignore: master}, tags: {ignore: /.*/}}
+      - setup: {requires: [onDevelopBranch]}
+      - lint: {requires: [setup]}
+      - build-server: {requires: [setup]}
+      - test-server: {requires: [build-server]}
+      - build-client: {requires: [setup]}
+      - test-client: {requires: [build-client]}
+  release:
+    jobs:
+      - isTagged:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+      - setup:
+          requires: [isTagged]
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+      - build-server:
+          requires: [setup]
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+      - test-server:
+          requires: [build-server]
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+      - deploy-server:
+          requires: [test-server]
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+      - build-client:
+          requires: [setup]
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+      - test-client:
+          requires: [build-client]
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+      - deploy-client:
+          requires: [test-client]
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
