@@ -1,3 +1,13 @@
+<a name="1.1.1"></a>
+## [1.1.1](https://github.com/kei-ito/maxi/compare/v1.1.0...v1.1.1) (2019-04-23)
+
+
+### Bug Fixes
+
+* fix endpoint ([d0dd60c](https://github.com/kei-ito/maxi/commit/d0dd60c))
+
+
+
 <a name="1.1.0"></a>
 # [1.1.0](https://github.com/kei-ito/maxi/compare/v1.0.0...v1.1.0) (2019-04-23)
 
