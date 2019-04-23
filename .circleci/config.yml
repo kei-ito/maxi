@@ -30,7 +30,6 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run: aws s3 mb "s3://$BUCKET"
       - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $BUCKET
   deploy:
     docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
