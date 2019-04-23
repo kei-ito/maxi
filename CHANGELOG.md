@@ -1,5 +1,15 @@
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/kei-ito/maxi/compare/v1.0.0...v1.1.0) (2019-04-23)
+
+
+### Bug Fixes
+
+* developMode ([8e73aa1](https://github.com/kei-ito/maxi/commit/8e73aa1))
+
+
+
 <a name="1.0.0"></a>
-# 1.0.0 (2019-04-23)
+# [1.0.0](https://github.com/kei-ito/maxi/compare/730df3e...v1.0.0) (2019-04-23)
 
 
 ### Bug Fixes
