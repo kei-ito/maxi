@@ -1,6 +1,6 @@
 {
     "private": true,
-    "version": "0.0.1",
+    "version": "1.0.0",
     "scripts": {
         "build:client": "parcel build client/index.html",
         "build:server:cleanup": "rimraf server/lib",
@@ -42,39 +42,68 @@
         "typescript": "^3.4.3"
     },
     "eslintConfig": {
-        "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/recommended"
+        ],
         "rules": {
-            "no-constant-condition": ["error", {"checkLoops": false}]
+            "no-constant-condition": [
+                "error",
+                {
+                    "checkLoops": false
+                }
+            ]
         },
         "overrides": [
             {
-                "files": ["*.ts"],
+                "files": [
+                    "*.ts"
+                ],
                 "parser": "@typescript-eslint/parser",
-                "plugins": ["@typescript-eslint"],
+                "plugins": [
+                    "@typescript-eslint"
+                ],
                 "rules": {
                     "indent": "off",
-                    "@typescript-eslint/array-type": ["error", "generic"],
+                    "@typescript-eslint/array-type": [
+                        "error",
+                        "generic"
+                    ],
                     "@typescript-eslint/explicit-function-return-type": "off",
-                    "@typescript-eslint/indent": ["error", 4, {
-                        "SwitchCase": 0,
-                        "MemberExpression": 0,
-                        "ignoredNodes": ["ConditionalExpression"]
-                    }],
-                    "@typescript-eslint/interface-name-prefix": ["error", "always"],
-                    "@typescript-eslint/member-delimiter-style": ["error", {
-                        "multiline": {
-                            "delimiter": "comma",
-                            "requireLast": true
-                        },
-                        "singleline": {
-                            "delimiter": "comma",
-                            "requireLast": false
+                    "@typescript-eslint/indent": [
+                        "error",
+                        4,
+                        {
+                            "SwitchCase": 0,
+                            "MemberExpression": 0,
+                            "ignoredNodes": [
+                                "ConditionalExpression"
+                            ]
                         }
-                    }]
+                    ],
+                    "@typescript-eslint/interface-name-prefix": [
+                        "error",
+                        "always"
+                    ],
+                    "@typescript-eslint/member-delimiter-style": [
+                        "error",
+                        {
+                            "multiline": {
+                                "delimiter": "comma",
+                                "requireLast": true
+                            },
+                            "singleline": {
+                                "delimiter": "comma",
+                                "requireLast": false
+                            }
+                        }
+                    ]
                 }
             },
             {
-                "files": ["client/**/*.ts"],
+                "files": [
+                    "client/**/*.ts"
+                ],
                 "env": {
                     "es6": true,
                     "browser": true
@@ -84,7 +113,9 @@
                 }
             },
             {
-                "files": ["server/**/*.ts"],
+                "files": [
+                    "server/**/*.ts"
+                ],
                 "env": {
                     "es6": true,
                     "node": true
