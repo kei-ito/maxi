@@ -1,6 +1,6 @@
 {
     "private": true,
-    "version": "1.1.1",
+    "version": "1.1.2",
     "scripts": {
         "build:client": "parcel build client/index.html",
         "build:server:cleanup": "rimraf server/lib",
