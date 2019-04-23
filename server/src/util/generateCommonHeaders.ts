@@ -5,9 +5,8 @@ export const generateCommonHeaders = (
     _context: Context,
     exposes: {[name: string]: string} = {},
 ): APIGatewayProxyResult['headers'] => {
-    const origin = event.headers.Origin || '';
-    // const allowedOrigin = origin === 'http://localhost:1234' ? origin : '';
-    const allowedOrigin = origin.match(/http:\/\/[\w.]+:1234/) ? origin : '';
+    const origin = event.headers && event.headers.Origin || '';
+    const allowedOrigin = origin.match(/http:\/\/[\w.]+:1234/) ? origin : 'https://maxi.wemo.me';
     const exposedHeaderNames = Object.keys(exposes).concat('x-elapsed-seconds', 'x-created-at');
     return {
         'access-control-allow-origin': allowedOrigin,
