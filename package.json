@@ -13,7 +13,10 @@
         "dev": "run-p dev:server dev:client",
         "test:server": "ava server/**/*.test.ts",
         "test": "run-p test:server",
-        "lint": "eslint ./client/script/**/*.ts ./server/src/**/*.ts"
+        "lint": "eslint ./client/script/**/*.ts ./server/src/**/*.ts",
+        "version:changelog": "conventional-changelog --preset angular --infile CHANGELOG.md --same-file --release-count 0",
+        "version:add": "git add .",
+        "version": "npm-run-all --sequential version:changelog version:add"
     },
     "devDependencies": {
         "@commitlint/cli": "^7.5.2",
