@@ -42,17 +42,12 @@ jobs:
       - run: npm run build:server
       - run: git diff --exit-code
       - persist_to_workspace: {root: ., paths: [.]}
-  package-server:
-    docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
-    steps:
-      - attach_workspace:
-          at: .
-      - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $BUCKET
   deploy-server:
     docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
     steps:
       - attach_workspace:
           at: .
+      - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $BUCKET
       - run: aws cloudformation deploy --template-file server/output-template.yml --stack-name maxiapp-server
   build-client:
     docker: [{image: "circleci/node:lts"}]
@@ -73,7 +68,6 @@ workflows:
       - lint: {requires: [setup]}
       - build-server: {requires: [setup]}
       - test-server: {requires: [build-server]}
-      - package-server: {requires: [test-server]}
       - deploy-server: {requires: [package-server]}
       - build-client: {requires: [setup]}
   # release:
