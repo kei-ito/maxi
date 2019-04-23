@@ -5,6 +5,7 @@ Transform: AWS::Serverless-2016-10-31
 # https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
+    CodeUri: lib/
     Timeout: 6
     Runtime: nodejs8.10
 
@@ -14,8 +15,8 @@ Resources:
     # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lib/
       Handler: index.handler
+      Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
         HttpGet:
           # More info about API Event Source:
@@ -27,11 +28,25 @@ Resources:
   ObjectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lib/
       Handler: object.handler
+      Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
         HttpGet:
           Type: Api
           Properties:
             Path: /objects/{objectId}
             Method: get
+  FunctionExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'lambda.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
