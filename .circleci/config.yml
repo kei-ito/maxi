@@ -68,7 +68,7 @@ workflows:
       - lint: {requires: [setup]}
       - build-server: {requires: [setup]}
       - test-server: {requires: [build-server]}
-      - deploy-server: {requires: [package-server]}
+      - deploy-server: {requires: [test-server]}
       - build-client: {requires: [setup]}
   # release:
   #   jobs:
