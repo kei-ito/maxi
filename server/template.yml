@@ -5,7 +5,6 @@ Transform: AWS::Serverless-2016-10-31
 # https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    CodeUri: lib/
     Timeout: 6
     Runtime: nodejs8.10
 
@@ -15,6 +14,7 @@ Resources:
     # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: lib
       Handler: index.handler
       Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
@@ -23,11 +23,12 @@ Resources:
           # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Type: Api
           Properties:
-            Path: /objects
+            Path: lib/objects
             Method: get
   ObjectFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: lib
       Handler: object.handler
       Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
