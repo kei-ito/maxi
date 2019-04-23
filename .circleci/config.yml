@@ -1,42 +1,5 @@
 version: 2.1
 jobs:
-  build:
-    docker: [{image: "circleci/node:lts"}]
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - dependencies-{{ checksum "package-lock.json" }}
-            - dependencies-
-      - run: npm ci
-      - save_cache:
-          paths: [node_modules]
-          key: dependencies-{{ checksum "package-lock.json" }}
-      - run: npm run build
-      - run: git diff --exit-code
-      - persist_to_workspace: {root: ., paths: [.]}
-  test:
-    docker: [{image: "circleci/node:lts"}]
-    steps:
-      - attach_workspace: {at: .}
-      - run: npm test
-  lint:
-    docker: [{image: "circleci/node:lts"}]
-    steps:
-      - attach_workspace: {at: .}
-      - run: npm run lint
-  package:
-    docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
-    steps:
-      - attach_workspace:
-          at: .
-      - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $BUCKET
-  deploy:
-    docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
-    steps:
-      - attach_workspace:
-          at: .
-      - run: echo "Deploy"
   onDevelopBranch:
     docker: [{image: "circleci/node:lts"}]
     steps:
@@ -49,6 +12,55 @@ jobs:
     docker: [{image: "circleci/node:lts"}]
     steps:
       - run: if [[ -z $CIRCLE_TAG ]]; then exit 1; fi
+  setup:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "package-lock.json" }}
+            - dependencies-
+      - run: npm ci
+      - save_cache:
+          paths: [node_modules]
+          key: dependencies-{{ checksum "package-lock.json" }}
+      - persist_to_workspace: {root: ., paths: [.]}
+  lint:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: npm run lint
+  test-server:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: npm test
+  build-server:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: npm run build:server
+      - run: git diff --exit-code
+      - persist_to_workspace: {root: ., paths: [.]}
+  package-server:
+    docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
+    steps:
+      - attach_workspace:
+          at: .
+      - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $BUCKET
+  deploy-server:
+    docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
+    steps:
+      - attach_workspace:
+          at: .
+      - run: aws cloudformation deploy --template-file server/output-template.yml --stack-name maxiapp-server
+  build-client:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: npm run build:client
+      - run: git diff --exit-code
+      - persist_to_workspace: {root: ., paths: [.]}
 workflows:
   version: 2
   run-tests:
@@ -57,33 +69,35 @@ workflows:
           filters:
             branches: {ignore: master}
             tags: {ignore: /.*/}
-      - build: {requires: [onDevelopBranch]}
-      - test: {requires: [build]}
-      - lint: {requires: [build]}
-      - package: {requires: [test]}
-  release:
-    jobs:
-      - isTagged:
-          filters:
-            branches: {ignore: /.*/}
-            tags: {only: /^v.*/}
-      - build:
-          requires: [isTagged]
-          filters:
-            branches: {ignore: /.*/}
-            tags: {only: /^v.*/}
-      - test:
-          requires: [build]
-          filters:
-            branches: {ignore: /.*/}
-            tags: {only: /^v.*/}
-      - lint:
-          requires: [build]
-          filters:
-            branches: {ignore: /.*/}
-            tags: {only: /^v.*/}
-      - deploy:
-          requires: [test, lint]
-          filters:
-            branches: {ignore: /.*/}
-            tags: {only: /^v.*/}
+      - lint: {requires: [onDevelopBranch]}
+      - build-server: {requires: [onDevelopBranch]}
+      - test-server: {requires: [build-server]}
+      - package-server: {requires: [test-server]}
+      - deploy-server: {requires: [package-server]}
+      - build-client: {requires: [onDevelopBranch]}
+  # release:
+  #   jobs:
+  #     - isTagged:
+  #         filters:
+  #           branches: {ignore: /.*/}
+  #           tags: {only: /^v.*/}
+  #     - build:
+  #         requires: [isTagged]
+  #         filters:
+  #           branches: {ignore: /.*/}
+  #           tags: {only: /^v.*/}
+  #     - test:
+  #         requires: [build]
+  #         filters:
+  #           branches: {ignore: /.*/}
+  #           tags: {only: /^v.*/}
+  #     - lint:
+  #         requires: [build]
+  #         filters:
+  #           branches: {ignore: /.*/}
+  #           tags: {only: /^v.*/}
+  #     - deploy:
+  #         requires: [test, lint]
+  #         filters:
+  #           branches: {ignore: /.*/}
+  #           tags: {only: /^v.*/}
