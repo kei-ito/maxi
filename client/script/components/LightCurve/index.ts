@@ -47,8 +47,8 @@ const createTextPositionFixer = (
                 return;
             }
             const x = Number(element.getAttribute('data-x'));
-            const minX = margin.left + element.getBoundingClientRect().width * 0.5;
-            element.setAttribute('x', `${Math.max(x, minX)}`);
+            const minMJD = margin.left + element.getBoundingClientRect().width * 0.5;
+            element.setAttribute('x', `${Math.max(x, minMJD)}`);
         };
     }
     if (index === length - 1) {
@@ -73,44 +73,44 @@ export const LightCurve = (
     props: ILightCurveProps,
 ) => {
     const svgRef = useRef<HTMLCanvasElement>(null);
-    const [xRange, setXRange] = useState<[number, number]>([Infinity, 0]);
+    const [mjdRange, setMJDRange] = useState<[number, number]>([Infinity, 0]);
     const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.9);
     const [xTicks, setXTicks] = useState<{mjd: ITicks, date: IDateTicks} | null>(null);
     const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
-    const [minOffset, setMinOffset] = useState(0);
-    const [rmaxOffset, setMaxOffset] = useState(0);
+    const [minOffsetMJD, setMinOffsetMJD] = useState(0);
+    const [maxOffsetMJD, setMaxOffsetMJD] = useState(0);
     const objectCount = props.objects.length;
     const areaWidth = svgWidth - margin.left - margin.right;
     const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * objectCount - margin.gap + margin.bottom;
-    const minX = xRange[0] + minOffset;
-    const maxX = xRange[1] + rmaxOffset;
-    const rangeX = maxX - minX;
-    const scaleX = areaWidth / rangeX;
+    const minMJD = mjdRange[0] + minOffsetMJD;
+    const maxMJD = mjdRange[1] + maxOffsetMJD;
+    const rangeMJD = maxMJD - minMJD;
+    const scaleX = areaWidth / rangeMJD;
     const isReady = 0 < scaleX;
     const left = margin.left;
     const right = left + areaWidth;
-    const X = (mjd: number) => left + scaleX * (mjd - minX);
-    const xToMJD = (x: number) => minX + (x - margin.left) * rangeX / areaWidth;
+    const X = (mjd: number) => left + scaleX * (mjd - minMJD);
+    const xToMJD = (x: number) => minMJD + (x - margin.left) * rangeMJD / areaWidth;
 
     useEffect(() => {
-        let minX = Infinity;
-        let maxX = 0;
+        let minMJD = Infinity;
+        let maxMJD = 0;
         props.objects.forEach((id) => {
             const data = props.cache.get(id);
             if (data) {
-                minX = Math.min(minX, data.minX) + minOffset;
-                maxX = Math.max(maxX, data.maxX) + rmaxOffset;
+                minMJD = Math.min(minMJD, data.minX) + minOffsetMJD;
+                maxMJD = Math.max(maxMJD, data.maxX) + maxOffsetMJD;
             }
         });
-        setXRange([minX, maxX]);
+        setMJDRange([minMJD, maxMJD]);
     }, [props.objects, props.cache]);
 
     useEffect(() => {
-        const mjd = getTicks(minX, maxX, areaWidth / 160);
-        const date = getDateTicks(mjdToDate(minX), mjdToDate(maxX), areaWidth / 160);
+        const mjd = getTicks(minMJD, maxMJD, areaWidth / 160);
+        const date = getDateTicks(mjdToDate(minMJD), mjdToDate(maxMJD), areaWidth / 160);
         setXTicks(mjd && date ? {mjd, date} : null);
-    }, [minX, maxX]);
+    }, [minMJD, maxMJD]);
 
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -148,13 +148,13 @@ export const LightCurve = (
                     if (event.ctrlKey) {
                         const dy = event.deltaY / scaleX;
                         const r = (x - left) / areaWidth;
-                        setMinOffset(minOffset + dy * -r);
-                        setMaxOffset(rmaxOffset + dy * (1 - r));
+                        setMinOffsetMJD(minOffsetMJD + dy * -r);
+                        setMaxOffsetMJD(maxOffsetMJD + dy * (1 - r));
                         event.preventDefault();
                     } else if (event.shiftKey) {
                         const dy = event.deltaY / scaleX;
-                        setMinOffset(minOffset + dy);
-                        setMaxOffset(rmaxOffset + dy);
+                        setMinOffsetMJD(minOffsetMJD + dy);
+                        setMaxOffsetMJD(maxOffsetMJD + dy);
                         event.preventDefault();
                     }
                 }
@@ -177,62 +177,86 @@ export const LightCurve = (
                     const onMouseMove = (event: MouseEvent) => {
                         const dx = x0 - event.clientX;
                         const dy = y0 - event.clientY;
-                        const newRangeX = rangeX * (1.01 ** dy);
+                        const newRangeX = rangeMJD * (1.01 ** dy);
                         const dh = newRangeX * dx / areaWidth;
-                        const dv = newRangeX - rangeX;
-                        setMinOffset(minOffset + dh - dv * r);
-                        setMaxOffset(rmaxOffset + dh + dv * (1 - r));
+                        const dv = newRangeX - rangeMJD;
+                        setMinOffsetMJD(minOffsetMJD + dh - dv * r);
+                        setMaxOffsetMJD(maxOffsetMJD + dh + dv * (1 - r));
                     };
                     addEventListener('mouseup', onMouseUp, {passive: true});
                     addEventListener('mousemove', onMouseMove, {passive: true});
                 }
             }
         };
-        // const onTouchStart = (event: TouchEvent) => {
-        //     const svgElement = svgRef.current;
-        //     const touch01 = event.touches.item(0);
-        //     const touch02 = event.touches.item(1);
-        //     if (svgElement && touch01 && touch02) {
-        //         event.preventDefault();
-        //         const rect = svgElement.getBoundingClientRect();
-        //         const onTouchEnd = (event: TouchEvent) => {
-        //             if (event.touches.length <= 1) {
-        //                 removeEventListener('touchmove', onTouchEnd);
-        //                 removeEventListener('touchend', onTouchStart);
-        //             }
-        //         };
-        //         const onMouseMove = (event: TouchEvent) => {
-        //             const touch11 = event.touches.item(0);
-        //             const touch12 = event.touches.item(1);
-        //             if (touch11 && touch12) {
-        //                 const dx = touch11 - event.clientX;
-        //                 const dy = y0 - event.clientY;
-    
-        //             } else {
-        //                 onTouchEnd(event);
-        //             }
-        //             const newRangeX = rangeX * (1.01 ** dy);
-        //             const dh = newRangeX * dx / areaWidth;
-        //             const dv = newRangeX - rangeX;
-        //             setMinOffset(minOffset + dh - dv * r);
-        //             setMaxOffset(rmaxOffset + dh + dv * (1 - r));
-        //         };
-        //         addEventListener('mouseup', onMouseUp, {passive: true});
-        //         addEventListener('mousemove', onMouseMove, {passive: true});
-        //     }
-        // };
+        const onTouchStart = (event: TouchEvent) => {
+            const svgElement = svgRef.current;
+            const touch11 = event.touches.item(0);
+            const touch12 = event.touches.item(1);
+            if (svgElement && touch11 && touch12) {
+                event.preventDefault();
+                const rect = svgElement.getBoundingClientRect();
+                const x0 = rect.left + margin.left;
+                const x11 = touch11.clientX - x0;
+                const x12 = touch12.clientX - x0;
+                const distance1 = Math.abs(x11 - x12);
+                const x1 = (x11 + x12) / 2;
+                const L1 = x1 / areaWidth;
+                const R1 = 1 - L1;
+                const onTouchEnd = (event: TouchEvent) => {
+                    if (event.touches.length <= 1) {
+                        removeEventListener('touchmove', onTouchEnd);
+                        removeEventListener('touchend', onTouchStart);
+                    }
+                };
+                const onToucheMove = (event: TouchEvent) => {
+                    let touch21: Touch | null = null;
+                    let touch22: Touch | null = null;
+                    for (let index = event.touches.length; index--;) {
+                        const touch = event.touches.item(index);
+                        if (touch) {
+                            const id = touch.identifier;
+                            if (id === touch11.identifier) {
+                                touch21 = touch;
+                            } else if (id === touch12.identifier) {
+                                touch22 = touch;
+                            }
+                        }
+                    }
+                    if (touch21 && touch22) {
+                        const x21 = touch21.clientX - x0;
+                        const x22 = touch22.clientX - x0;
+                        const distance2 = Math.abs(x21 - x22);
+                        const x2 = (x21 + x22) / 2;
+                        const L2 = x2 / areaWidth;
+                        const R2 = 1 - L2;
+                        const scale = distance2 / distance1;
+                        const dL = L1 * scale - L2;
+                        const dR = R1 * scale - R2;
+                        const newRangeMJD = rangeMJD / scale;
+                        setMinOffsetMJD(minOffsetMJD + newRangeMJD * dL);
+                        setMaxOffsetMJD(maxOffsetMJD - newRangeMJD * dR);
+                    } else {
+                        onTouchEnd(event);
+                    }
+                };
+                addEventListener('touchend', onTouchEnd, {passive: true});
+                addEventListener('touchmove', onToucheMove, {passive: true});
+            }
+        };
         const svg = svgRef.current;
         if (svg) {
             svg.addEventListener('wheel', onWheel);
             svg.addEventListener('mousedown', onMouseDown);
+            svg.addEventListener('touchstart', onTouchStart);
         }
         return () => {
             if (svg) {
                 svg.removeEventListener('wheel', onWheel);
                 svg.removeEventListener('mousedown', onMouseDown);
+                svg.removeEventListener('touchstart', onTouchStart);
             }
         };
-    }, [svgRef, minX, maxX]);
+    }, [svgRef, minMJD, maxMJD]);
 
     return createElement(
         'svg',
