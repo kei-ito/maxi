@@ -9,7 +9,7 @@
         "dev:client": "parcel client/index.html",
         "dev:server:tsc": "tsc --project server/tsconfig.json --watch --preserveWatchOutput",
         "dev:server": "run-p dev:server:*",
-        "dev:start-server": "sam local start-api --region ap-northeast-1 --template server/template.yaml",
+        "dev:start-server": "sam local start-api --region ap-northeast-1 --template server/template.yml",
         "dev": "run-p dev:server dev:client",
         "test:server": "ava server/**/*.test.ts",
         "test": "run-p test:server",
