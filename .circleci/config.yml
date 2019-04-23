@@ -60,7 +60,7 @@ workflows:
       - build: {requires: [onDevelopBranch]}
       - test: {requires: [build]}
       - lint: {requires: [build]}
-      - pacakge: {requires: [test]}
+      - package: {requires: [test]}
   release:
     jobs:
       - isTagged:
