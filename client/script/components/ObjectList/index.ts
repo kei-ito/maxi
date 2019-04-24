@@ -1,4 +1,4 @@
-import {createElement, PointerEvent, KeyboardEvent} from 'react';
+import {createElement, PointerEvent, KeyboardEvent, useRef, useState} from 'react';
 import {IObject, Mode, IObjectMap} from '../../types';
 import {Loading} from '../Loading/index';
 import classes from './style.css';
@@ -42,8 +42,11 @@ export const getModeFromEvent = (
 export const ObjectList = (
     props: IObjectMapProps,
 ) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [initialSelected, setInitialSelected] = useState<string | null>(null);
     const rows = [createHeading(0)];
     if (props.objectMap) {
+        let selectedObjectIsFound = false;
         props.objectMap.forEach((object) => {
             const isSelected = props.selected.includes(object.id);
             if (!object.hash.includes(props.searchWords)) {
@@ -64,6 +67,17 @@ export const ObjectList = (
                         }
                     },
                     'data-selected': isSelected ? '' : null,
+                    'ref': selectedObjectIsFound || initialSelected || !isSelected ? null : (trElement) => {
+                        const containerElement = containerRef.current;
+                        if (containerElement && trElement) {
+                            const containerRect = containerElement.getBoundingClientRect();
+                            const trTop = trElement.getBoundingClientRect().top;
+                            const diff = trTop - (containerRect.top + containerRect.height * 0.3);
+                            containerElement.scrollTop = diff;
+                            setInitialSelected(object.id);
+
+                        }
+                    },
                 },
                 createElement('td', {className: classes.id}, object.id),
                 createElement(
@@ -77,11 +91,15 @@ export const ObjectList = (
                 createElement('td', {className: classes.number}, object.B.toFixed(3)),
                 createElement('td', null, object.category),
             ));
+            selectedObjectIsFound = selectedObjectIsFound || isSelected;
         });
     }
     return createElement(
         'div',
-        {className: classes.container},
+        {
+            className: classes.container,
+            ref: containerRef,
+        },
         props.loading && Loading({
             message: 'Loading objects...',
             htmlProps: {className: classes.loading},

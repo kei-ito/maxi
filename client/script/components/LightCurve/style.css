@@ -36,24 +36,29 @@
 }
 
 [data-band='2-20keV']>.plot {
-    stroke: black;
+    --stroke: black;
 }
 
 [data-band='2-4keV']>.plot {
-    stroke: red;
+    --stroke: red;
 }
 
 [data-band='4-10keV']>.plot {
-    stroke: green;
+    --stroke: green;
 }
 
 [data-band='10-20keV']>.plot {
-    stroke: blue;
+    --stroke: blue;
 }
 
-.plot.average {
-    stroke-width: 2;
-    opacity: 0.2;
+.plot {
+    stroke: var(--stroke);
+}
+
+.plot.error {
+    stroke: none;
+    fill: var(--stroke);
+    opacity: 0.3;
 }
 
 .yLabel {

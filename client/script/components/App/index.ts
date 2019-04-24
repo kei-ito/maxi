@@ -1,16 +1,22 @@
-import {useState, createElement, useEffect, Fragment, useReducer} from 'react';
+import {useState, createElement, useEffect, Fragment, useReducer, ChangeEvent} from 'react';
 import {getObjectMap} from '../../util/getObjectMap';
 import {Mode, ILightCurveData, IError, IObjectMap, IRollingAverageData, IPreferences} from '../../types';
 import {getLightCurveData} from '../../util/getData';
 import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
-import {getDefaultPreferences, filterBinSize, filterMaxMJD, filterMinMJD} from '../../util/getDefaultPreferences';
-import {URLParameterKey} from '../../util/constants';
+import {getDefaultPreferences, filterBinSize, filterMJDRange, filterPlotType} from '../../util/getDefaultPreferences';
+import {URLParameterKey, AvailablePlotTypes} from '../../util/constants';
 import {ObjectList} from '../ObjectList/index';
-import {Preferences} from '../Preferences/index';
 import {LightCurve} from '../LightCurve/index';
 import {SearchForm} from '../SearchForm/index';
 import {normalizeSearchText} from '../../util/normalizeSearchText';
+import classes from './style.css';
+
+export const getInitialSelectedObjects = (): Array<string> => {
+    const urlParameters = new URLSearchParams(location.search);
+    const parameter = urlParameters.get(URLParameterKey.selected);
+    return parameter ? parameter.trim().split(/\s*,\s*/) : [];
+};
 
 export const App = () => {
     const [errors, onError] = useReducer(
@@ -20,20 +26,31 @@ export const App = () => {
         ) => errors.concat(newError),
         [],
     );
-    const [preferences, setPreferences] = useReducer(
+    const [preferences, __setPreferences] = useReducer(
         (
             currentPreferences: IPreferences,
             nextPreferences: Partial<IPreferences>,
         ): IPreferences => ({
             binSize: filterBinSize(nextPreferences.binSize || currentPreferences.binSize),
-            minMJD: filterMinMJD(nextPreferences.minMJD || currentPreferences.minMJD),
-            maxMJD: filterMaxMJD(nextPreferences.maxMJD || currentPreferences.maxMJD),
+            mjdRange: filterMJDRange(nextPreferences.mjdRange || currentPreferences.mjdRange),
+            plotType: filterPlotType(nextPreferences.plotType || currentPreferences.plotType),
         }),
-        getDefaultPreferences(),
+        getDefaultPreferences(new URLSearchParams(location.search)),
+    );
+    const [preferencesBuffer, requestPreferenceUpdate] = useReducer(
+        (
+            currentPreferencesBuffer: Partial<IPreferences>,
+            updates: Partial<IPreferences>,
+        ): Partial<IPreferences> => ({
+            binSize: updates.binSize || currentPreferencesBuffer.binSize,
+            mjdRange: updates.mjdRange || currentPreferencesBuffer.mjdRange,
+            plotType: updates.plotType || currentPreferencesBuffer.plotType,
+        }),
+        getDefaultPreferences(new URLSearchParams(location.search)),
     );
     const [objectMap, setObjectMap] = useState<IObjectMap | null>(null);
     const [searchWords, setSearchWords] = useState('');
-    const [selected, setSelected] = useState<Array<string>>([]);
+    const [selected, setSelected] = useState<Array<string>>(getInitialSelectedObjects());
     const [loading, setLoading] = useState(-1);
     const lightCurveCache = useCache<ILightCurveData>({
         keys: selected,
@@ -54,24 +71,23 @@ export const App = () => {
     });
 
     useEffect(() => {
+        const timerId = setTimeout(() => __setPreferences(preferencesBuffer), 300);
+        return () => clearTimeout(timerId);
+    }, [preferencesBuffer]);
+
+    useEffect(() => {
         if (loading === -1 && !objectMap) {
             setLoading(1);
             getObjectMap()
             .then((newObjectMap) => {
-                const urlParameters = new URLSearchParams(location.search);
-                const requestedObjects = urlParameters.get(URLParameterKey.selected);
-                if (requestedObjects) {
-                    setSelected(
-                        requestedObjects.trim().split(/\s*,\s*/)
-                        .filter((objectId) => newObjectMap.has(objectId)),
-                    );
-                } else {
-                    const newObjects: Array<string> = [];
-                    newObjectMap.forEach((_, objectId) => {
-                        newObjects.push(objectId);
-                    });
-                    setSelected(newObjects.slice(0, 1));
+                const newSelected = selected.filter((objectId) => newObjectMap.has(objectId));
+                if (newSelected.length === 0) {
+                    const firstIteratorResult = newObjectMap.keys().next();
+                    if (!firstIteratorResult.done) {
+                        newSelected.push(firstIteratorResult.value);
+                    }
                 }
+                setSelected(newSelected);
                 setObjectMap(newObjectMap);
                 setLoading(0);
             })
@@ -84,9 +100,9 @@ export const App = () => {
             const urlParameters = new URLSearchParams();
             const selectedObjectsCSV = selected.join(',');
             urlParameters.set(URLParameterKey.selected, selectedObjectsCSV);
+            urlParameters.set(URLParameterKey.mjdRange, preferences.mjdRange.map((mjd) => mjd.toFixed(0)).join('-'));
             urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
-            urlParameters.set(URLParameterKey.minMJD, preferences.minMJD.toFixed(0));
-            urlParameters.set(URLParameterKey.maxMJD, preferences.maxMJD.toFixed(0));
+            urlParameters.set(URLParameterKey.plotType, `${preferences.plotType}`);
             const url = new URL(location.href);
             url.search = `${urlParameters}`;
             history.replaceState(null, selectedObjectsCSV, `${url}`);
@@ -157,10 +173,44 @@ export const App = () => {
                 createElement(
                     'li',
                     null,
-                    createElement(Preferences, {
-                        preferences,
-                        onChange: setPreferences,
-                    }),
+                    createElement('label', {htmlFor: URLParameterKey.binSize}, 'Bin size: '),
+                    createElement(
+                        'input',
+                        {
+                            id: URLParameterKey.binSize,
+                            type: 'number',
+                            min: 1,
+                            max: 100,
+                            defaultValue: preferences.binSize,
+                            onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                                requestPreferenceUpdate({binSize: filterBinSize(event.currentTarget.value)});
+                            },
+                        },
+                    ),
+                    `day${preferences.binSize === 1 ? '' : 's'}.`,
+                ),
+                createElement(
+                    'li',
+                    null,
+                    createElement('label', null, 'Plot type: '),
+                    ...AvailablePlotTypes.map((plotType) => createElement(
+                        'label',
+                        {className: classes.radioLabel},
+                        createElement(
+                            'input',
+                            {
+                                type: 'radio',
+                                name: URLParameterKey.plotType,
+                                value: plotType,
+                                defaultChecked: preferences.plotType === plotType,
+                                onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                                    requestPreferenceUpdate({plotType: filterPlotType(event.currentTarget.value)});
+                                },
+                            },
+                        ),
+                        plotType,
+                    )),
+                    '.',
                 ),
             ),
             createElement(
@@ -168,10 +218,10 @@ export const App = () => {
                 null,
                 createElement(LightCurve, {
                     preferences,
-                    objects: selected,
+                    objects: 0 < selected.length ? selected : [''],
                     objectMap,
                     cache: rollingAverageCache,
-                    setPreferences,
+                    setPreferences: __setPreferences,
                 }),
                 createElement(
                     'figcaption',
@@ -197,7 +247,7 @@ export const App = () => {
                 objectMap && createElement(
                     'li',
                     {id: 'List'},
-                    `${objectMap.sourceTitle}, `,
+                    `${objectMap.sourceTitle}. Retrieved ${objectMap.createdAt.toLocaleString()}. `,
                     createElement(
                         'a',
                         {href: objectMap.sourceURL, target: '_blank'},
@@ -209,7 +259,7 @@ export const App = () => {
                     return createElement(
                         'li',
                         {id: `Source-${objectId}`},
-                        `${data ? data.sourceTitle : objectId}, `,
+                        `${data ? `${data.sourceTitle}. Retrieved ${data.createdAt.toLocaleString()}` : objectId}. `,
                         createElement(
                             'a',
                             {href: data && data.sourceURL, target: '_blank'},
@@ -220,7 +270,7 @@ export const App = () => {
                 createElement(
                     'li',
                     {id: 'Source-GitHub'},
-                    'Source code of this app, ',
+                    'Source code of this app. ',
                     createElement(
                         'a',
                         {href: 'https://github.com/kei-ito/maxi', target: '_blank'},

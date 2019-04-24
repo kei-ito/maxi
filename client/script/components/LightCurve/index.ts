@@ -1,6 +1,6 @@
 import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment} from 'react';
 import classes from './style.css';
-import {IPreferences, Band, BandTitles, IObjectMap, ITicks, IDateTicks, IRollingAverageData} from '../../types';
+import {IPreferences, Band, BandTitles, IObjectMap, IRollingAverageData, PlotType, IRollingAverageBin} from '../../types';
 import {getTicks} from '../../util/getTicks';
 import {getDateTicks} from '../../util/getDateTicks';
 import {mjdToDate, dateToMJD} from '../../util/mjd';
@@ -33,7 +33,8 @@ const margin: IMargin = {
 const mainTickSize = 10;
 const subTickSize = 5;
 const getAreaHeight = () => window.innerHeight * 0.2;
-const createTextPositionFixer = (
+
+export const createTextPositionFixer = (
     index: number,
     length: number,
     margin: IMargin,
@@ -70,41 +71,41 @@ const createTextPositionFixer = (
     return null;
 };
 
+export const getXTicks = (
+    minMJD: number,
+    maxMJD: number,
+    numberOfTicks: number,
+) => {
+    const mjd = getTicks(minMJD, maxMJD, numberOfTicks);
+    const date = getDateTicks(mjdToDate(minMJD), mjdToDate(maxMJD), numberOfTicks);
+    return mjd && date ? {mjd, date} : null;
+};
+
 export const LightCurve = (
     props: ILightCurveProps,
 ) => {
     const svgRef = useRef<HTMLCanvasElement>(null);
-    const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.9);
-    const [xTicks, setXTicks] = useState<{mjd: ITicks, date: IDateTicks} | null>(null);
-    const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
-    const [mjdMinMax, setMinMaxMJD] = useState([props.preferences.minMJD, props.preferences.maxMJD]);
+    const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.94);
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
-    const objectCount = props.objects.length;
     const areaWidth = svgWidth - margin.left - margin.right;
-    const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * objectCount - margin.gap + margin.bottom;
-    const rangeMJD = mjdMinMax[1] - mjdMinMax[0];
-    const scaleX = areaWidth / rangeMJD;
-    const isReady = 0 < scaleX;
+    const [mjdRange, setMJDRange] = useState(props.preferences.mjdRange);
+    const [xTicks, setXTicks] = useState(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 160));
+    const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
+    const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * (props.objects.length || 1) - margin.gap + margin.bottom;
+    const rangeMJD = mjdRange[1] - mjdRange[0];
     const left = margin.left;
     const right = left + areaWidth;
-    const X = (mjd: number) => left + scaleX * (mjd - mjdMinMax[0]);
-    const xToMJD = (x: number) => mjdMinMax[0] + (x - margin.left) * rangeMJD / areaWidth;
+    const X = (mjd: number) => left + (areaWidth / rangeMJD) * (mjd - mjdRange[0]);
+    const xToMJD = (x: number) => mjdRange[0] + (x - margin.left) * rangeMJD / areaWidth;
 
     useEffect(() => {
-        const mjd = getTicks(mjdMinMax[0], mjdMinMax[1], areaWidth / 160);
-        const date = getDateTicks(mjdToDate(mjdMinMax[0]), mjdToDate(mjdMinMax[1]), areaWidth / 160);
-        setXTicks(mjd && date ? {mjd, date} : null);
-    }, [mjdMinMax]);
+        setXTicks(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 160));
+    }, [mjdRange, areaWidth]);
 
     useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            props.setPreferences({
-                minMJD: mjdMinMax[0],
-                maxMJD: mjdMinMax[1],
-            });
-        }, 800);
+        const timeoutId = setTimeout(() => props.setPreferences({mjdRange}), 800);
         return () => clearTimeout(timeoutId);
-    }, [mjdMinMax]);
+    }, [mjdRange]);
 
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -141,17 +142,17 @@ export const LightCurve = (
                 const rect = svgElement.getBoundingClientRect();
                 const x = event.clientX - rect.left;
                 if (left <= x && x <= right) {
-                    const dy = event.deltaY / scaleX;
+                    const dy = (rangeMJD - dMin + dMax) * event.deltaY / areaWidth;
                     if (event.ctrlKey) {
                         const r = (x - left) / areaWidth;
                         dMin += dy * -r;
                         dMax += dy * (1 - r);
-                        setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[1] + dMax]);
+                        setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
                         event.preventDefault();
                     } else if (event.shiftKey) {
                         dMin += dy;
                         dMax += dy;
-                        setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[1] + dMax]);
+                        setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
                         event.preventDefault();
                     }
                 }
@@ -185,7 +186,7 @@ export const LightCurve = (
                     const newRangeMJD = (rangeMJD - dMin0 + dMax0) / scale;
                     dMin = dMin0 + newRangeMJD * dL;
                     dMax = dMax0 + newRangeMJD * -dR;
-                    setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[1] + dMax]);
+                    setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
                 };
                 addEventListener('mouseup', onMouseUp, {passive: true});
                 addEventListener('mousemove', onMouseMove, {passive: true});
@@ -240,7 +241,7 @@ export const LightCurve = (
                         const newRangeMJD = (rangeMJD - dMin0 + dMax0) / scale;
                         dMin = dMin0 + newRangeMJD * dL;
                         dMax = dMax0 + newRangeMJD * -dR;
-                        setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[0] + dMax]);
+                        setMJDRange([mjdRange[0] + dMin, mjdRange[0] + dMax]);
                     } else {
                         onTouchEnd(event);
                     }
@@ -273,21 +274,17 @@ export const LightCurve = (
             ref: svgRef,
             viewBox: `0 0 ${svgWidth} ${svgHeight}`,
             onMouseMove: (event) => {
-                if (isReady) {
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    const x = event.clientX - rect.left;
-                    if (left <= x && x <= right) {
-                        const y = event.clientY - rect.top;
-                        setCursor({x, y});
-                    } else {
-                        setCursor(null);
-                    }
+                const rect = event.currentTarget.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                if (left <= x && x <= right) {
+                    const y = event.clientY - rect.top;
+                    setCursor({x, y});
+                } else {
+                    setCursor(null);
                 }
             },
             onMouseLeave: () => {
-                if (isReady) {
-                    setCursor(null);
-                }
+                setCursor(null);
             },
         },
         cursor && createElement(
@@ -357,7 +354,7 @@ export const LightCurve = (
                 Fragment,
                 null,
                 ...props.objects.map((id, objectIndex) => {
-                    const index = objectCount * band + objectIndex;
+                    const index = props.objects.length * band + objectIndex;
                     const fluxIndex = band * 2 + 3;
                     const errorIndex = band * 2 + 4;
                     const bottom = margin.top + areaHeight * (index + 1) + margin.gap * index;
@@ -399,6 +396,8 @@ export const LightCurve = (
                             `${object.name} (${object.id}) ${bandTitle}`,
                         ));
                     }
+                    const mjdTicks = xTicks && xTicks.mjd;
+                    const dateTicks = xTicks && xTicks.date;
                     const data = props.cache.get(id);
                     if (data) {
                         const minY = data.minY[band];
@@ -407,8 +406,6 @@ export const LightCurve = (
                         const scaleY = areaHeight / rangeY;
                         const Y = (flux: number) => bottom - scaleY * (flux - minY);
                         const yTicks = getTicks(minY, maxY, areaHeight / 100);
-                        const mjdTicks = xTicks && xTicks.mjd;
-                        const dateTicks = xTicks && xTicks.date;
                         elements.push(
                             createElement(
                                 'path',
@@ -436,55 +433,99 @@ export const LightCurve = (
                                 )),
                             );
                         }
-                        let previousBinEndMJD = -1;
-                        const rollingAverageD = data.bins.map((bin) => {
-                            const x = X(bin[0]);
-                            const y = Y(bin[fluxIndex]);
-                            const jump = previousBinEndMJD < bin[1];
-                            previousBinEndMJD = bin[2];
-                            if (left <= x && x <= right) {
-                                return `${jump ? 'M' : 'L'}${x},${y}`;
+                        if (props.preferences.plotType === PlotType.Line) {
+                            let previousBinEndMJD = -1;
+                            let bins: Array<IRollingAverageBin> = [];
+                            const errorD: Array<string> = [];
+                            const flushErrorPath = () => {
+                                if (0 < bins.length) {
+                                    errorD.push([
+                                        `M${bins.map((bin) => `${X(bin[0])},${Y(bin[fluxIndex] + bin[fluxIndex + 1])}`).join('L')}`,
+                                        `L${bins.reverse().map((bin) => `${X(bin[0])},${Y(bin[fluxIndex] - bin[fluxIndex + 1])}`).join('L')}z`,
+                                        'z',
+                                    ].join(''));
+                                }
+                                bins = [];
+                            };
+                            const rollingAverageD = data.bins.map((bin) => {
+                                const x = X(bin[0]);
+                                const y = Y(bin[fluxIndex]);
+                                const jump = previousBinEndMJD < bin[1];
+                                previousBinEndMJD = bin[2];
+                                if (left <= x && x <= right) {
+                                    if (jump) {
+                                        flushErrorPath();
+                                        bins.push(bin);
+                                        return `M${x},${y}`;
+                                    } else {
+                                        bins.push(bin);
+                                        return `L${x},${y}`;
+                                    }
+                                }
+                                return '';
+                            }).join('');
+                            flushErrorPath();
+                            if (rollingAverageD) {
+                                elements.push(
+                                    createElement(
+                                        'path',
+                                        {
+                                            className: classnames(classes.plot, classes.error),
+                                            key: `${PlotType.Line}-error`,
+                                            d: errorD.join(''),
+                                        },
+                                    ),
+                                    createElement(
+                                        'path',
+                                        {
+                                            className: classes.plot,
+                                            key: PlotType.Line,
+                                            d: `M${rollingAverageD.slice(1)}`,
+                                        },
+                                    ),
+                                );
                             }
-                            return '';
-                        }).join('');
-                        if (rollingAverageD) {
+                        } else {
+                            let previousBinEndMJD = -1;
                             elements.push(
                                 createElement(
                                     'path',
                                     {
-                                        className: classnames(classes.plot, classes.average),
-                                        key: 'average',
-                                        d: `M${rollingAverageD.slice(1)}`,
+                                        className: classes.plot,
+                                        key: PlotType.Point,
+                                        d: data.bins.map((bin) => {
+                                            if (bin[1] < previousBinEndMJD) {
+                                                return '';
+                                            }
+                                            previousBinEndMJD = bin[2];
+                                            const x = X(bin[0]);
+                                            const xL = X(bin[1]);
+                                            const xR = X(bin[2]);
+                                            const y = Y(bin[fluxIndex]);
+                                            const e = bin[errorIndex] * scaleY;
+                                            const fragments: Array<string> = [];
+                                            if (left < xR && xL < right) {
+                                                fragments.push(`M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
+                                                if (left <= x && x <= right) {
+                                                    fragments.push(`M${x},${y - e}V${y + e}M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
+                                                }
+                                            }
+                                            return fragments.join('');
+                                        }).join(''),
                                     },
                                 ),
                             );
                         }
-                        previousBinEndMJD = -1;
+                    } else {
                         elements.push(
                             createElement(
                                 'path',
                                 {
-                                    className: classes.plot,
-                                    key: 'plot',
-                                    d: data.bins.map((bin) => {
-                                        if (bin[1] < previousBinEndMJD) {
-                                            return '';
-                                        }
-                                        previousBinEndMJD = bin[2];
-                                        const x = X(bin[0]);
-                                        const xL = X(bin[1]);
-                                        const xR = X(bin[2]);
-                                        const y = Y(bin[fluxIndex]);
-                                        const e = bin[errorIndex] * scaleY;
-                                        const fragments: Array<string> = [];
-                                        if (left < xR && xL < right) {
-                                            fragments.push(`M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
-                                            if (left <= x && x <= right) {
-                                                fragments.push(`M${x},${y - e}V${y + e}M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
-                                            }
-                                        }
-                                        return fragments.join('');
-                                    }).join(''),
+                                    key: 'ticks',
+                                    d: [
+                                        (dateTicks ? dateTicks.sub.map((date, index) => `M${X(dateToMJD(date))},${top}v${(index - dateTicks.stepOffset) % dateTicks.step === 0 ? mainTickSize : subTickSize}`).join('') : ''),
+                                        (mjdTicks ? mjdTicks.sub.map((mjd, index) => `M${X(mjd)},${bottom}v${-((index - mjdTicks.stepOffset) % mjdTicks.step === 0 ? mainTickSize : subTickSize)}`).join('') : ''),
+                                    ].join(''),
                                 },
                             ),
                         );

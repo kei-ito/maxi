@@ -197,8 +197,10 @@ text {
     stroke: none;
 }
 
+select,
 input {
     font: inherit;
+
 }
 
 input[type=text],
