@@ -69,7 +69,7 @@ jobs:
     steps:
       - attach_workspace: {at: .}
       - run: aws s3 cp client/output s3://$S3_CLIENTAPP_BUCKET/ --recursive
-      - run: aws create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths /index.html
+      - run: aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths /index.html
 workflows:
   version: 2
   run-tests:
