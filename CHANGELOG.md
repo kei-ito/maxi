@@ -1,3 +1,13 @@
+<a name="1.1.5"></a>
+## [1.1.5](https://github.com/kei-ito/maxi/compare/v1.1.4...v1.1.5) (2019-04-24)
+
+
+### Bug Fixes
+
+* fix the deploy command ([f3d72a9](https://github.com/kei-ito/maxi/commit/f3d72a9))
+
+
+
 <a name="1.1.4"></a>
 ## [1.1.4](https://github.com/kei-ito/maxi/compare/v1.1.3...v1.1.4) (2019-04-24)
 
