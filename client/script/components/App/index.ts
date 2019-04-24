@@ -5,7 +5,7 @@ import {getLightCurveData} from '../../util/getData';
 import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
 import {getDefaultPreferences, filterBinSize, filterMJDRange, filterPlotType} from '../../util/getDefaultPreferences';
-import {URLParameterKey, AvailablePlotTypes} from '../../util/constants';
+import {URLParameterKey, AvailablePlotTypes, pageTitle} from '../../util/constants';
 import {ObjectList} from '../ObjectList/index';
 import {LightCurve} from '../LightCurve/index';
 import {SearchForm} from '../SearchForm/index';
@@ -52,6 +52,13 @@ export const App = () => {
     const [searchWords, setSearchWords] = useState('');
     const [selected, setSelected] = useState<Array<string>>(getInitialSelectedObjects());
     const [loading, setLoading] = useState(-1);
+    const [currentURL, setURLParameters] = useReducer(
+        (
+            currentURL: URL,
+            urlParameters: URLSearchParams,
+        ): URL => new URL(`?${urlParameters}`, currentURL),
+        new URL(location.href),
+    );
     const lightCurveCache = useCache<ILightCurveData>({
         keys: selected,
         getter: getLightCurveData,
@@ -103,16 +110,22 @@ export const App = () => {
             urlParameters.set(URLParameterKey.mjdRange, preferences.mjdRange.map((mjd) => mjd.toFixed(0)).join('-'));
             urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
             urlParameters.set(URLParameterKey.plotType, `${preferences.plotType}`);
-            const url = new URL(location.href);
-            url.search = `${urlParameters}`;
-            history.replaceState(null, selectedObjectsCSV, `${url}`);
+            setURLParameters(urlParameters);
         }
     }, [selected, preferences, loading]);
+
+    useEffect(() => history.replaceState(null, '', `${currentURL}`), [currentURL]);
+    useEffect(() => {
+        document.title = `${selected.map((objectId) => {
+            const object = objectMap && objectMap.get(objectId);
+            return object ? object.name : objectId;
+        }).join(', ')} | ${pageTitle}`;
+    }, [selected, objectMap]);
 
     return createElement(
         Fragment,
         null,
-        createElement('header', null, createElement('h1', null, 'MAXI GSC Data Viewer')),
+        createElement('header', null, createElement('h1', null, pageTitle)),
         createElement(
             'article',
             null,
@@ -167,9 +180,6 @@ export const App = () => {
             createElement(
                 'ul',
                 null,
-                createElement('li', null, 'Drag horizontally to move the range.'),
-                createElement('li', null, 'Drag vertically to change the scale.'),
-                createElement('li', null, 'For a touch device, Pinch with 2 fingers to change the range.'),
                 createElement(
                     'li',
                     null,
@@ -238,6 +248,21 @@ export const App = () => {
                         ),
                     )),
                     '.',
+                ),
+            ),
+            createElement('h1', null, 'Tips'),
+            createElement(
+                'ol',
+                null,
+                createElement('li', null, 'To move the range, drag horizontally or scroll while holding Shift key.'),
+                createElement('li', null, 'To change the scale, drag vertically or scroll while holding Ctrl key.'),
+                createElement('li', null, 'For a touch device, Pinch with 2 fingers to change the range.'),
+                createElement(
+                    'li',
+                    null,
+                    'The URL ',
+                    createElement('a', {href: `${currentURL}`}, `${currentURL}`),
+                    ' contains the current state of this app. You can share it to others and reproduce what you see now on their devices.',
                 ),
             ),
             createElement('h1', null, 'References'),

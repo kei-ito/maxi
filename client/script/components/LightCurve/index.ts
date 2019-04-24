@@ -1,11 +1,9 @@
 import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment} from 'react';
 import classes from './style.css';
-import {IPreferences, Band, BandTitles, IObjectMap, IRollingAverageData, PlotType, IRollingAverageBin} from '../../types';
+import {IPreferences, Band, BandTitles, IObjectMap, IRollingAverageData, PlotType, IRollingAverageBin, BandColors, Color} from '../../types';
 import {getTicks} from '../../util/getTicks';
 import {getDateTicks} from '../../util/getDateTicks';
 import {mjdToDate, dateToMJD} from '../../util/mjd';
-import {classnames} from '../../util/classnames';
-
 interface ILightCurveProps {
     preferences: IPreferences,
     objects: Array<string>,
@@ -24,7 +22,7 @@ interface IMargin {
 
 const bandCount = 4;
 const margin: IMargin = {
-    left: 46,
+    left: 50,
     right: 0.5,
     top: 18,
     bottom: 18,
@@ -64,7 +62,7 @@ export const createTextPositionFixer = (
             }
             const x = Number(element.getAttribute('data-x'));
             const right = x + element.getBoundingClientRect().width * 0.5;
-            const d = parent.getBoundingClientRect().width - right;
+            const d = parent.getBoundingClientRect().width - right - 40;
             element.setAttribute('x', `${Math.min(x, x + d)}`);
         };
     }
@@ -84,12 +82,12 @@ export const getXTicks = (
 export const LightCurve = (
     props: ILightCurveProps,
 ) => {
-    const svgRef = useRef<HTMLCanvasElement>(null);
+    const svgRef = useRef<SVGSVGElement>(null);
     const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.94);
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
     const areaWidth = svgWidth - margin.left - margin.right;
     const [mjdRange, setMJDRange] = useState(props.preferences.mjdRange);
-    const [xTicks, setXTicks] = useState(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 160));
+    const [xTicks, setXTicks] = useState(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 200));
     const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
     const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * (props.objects.length || 1) - margin.gap + margin.bottom;
     const rangeMJD = mjdRange[1] - mjdRange[0];
@@ -273,6 +271,10 @@ export const LightCurve = (
             className: classes.svg,
             ref: svgRef,
             viewBox: `0 0 ${svgWidth} ${svgHeight}`,
+            fontSize: '14px',
+            strokeLinecap: 'round',
+            strokeLinejoin: 'round',
+            fill: 'none',
             onMouseMove: (event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
                 const x = event.clientX - rect.left;
@@ -293,25 +295,30 @@ export const LightCurve = (
             createElement(
                 'path',
                 {
-                    className: classes.cursorLine,
                     d: `M${cursor.x},1V${svgHeight - 1}`,
+                    stroke: Color.black,
+                    opacity: 0.3,
                 },
             ),
             createElement(
                 'text',
                 {
-                    className: classes.cursorText,
                     x: cursor.x + 2,
                     y: cursor.y - 12,
+                    fontSize: '80%',
+                    fill: Color.black,
+                    opacity: 0.7,
                 },
                 `${xToMJD(cursor.x).toFixed(0)}MJD`,
             ),
             createElement(
                 'text',
                 {
-                    className: classes.cursorText,
                     x: cursor.x + 2,
                     y: cursor.y - 2,
+                    fontSize: '80%',
+                    fill: Color.black,
+                    opacity: 0.7,
                 },
                 `${mjdToDate(xToMJD(cursor.x)).toISOString().split('T')[0]}`,
             ),
@@ -325,31 +332,58 @@ export const LightCurve = (
                     'text',
                     {
                         'data-x': x,
-                        'className': classnames(classes.alignBottom, classes.alignCenter),
                         'x': x,
                         'y': margin.top - 4,
                         'ref': createTextPositionFixer(index, xTicks.date.main.length, margin),
+                        'fill': Color.black,
+                        'dominantBaseline': 'baseline',
+                        'textAnchor': 'middle',
                     },
                     `${xTicks.date.toString(date)}`,
                 );
             }),
+            createElement(
+                'text',
+                {
+                    x: right,
+                    y: margin.top - 4,
+                    fill: Color.black,
+                    dominantBaseline: 'baseline',
+                    textAnchor: 'end',
+                },
+                'UTC',
+            ),
             ...xTicks.mjd.main.map((mjd, index) => {
                 const x = X(mjd);
                 return createElement(
                     'text',
                     {
                         'data-x': x,
-                        'className': classnames(classes.alignTop, classes.alignCenter),
                         'x': x,
                         'y': svgHeight - margin.bottom + 4,
                         'ref': createTextPositionFixer(index, xTicks.mjd.main.length, margin),
+                        'fill': Color.black,
+                        'dominantBaseline': 'hanging',
+                        'textAnchor': 'middle',
                     },
                     `${mjd.toFixed(0)}`,
                 );
             }),
+            createElement(
+                'text',
+                {
+                    x: right,
+                    y: svgHeight - margin.bottom + 4,
+                    fill: Color.black,
+                    dominantBaseline: 'hanging',
+                    textAnchor: 'end',
+                },
+                'MJD',
+            ),
         ),
         ...[Band.$2_20, Band.$2_4, Band.$4_10, Band.$10_20].map((band) => {
             const bandTitle = BandTitles[band];
+            const bandColor = BandColors[band];
             return createElement(
                 Fragment,
                 null,
@@ -365,10 +399,12 @@ export const LightCurve = (
                             'text',
                             {
                                 key: 'yTitle',
-                                className: classnames(classes.alignTop, classes.alignCenter),
                                 x: 4,
                                 y: centerY,
                                 transform: `rotate(-90, 3,${centerY})`,
+                                fill: Color.black,
+                                dominantBaseline: 'hanging',
+                                textAnchor: 'middle',
                             },
                             'Photons cm\u207B\u00B2 s\u207B\u00B9',
                         ),
@@ -380,18 +416,33 @@ export const LightCurve = (
                                 y: top,
                                 width: areaWidth,
                                 height: areaHeight,
+                                stroke: Color.black,
                             },
                         ),
                     ];
                     const object = props.objectMap && props.objectMap.get(id);
+                    elements.push(createElement(
+                        'text',
+                        {
+                            key: 'subTitle',
+                            x: left + mainTickSize + 4,
+                            y: top + mainTickSize + 20,
+                            fill: Color.black,
+                            dominantBaseline: 'hanging',
+                            textAnchor: 'start',
+                        },
+                        `bin size: ${props.preferences.binSize} day${props.preferences.binSize === 1 ? '' : 's'}`,
+                    ));
                     if (object) {
                         elements.push(createElement(
                             'text',
                             {
                                 key: 'title',
-                                className: classnames(classes.alignTop, classes.alignLeft),
                                 x: left + mainTickSize + 4,
                                 y: top + mainTickSize + 3,
+                                fill: Color.black,
+                                dominantBaseline: 'hanging',
+                                textAnchor: 'start',
                             },
                             `${object.name} (${object.id}) ${bandTitle}`,
                         ));
@@ -416,6 +467,7 @@ export const LightCurve = (
                                         (dateTicks ? dateTicks.sub.map((date, index) => `M${X(dateToMJD(date))},${top}v${(index - dateTicks.stepOffset) % dateTicks.step === 0 ? mainTickSize : subTickSize}`).join('') : ''),
                                         (mjdTicks ? mjdTicks.sub.map((mjd, index) => `M${X(mjd)},${bottom}v${-((index - mjdTicks.stepOffset) % mjdTicks.step === 0 ? mainTickSize : subTickSize)}`).join('') : ''),
                                     ].join(''),
+                                    stroke: Color.black,
                                 },
                             ),
                         );
@@ -425,11 +477,13 @@ export const LightCurve = (
                                     'text',
                                     {
                                         key: `yLabel-${index}`,
-                                        className: classnames(classes.alignMiddle, classes.alignRight),
                                         x: left - 4,
                                         y: Y(flux),
+                                        fill: Color.black,
+                                        dominantBaseline: 'middle',
+                                        textAnchor: 'end',
                                     },
-                                    `${flux.toFixed(1)}`,
+                                    `${flux.toFixed(2)}`,
                                 )),
                             );
                         }
@@ -470,17 +524,18 @@ export const LightCurve = (
                                     createElement(
                                         'path',
                                         {
-                                            className: classnames(classes.plot, classes.error),
                                             key: `${PlotType.Line}-error`,
                                             d: errorD.join(''),
+                                            fill: bandColor,
+                                            opacity: 0.2,
                                         },
                                     ),
                                     createElement(
                                         'path',
                                         {
-                                            className: classes.plot,
                                             key: PlotType.Line,
                                             d: `M${rollingAverageD.slice(1)}`,
+                                            stroke: bandColor,
                                         },
                                     ),
                                 );
@@ -491,7 +546,6 @@ export const LightCurve = (
                                 createElement(
                                     'path',
                                     {
-                                        className: classes.plot,
                                         key: PlotType.Point,
                                         d: data.bins.map((bin) => {
                                             if (bin[1] < previousBinEndMJD) {
@@ -512,6 +566,7 @@ export const LightCurve = (
                                             }
                                             return fragments.join('');
                                         }).join(''),
+                                        stroke: bandColor,
                                     },
                                 ),
                             );
@@ -526,6 +581,7 @@ export const LightCurve = (
                                         (dateTicks ? dateTicks.sub.map((date, index) => `M${X(dateToMJD(date))},${top}v${(index - dateTicks.stepOffset) % dateTicks.step === 0 ? mainTickSize : subTickSize}`).join('') : ''),
                                         (mjdTicks ? mjdTicks.sub.map((mjd, index) => `M${X(mjd)},${bottom}v${-((index - mjdTicks.stepOffset) % mjdTicks.step === 0 ? mainTickSize : subTickSize)}`).join('') : ''),
                                     ].join(''),
+                                    stroke: Color.black,
                                 },
                             ),
                         );
