@@ -105,6 +105,7 @@ export const App = () => {
             urlParameters.set(URLParameterKey.plotType, `${preferences.plotType}`);
             const url = new URL(location.href);
             url.search = `${urlParameters}`;
+            url.hash = '';
             history.replaceState(null, selectedObjectsCSV, `${url}`);
         }
     }, [selected, preferences, loading]);
