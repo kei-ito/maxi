@@ -102,12 +102,16 @@ export interface IRollingAverageData {
     rangeY: [number, number, number, number],
 }
 
-export type IFont = 'Sans' | 'Serif' | 'Monospace';
 export type IMJDRange = [number, number];
+export enum PlotType {
+    Point = 'point',
+    Line = 'line',
+}
 
 export interface IPreferences {
     binSize: number,
     mjdRange: IMJDRange,
+    plotType: PlotType,
 }
 
 export interface ITickData {

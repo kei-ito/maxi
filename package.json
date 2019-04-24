@@ -134,6 +134,7 @@
                 "files": [
                     "server/src/types.ts",
                     "client/script/types.ts",
+                    "client/script/util/isAvailablePlotType.ts",
                     "client/script/util/useCache.ts"
                 ],
                 "rules": {

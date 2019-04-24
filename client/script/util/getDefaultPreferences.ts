@@ -1,10 +1,11 @@
-import {IPreferences, IMJDRange} from '../types';
+import {IPreferences, IMJDRange, PlotType} from '../types';
 import {clamp} from './clamp';
 import {URLParameterKey, epochMJD, nowMJD} from './constants';
+import {isAvailablePlotType} from './isAvailablePlotType';
 
 export const filterBinSize = (
     binSize: string | number | null,
-) => clamp((binSize && Math.round(Number(binSize))) || 7, 1, 100);
+) => clamp((binSize && Math.round(Number(binSize))) || 20, 1, 100);
 
 export const filterMJDRange = (
     mjdRangeStringOrArray: string | IMJDRange | null,
@@ -23,9 +24,14 @@ export const filterMJDRange = (
     return result;
 };
 
+export const filterPlotType = (
+    plot: string | number | null,
+): PlotType => isAvailablePlotType(plot) ? plot : PlotType.Point;
+
 export const getDefaultPreferences = (
     searchParameters: URLSearchParams,
 ): IPreferences => ({
     binSize: filterBinSize(searchParameters.get(URLParameterKey.binSize)),
     mjdRange: filterMJDRange(searchParameters.get(URLParameterKey.mjdRange)),
+    plotType: filterPlotType(searchParameters.get(URLParameterKey.plotType)),
 });

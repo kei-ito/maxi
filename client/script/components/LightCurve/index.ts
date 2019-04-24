@@ -1,6 +1,6 @@
 import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment} from 'react';
 import classes from './style.css';
-import {IPreferences, Band, BandTitles, IObjectMap, IRollingAverageData} from '../../types';
+import {IPreferences, Band, BandTitles, IObjectMap, IRollingAverageData, PlotType, IRollingAverageBin} from '../../types';
 import {getTicks} from '../../util/getTicks';
 import {getDateTicks} from '../../util/getDateTicks';
 import {mjdToDate, dateToMJD} from '../../util/mjd';
@@ -433,58 +433,89 @@ export const LightCurve = (
                                 )),
                             );
                         }
-                        let previousBinEndMJD = -1;
-                        const rollingAverageD = data.bins.map((bin) => {
-                            const x = X(bin[0]);
-                            const y = Y(bin[fluxIndex]);
-                            const jump = previousBinEndMJD < bin[1];
-                            previousBinEndMJD = bin[2];
-                            if (left <= x && x <= right) {
-                                return `${jump ? 'M' : 'L'}${x},${y}`;
+                        if (props.preferences.plotType === PlotType.Line) {
+                            let previousBinEndMJD = -1;
+                            let bins: Array<IRollingAverageBin> = [];
+                            const errorD: Array<string> = [];
+                            const flushErrorPath = () => {
+                                if (0 < bins.length) {
+                                    errorD.push([
+                                        `M${bins.map((bin) => `${X(bin[0])},${Y(bin[fluxIndex] + bin[fluxIndex + 1])}`).join('L')}`,
+                                        `L${bins.reverse().map((bin) => `${X(bin[0])},${Y(bin[fluxIndex] - bin[fluxIndex + 1])}`).join('L')}z`,
+                                        'z',
+                                    ].join(''));
+                                }
+                                bins = [];
+                            };
+                            const rollingAverageD = data.bins.map((bin) => {
+                                const x = X(bin[0]);
+                                const y = Y(bin[fluxIndex]);
+                                const jump = previousBinEndMJD < bin[1];
+                                previousBinEndMJD = bin[2];
+                                if (left <= x && x <= right) {
+                                    if (jump) {
+                                        flushErrorPath();
+                                        bins.push(bin);
+                                        return `M${x},${y}`;
+                                    } else {
+                                        bins.push(bin);
+                                        return `L${x},${y}`;
+                                    }
+                                }
+                                return '';
+                            }).join('');
+                            flushErrorPath();
+                            if (rollingAverageD) {
+                                elements.push(
+                                    createElement(
+                                        'path',
+                                        {
+                                            className: classnames(classes.plot, classes.error),
+                                            key: `${PlotType.Line}-error`,
+                                            d: errorD.join(''),
+                                        },
+                                    ),
+                                    createElement(
+                                        'path',
+                                        {
+                                            className: classes.plot,
+                                            key: PlotType.Line,
+                                            d: `M${rollingAverageD.slice(1)}`,
+                                        },
+                                    ),
+                                );
                             }
-                            return '';
-                        }).join('');
-                        if (rollingAverageD) {
+                        } else {
+                            let previousBinEndMJD = -1;
                             elements.push(
                                 createElement(
                                     'path',
                                     {
-                                        className: classnames(classes.plot, classes.average),
-                                        key: 'average',
-                                        d: `M${rollingAverageD.slice(1)}`,
+                                        className: classes.plot,
+                                        key: PlotType.Point,
+                                        d: data.bins.map((bin) => {
+                                            if (bin[1] < previousBinEndMJD) {
+                                                return '';
+                                            }
+                                            previousBinEndMJD = bin[2];
+                                            const x = X(bin[0]);
+                                            const xL = X(bin[1]);
+                                            const xR = X(bin[2]);
+                                            const y = Y(bin[fluxIndex]);
+                                            const e = bin[errorIndex] * scaleY;
+                                            const fragments: Array<string> = [];
+                                            if (left < xR && xL < right) {
+                                                fragments.push(`M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
+                                                if (left <= x && x <= right) {
+                                                    fragments.push(`M${x},${y - e}V${y + e}M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
+                                                }
+                                            }
+                                            return fragments.join('');
+                                        }).join(''),
                                     },
                                 ),
                             );
                         }
-                        previousBinEndMJD = -1;
-                        elements.push(
-                            createElement(
-                                'path',
-                                {
-                                    className: classes.plot,
-                                    key: 'plot',
-                                    d: data.bins.map((bin) => {
-                                        if (bin[1] < previousBinEndMJD) {
-                                            return '';
-                                        }
-                                        previousBinEndMJD = bin[2];
-                                        const x = X(bin[0]);
-                                        const xL = X(bin[1]);
-                                        const xR = X(bin[2]);
-                                        const y = Y(bin[fluxIndex]);
-                                        const e = bin[errorIndex] * scaleY;
-                                        const fragments: Array<string> = [];
-                                        if (left < xR && xL < right) {
-                                            fragments.push(`M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
-                                            if (left <= x && x <= right) {
-                                                fragments.push(`M${x},${y - e}V${y + e}M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
-                                            }
-                                        }
-                                        return fragments.join('');
-                                    }).join(''),
-                                },
-                            ),
-                        );
                     } else {
                         elements.push(
                             createElement(

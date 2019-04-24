@@ -1,16 +1,16 @@
-import {useState, createElement, useEffect, Fragment, useReducer} from 'react';
+import {useState, createElement, useEffect, Fragment, useReducer, ChangeEvent} from 'react';
 import {getObjectMap} from '../../util/getObjectMap';
 import {Mode, ILightCurveData, IError, IObjectMap, IRollingAverageData, IPreferences} from '../../types';
 import {getLightCurveData} from '../../util/getData';
 import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
-import {getDefaultPreferences, filterBinSize, filterMJDRange} from '../../util/getDefaultPreferences';
-import {URLParameterKey} from '../../util/constants';
+import {getDefaultPreferences, filterBinSize, filterMJDRange, filterPlotType} from '../../util/getDefaultPreferences';
+import {URLParameterKey, AvailablePlotTypes} from '../../util/constants';
 import {ObjectList} from '../ObjectList/index';
-import {Preferences} from '../Preferences/index';
 import {LightCurve} from '../LightCurve/index';
 import {SearchForm} from '../SearchForm/index';
 import {normalizeSearchText} from '../../util/normalizeSearchText';
+import classes from './style.css';
 
 export const getInitialSelectedObjects = (): Array<string> => {
     const urlParameters = new URLSearchParams(location.search);
@@ -26,13 +26,25 @@ export const App = () => {
         ) => errors.concat(newError),
         [],
     );
-    const [preferences, setPreferences] = useReducer(
+    const [preferences, __setPreferences] = useReducer(
         (
             currentPreferences: IPreferences,
             nextPreferences: Partial<IPreferences>,
         ): IPreferences => ({
             binSize: filterBinSize(nextPreferences.binSize || currentPreferences.binSize),
             mjdRange: filterMJDRange(nextPreferences.mjdRange || currentPreferences.mjdRange),
+            plotType: filterPlotType(nextPreferences.plotType || currentPreferences.plotType),
+        }),
+        getDefaultPreferences(new URLSearchParams(location.search)),
+    );
+    const [preferencesBuffer, requestPreferenceUpdate] = useReducer(
+        (
+            currentPreferencesBuffer: Partial<IPreferences>,
+            updates: Partial<IPreferences>,
+        ): Partial<IPreferences> => ({
+            binSize: updates.binSize || currentPreferencesBuffer.binSize,
+            mjdRange: updates.mjdRange || currentPreferencesBuffer.mjdRange,
+            plotType: updates.plotType || currentPreferencesBuffer.plotType,
         }),
         getDefaultPreferences(new URLSearchParams(location.search)),
     );
@@ -59,6 +71,11 @@ export const App = () => {
     });
 
     useEffect(() => {
+        const timerId = setTimeout(() => __setPreferences(preferencesBuffer), 300);
+        return () => clearTimeout(timerId);
+    }, [preferencesBuffer]);
+
+    useEffect(() => {
         if (loading === -1 && !objectMap) {
             setLoading(1);
             getObjectMap()
@@ -83,8 +100,9 @@ export const App = () => {
             const urlParameters = new URLSearchParams();
             const selectedObjectsCSV = selected.join(',');
             urlParameters.set(URLParameterKey.selected, selectedObjectsCSV);
-            urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
             urlParameters.set(URLParameterKey.mjdRange, preferences.mjdRange.map((mjd) => mjd.toFixed(0)).join('-'));
+            urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
+            urlParameters.set(URLParameterKey.plotType, `${preferences.plotType}`);
             const url = new URL(location.href);
             url.search = `${urlParameters}`;
             history.replaceState(null, selectedObjectsCSV, `${url}`);
@@ -155,10 +173,44 @@ export const App = () => {
                 createElement(
                     'li',
                     null,
-                    createElement(Preferences, {
-                        preferences,
-                        onChange: setPreferences,
-                    }),
+                    createElement('label', {htmlFor: URLParameterKey.binSize}, 'Bin size: '),
+                    createElement(
+                        'input',
+                        {
+                            id: URLParameterKey.binSize,
+                            type: 'number',
+                            min: 1,
+                            max: 100,
+                            defaultValue: preferences.binSize,
+                            onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                                requestPreferenceUpdate({binSize: filterBinSize(event.currentTarget.value)});
+                            },
+                        },
+                    ),
+                    `day${preferences.binSize === 1 ? '' : 's'}.`,
+                ),
+                createElement(
+                    'li',
+                    null,
+                    createElement('label', null, 'Plot type: '),
+                    ...AvailablePlotTypes.map((plotType) => createElement(
+                        'label',
+                        {className: classes.radioLabel},
+                        createElement(
+                            'input',
+                            {
+                                type: 'radio',
+                                name: URLParameterKey.plotType,
+                                value: plotType,
+                                defaultChecked: preferences.plotType === plotType,
+                                onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                                    requestPreferenceUpdate({plotType: filterPlotType(event.currentTarget.value)});
+                                },
+                            },
+                        ),
+                        plotType,
+                    )),
+                    '.',
                 ),
             ),
             createElement(
@@ -169,7 +221,7 @@ export const App = () => {
                     objects: 0 < selected.length ? selected : [''],
                     objectMap,
                     cache: rollingAverageCache,
-                    setPreferences,
+                    setPreferences: __setPreferences,
                 }),
                 createElement(
                     'figcaption',
