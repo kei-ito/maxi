@@ -26,7 +26,7 @@ export const filterMJDRange = (
 
 export const filterPlotType = (
     plot: string | number | null,
-): PlotType => isAvailablePlotType(plot) ? plot : PlotType.Point;
+): PlotType => isAvailablePlotType(plot) ? plot : PlotType.Line;
 
 export const getDefaultPreferences = (
     searchParameters: URLSearchParams,
