@@ -89,6 +89,9 @@ workflows:
       - setup:
           requires: [isTagged]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+      - lint:
+          requires: [setup]
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
       - build-server:
           requires: [setup]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
