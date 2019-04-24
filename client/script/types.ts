@@ -103,13 +103,11 @@ export interface IRollingAverageData {
 }
 
 export type IFont = 'Sans' | 'Serif' | 'Monospace';
+export type IMJDRange = [number, number];
 
 export interface IPreferences {
     binSize: number,
-    minMJD: number,
-    maxMJD: number,
-    // font: IFont,
-    // scale: number,
+    mjdRange: IMJDRange,
 }
 
 export interface ITickData {

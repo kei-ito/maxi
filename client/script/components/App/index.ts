@@ -4,7 +4,7 @@ import {Mode, ILightCurveData, IError, IObjectMap, IRollingAverageData, IPrefere
 import {getLightCurveData} from '../../util/getData';
 import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
-import {getDefaultPreferences, filterBinSize, filterMaxMJD, filterMinMJD} from '../../util/getDefaultPreferences';
+import {getDefaultPreferences, filterBinSize, filterMJDRange} from '../../util/getDefaultPreferences';
 import {URLParameterKey} from '../../util/constants';
 import {ObjectList} from '../ObjectList/index';
 import {Preferences} from '../Preferences/index';
@@ -32,10 +32,9 @@ export const App = () => {
             nextPreferences: Partial<IPreferences>,
         ): IPreferences => ({
             binSize: filterBinSize(nextPreferences.binSize || currentPreferences.binSize),
-            minMJD: filterMinMJD(nextPreferences.minMJD || currentPreferences.minMJD),
-            maxMJD: filterMaxMJD(nextPreferences.maxMJD || currentPreferences.maxMJD),
+            mjdRange: filterMJDRange(nextPreferences.mjdRange || currentPreferences.mjdRange),
         }),
-        getDefaultPreferences(),
+        getDefaultPreferences(new URLSearchParams(location.search)),
     );
     const [objectMap, setObjectMap] = useState<IObjectMap | null>(null);
     const [searchWords, setSearchWords] = useState('');
@@ -85,8 +84,7 @@ export const App = () => {
             const selectedObjectsCSV = selected.join(',');
             urlParameters.set(URLParameterKey.selected, selectedObjectsCSV);
             urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
-            urlParameters.set(URLParameterKey.minMJD, preferences.minMJD.toFixed(0));
-            urlParameters.set(URLParameterKey.maxMJD, preferences.maxMJD.toFixed(0));
+            urlParameters.set(URLParameterKey.mjdRange, preferences.mjdRange.map((mjd) => mjd.toFixed(0)).join('-'));
             const url = new URL(location.href);
             url.search = `${urlParameters}`;
             history.replaceState(null, selectedObjectsCSV, `${url}`);
@@ -197,7 +195,7 @@ export const App = () => {
                 objectMap && createElement(
                     'li',
                     {id: 'List'},
-                    `${objectMap.sourceTitle}, `,
+                    `${objectMap.sourceTitle}. Retrieved ${objectMap.createdAt.toLocaleString()}. `,
                     createElement(
                         'a',
                         {href: objectMap.sourceURL, target: '_blank'},
@@ -209,7 +207,7 @@ export const App = () => {
                     return createElement(
                         'li',
                         {id: `Source-${objectId}`},
-                        `${data ? data.sourceTitle : objectId}, `,
+                        `${data ? `${data.sourceTitle}. Retrieved ${data.createdAt.toLocaleString()}` : objectId}. `,
                         createElement(
                             'a',
                             {href: data && data.sourceURL, target: '_blank'},
@@ -220,7 +218,7 @@ export const App = () => {
                 createElement(
                     'li',
                     {id: 'Source-GitHub'},
-                    'Source code of this app, ',
+                    'Source code of this app. ',
                     createElement(
                         'a',
                         {href: 'https://github.com/kei-ito/maxi', target: '_blank'},

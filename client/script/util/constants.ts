@@ -7,6 +7,7 @@ export const AvailableFonts: Array<IFont> = ['Serif', 'Sans', 'Monospace'];
 export enum URLParameterKey {
     minMJD = 'min',
     maxMJD = 'max',
+    mjdRange = 'mjd',
     selected = 'objects',
     binSize = 'bin',
     font = 'font',

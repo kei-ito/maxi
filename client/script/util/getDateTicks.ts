@@ -25,10 +25,7 @@ export const getMillisecondsTicks = (
         return Object.assign(scale, {
             main,
             sub,
-            toString: (time: number) => {
-                const date = new Date(time);
-                return `${date.getSeconds()}.${`${date.getMilliseconds()}`.padStart(3, '0')}`;
-            },
+            toString: (date: Date) => date.toLocaleString(),
         });
     }
     return null;
@@ -56,19 +53,7 @@ export const getMinuteTicks = (
             stepOffset: scale.stepOffset,
             sub,
             main,
-            toString: (time: Date) => {
-                const date = new Date(time);
-                const dateString = [
-                    date.getFullYear(),
-                    `${date.getMonth() + 1}`.padStart(2, '0'),
-                    `${date.getDate()}`.padStart(2, '0'),
-                ].join('-');
-                const timeString = [
-                    `${date.getHours()}`.padStart(2, '0'),
-                    `${date.getMinutes()}`.padStart(2, '0'),
-                ].join(':');
-                return `${dateString} ${timeString}`;
-            },
+            toString: (date: Date) => date.toLocaleString(),
         };
     }
     return null;
@@ -96,19 +81,7 @@ export const getHourTicks = (
             stepOffset: scale.stepOffset,
             sub,
             main,
-            toString: (time: Date) => {
-                const date = new Date(time);
-                const dateString = [
-                    date.getFullYear(),
-                    `${date.getMonth() + 1}`.padStart(2, '0'),
-                    `${date.getDate()}`.padStart(2, '0'),
-                ].join('-');
-                const timeString = [
-                    `${date.getHours()}`.padStart(2, '0'),
-                    `${date.getMinutes()}`.padStart(2, '0'),
-                ].join(':');
-                return `${dateString} ${timeString}`;
-            },
+            toString: (date: Date) => date.toLocaleString(),
         };
     }
     return null;
@@ -136,14 +109,7 @@ export const getDayTicks = (
             stepOffset: scale.stepOffset,
             sub,
             main,
-            toString: (time: Date) => {
-                const date = new Date(time);
-                return [
-                    date.getFullYear(),
-                    `${date.getMonth() + 1}`.padStart(2, '0'),
-                    `${date.getDate()}`.padStart(2, '0'),
-                ].join('-');
-            },
+            toString: (date: Date) => date.toLocaleDateString(),
         };
     }
     return null;
@@ -176,14 +142,7 @@ export const getMonthTicks = (
             stepOffset: scale.stepOffset,
             sub,
             main,
-            toString: (time: Date) => {
-                const date = new Date(time);
-                return [
-                    date.getFullYear(),
-                    `${date.getMonth() + 1}`.padStart(2, '0'),
-                    `${date.getDate()}`.padStart(2, '0'),
-                ].join('-');
-            },
+            toString: (date: Date) => date.toLocaleDateString(),
         };
     }
     return null;

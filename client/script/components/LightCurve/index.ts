@@ -1,6 +1,6 @@
 import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment} from 'react';
 import classes from './style.css';
-import {IPreferences, Band, BandTitles, IObjectMap, ITicks, IDateTicks, IRollingAverageData} from '../../types';
+import {IPreferences, Band, BandTitles, IObjectMap, IRollingAverageData} from '../../types';
 import {getTicks} from '../../util/getTicks';
 import {getDateTicks} from '../../util/getDateTicks';
 import {mjdToDate, dateToMJD} from '../../util/mjd';
@@ -88,29 +88,24 @@ export const LightCurve = (
     const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.94);
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
     const areaWidth = svgWidth - margin.left - margin.right;
-    const [mjdMinMax, setMinMaxMJD] = useState([props.preferences.minMJD, props.preferences.maxMJD]);
-    const [xTicks, setXTicks] = useState(getXTicks(mjdMinMax[0], mjdMinMax[1], areaWidth / 160));
+    const [mjdRange, setMJDRange] = useState(props.preferences.mjdRange);
+    const [xTicks, setXTicks] = useState(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 160));
     const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
     const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * (props.objects.length || 1) - margin.gap + margin.bottom;
-    const rangeMJD = mjdMinMax[1] - mjdMinMax[0];
+    const rangeMJD = mjdRange[1] - mjdRange[0];
     const left = margin.left;
     const right = left + areaWidth;
-    const X = (mjd: number) => left + (areaWidth / rangeMJD) * (mjd - mjdMinMax[0]);
-    const xToMJD = (x: number) => mjdMinMax[0] + (x - margin.left) * rangeMJD / areaWidth;
+    const X = (mjd: number) => left + (areaWidth / rangeMJD) * (mjd - mjdRange[0]);
+    const xToMJD = (x: number) => mjdRange[0] + (x - margin.left) * rangeMJD / areaWidth;
 
     useEffect(() => {
-        setXTicks(getXTicks(mjdMinMax[0], mjdMinMax[1], areaWidth / 160));
-    }, [mjdMinMax, areaWidth]);
+        setXTicks(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 160));
+    }, [mjdRange, areaWidth]);
 
     useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            props.setPreferences({
-                minMJD: mjdMinMax[0],
-                maxMJD: mjdMinMax[1],
-            });
-        }, 800);
+        const timeoutId = setTimeout(() => props.setPreferences({mjdRange}), 800);
         return () => clearTimeout(timeoutId);
-    }, [mjdMinMax]);
+    }, [mjdRange]);
 
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -152,12 +147,12 @@ export const LightCurve = (
                         const r = (x - left) / areaWidth;
                         dMin += dy * -r;
                         dMax += dy * (1 - r);
-                        setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[1] + dMax]);
+                        setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
                         event.preventDefault();
                     } else if (event.shiftKey) {
                         dMin += dy;
                         dMax += dy;
-                        setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[1] + dMax]);
+                        setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
                         event.preventDefault();
                     }
                 }
@@ -191,7 +186,7 @@ export const LightCurve = (
                     const newRangeMJD = (rangeMJD - dMin0 + dMax0) / scale;
                     dMin = dMin0 + newRangeMJD * dL;
                     dMax = dMax0 + newRangeMJD * -dR;
-                    setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[1] + dMax]);
+                    setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
                 };
                 addEventListener('mouseup', onMouseUp, {passive: true});
                 addEventListener('mousemove', onMouseMove, {passive: true});
@@ -246,7 +241,7 @@ export const LightCurve = (
                         const newRangeMJD = (rangeMJD - dMin0 + dMax0) / scale;
                         dMin = dMin0 + newRangeMJD * dL;
                         dMax = dMax0 + newRangeMJD * -dR;
-                        setMinMaxMJD([mjdMinMax[0] + dMin, mjdMinMax[0] + dMax]);
+                        setMJDRange([mjdRange[0] + dMin, mjdRange[0] + dMax]);
                     } else {
                         onTouchEnd(event);
                     }
