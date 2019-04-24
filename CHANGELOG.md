@@ -1,3 +1,18 @@
+<a name="1.2.1"></a>
+## [1.2.1](https://github.com/kei-ito/maxi/compare/v1.2.0...v1.2.1) (2019-04-24)
+
+
+### Features
+
+* add a button to download as a SVG image ([3aa0fe9](https://github.com/kei-ito/maxi/commit/3aa0fe9))
+* add unit labels ([7380d2d](https://github.com/kei-ito/maxi/commit/7380d2d))
+* move some <li> to Tips section ([723e292](https://github.com/kei-ito/maxi/commit/723e292))
+* set og:XXX ([8dbdac9](https://github.com/kei-ito/maxi/commit/8dbdac9))
+* set PlotType.Line as default value ([3cfaa2e](https://github.com/kei-ito/maxi/commit/3cfaa2e))
+* update document.title ([525cf90](https://github.com/kei-ito/maxi/commit/525cf90))
+
+
+
 <a name="1.2.0"></a>
 # [1.2.0](https://github.com/kei-ito/maxi/compare/v1.1.5...v1.2.0) (2019-04-24)
 
