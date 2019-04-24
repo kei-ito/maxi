@@ -33,7 +33,8 @@ const margin: IMargin = {
 const mainTickSize = 10;
 const subTickSize = 5;
 const getAreaHeight = () => window.innerHeight * 0.2;
-const createTextPositionFixer = (
+
+export const createTextPositionFixer = (
     index: number,
     length: number,
     margin: IMargin,
@@ -70,18 +71,27 @@ const createTextPositionFixer = (
     return null;
 };
 
+export const getXTicks = (
+    minMJD: number,
+    maxMJD: number,
+    numberOfTicks: number,
+) => {
+    const mjd = getTicks(minMJD, maxMJD, numberOfTicks);
+    const date = getDateTicks(mjdToDate(minMJD), mjdToDate(maxMJD), numberOfTicks);
+    return mjd && date ? {mjd, date} : null;
+};
+
 export const LightCurve = (
     props: ILightCurveProps,
 ) => {
     const svgRef = useRef<HTMLCanvasElement>(null);
-    const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.9);
-    const [xTicks, setXTicks] = useState<{mjd: ITicks, date: IDateTicks} | null>(null);
-    const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
-    const [mjdMinMax, setMinMaxMJD] = useState([props.preferences.minMJD, props.preferences.maxMJD]);
+    const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.94);
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
-    const objectCount = props.objects.length;
     const areaWidth = svgWidth - margin.left - margin.right;
-    const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * objectCount - margin.gap + margin.bottom;
+    const [mjdMinMax, setMinMaxMJD] = useState([props.preferences.minMJD, props.preferences.maxMJD]);
+    const [xTicks, setXTicks] = useState(getXTicks(mjdMinMax[0], mjdMinMax[1], areaWidth / 160));
+    const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
+    const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * (props.objects.length || 1) - margin.gap + margin.bottom;
     const rangeMJD = mjdMinMax[1] - mjdMinMax[0];
     const left = margin.left;
     const right = left + areaWidth;
@@ -89,10 +99,8 @@ export const LightCurve = (
     const xToMJD = (x: number) => mjdMinMax[0] + (x - margin.left) * rangeMJD / areaWidth;
 
     useEffect(() => {
-        const mjd = getTicks(mjdMinMax[0], mjdMinMax[1], areaWidth / 160);
-        const date = getDateTicks(mjdToDate(mjdMinMax[0]), mjdToDate(mjdMinMax[1]), areaWidth / 160);
-        setXTicks(mjd && date ? {mjd, date} : null);
-    }, [mjdMinMax]);
+        setXTicks(getXTicks(mjdMinMax[0], mjdMinMax[1], areaWidth / 160));
+    }, [mjdMinMax, areaWidth]);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -351,7 +359,7 @@ export const LightCurve = (
                 Fragment,
                 null,
                 ...props.objects.map((id, objectIndex) => {
-                    const index = objectCount * band + objectIndex;
+                    const index = props.objects.length * band + objectIndex;
                     const fluxIndex = band * 2 + 3;
                     const errorIndex = band * 2 + 4;
                     const bottom = margin.top + areaHeight * (index + 1) + margin.gap * index;
@@ -393,6 +401,8 @@ export const LightCurve = (
                             `${object.name} (${object.id}) ${bandTitle}`,
                         ));
                     }
+                    const mjdTicks = xTicks && xTicks.mjd;
+                    const dateTicks = xTicks && xTicks.date;
                     const data = props.cache.get(id);
                     if (data) {
                         const minY = data.minY[band];
@@ -401,8 +411,6 @@ export const LightCurve = (
                         const scaleY = areaHeight / rangeY;
                         const Y = (flux: number) => bottom - scaleY * (flux - minY);
                         const yTicks = getTicks(minY, maxY, areaHeight / 100);
-                        const mjdTicks = xTicks && xTicks.mjd;
-                        const dateTicks = xTicks && xTicks.date;
                         elements.push(
                             createElement(
                                 'path',
@@ -479,6 +487,19 @@ export const LightCurve = (
                                         }
                                         return fragments.join('');
                                     }).join(''),
+                                },
+                            ),
+                        );
+                    } else {
+                        elements.push(
+                            createElement(
+                                'path',
+                                {
+                                    key: 'ticks',
+                                    d: [
+                                        (dateTicks ? dateTicks.sub.map((date, index) => `M${X(dateToMJD(date))},${top}v${(index - dateTicks.stepOffset) % dateTicks.step === 0 ? mainTickSize : subTickSize}`).join('') : ''),
+                                        (mjdTicks ? mjdTicks.sub.map((mjd, index) => `M${X(mjd)},${bottom}v${-((index - mjdTicks.stepOffset) % mjdTicks.step === 0 ? mainTickSize : subTickSize)}`).join('') : ''),
+                                    ].join(''),
                                 },
                             ),
                         );

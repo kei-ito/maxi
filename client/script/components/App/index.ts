@@ -12,6 +12,12 @@ import {LightCurve} from '../LightCurve/index';
 import {SearchForm} from '../SearchForm/index';
 import {normalizeSearchText} from '../../util/normalizeSearchText';
 
+export const getInitialSelectedObjects = (): Array<string> => {
+    const urlParameters = new URLSearchParams(location.search);
+    const parameter = urlParameters.get(URLParameterKey.selected);
+    return parameter ? parameter.trim().split(/\s*,\s*/) : [];
+};
+
 export const App = () => {
     const [errors, onError] = useReducer(
         (
@@ -33,7 +39,7 @@ export const App = () => {
     );
     const [objectMap, setObjectMap] = useState<IObjectMap | null>(null);
     const [searchWords, setSearchWords] = useState('');
-    const [selected, setSelected] = useState<Array<string>>([]);
+    const [selected, setSelected] = useState<Array<string>>(getInitialSelectedObjects());
     const [loading, setLoading] = useState(-1);
     const lightCurveCache = useCache<ILightCurveData>({
         keys: selected,
@@ -58,20 +64,14 @@ export const App = () => {
             setLoading(1);
             getObjectMap()
             .then((newObjectMap) => {
-                const urlParameters = new URLSearchParams(location.search);
-                const requestedObjects = urlParameters.get(URLParameterKey.selected);
-                if (requestedObjects) {
-                    setSelected(
-                        requestedObjects.trim().split(/\s*,\s*/)
-                        .filter((objectId) => newObjectMap.has(objectId)),
-                    );
-                } else {
-                    const newObjects: Array<string> = [];
-                    newObjectMap.forEach((_, objectId) => {
-                        newObjects.push(objectId);
-                    });
-                    setSelected(newObjects.slice(0, 1));
+                const newSelected = selected.filter((objectId) => newObjectMap.has(objectId));
+                if (newSelected.length === 0) {
+                    const firstIteratorResult = newObjectMap.keys().next();
+                    if (!firstIteratorResult.done) {
+                        newSelected.push(firstIteratorResult.value);
+                    }
                 }
+                setSelected(newSelected);
                 setObjectMap(newObjectMap);
                 setLoading(0);
             })
@@ -168,7 +168,7 @@ export const App = () => {
                 null,
                 createElement(LightCurve, {
                     preferences,
-                    objects: selected,
+                    objects: 0 < selected.length ? selected : [''],
                     objectMap,
                     cache: rollingAverageCache,
                     setPreferences,
