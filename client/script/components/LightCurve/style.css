@@ -2,7 +2,7 @@
     display: block;
     width: 100%;
     margin: 0 auto;
-    font-size: 90%;
+    font-size: 85%;
     break-inside: avoid;
     stroke: currentColor;
     stroke-linecap: round;
@@ -58,7 +58,7 @@
 .plot.error {
     stroke: none;
     fill: var(--stroke);
-    opacity: 0.3;
+    opacity: 0.2;
 }
 
 .yLabel {

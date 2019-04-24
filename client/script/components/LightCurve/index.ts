@@ -24,7 +24,7 @@ interface IMargin {
 
 const bandCount = 4;
 const margin: IMargin = {
-    left: 46,
+    left: 50,
     right: 0.5,
     top: 18,
     bottom: 18,
@@ -64,7 +64,7 @@ export const createTextPositionFixer = (
             }
             const x = Number(element.getAttribute('data-x'));
             const right = x + element.getBoundingClientRect().width * 0.5;
-            const d = parent.getBoundingClientRect().width - right;
+            const d = parent.getBoundingClientRect().width - right - 40;
             element.setAttribute('x', `${Math.min(x, x + d)}`);
         };
     }
@@ -89,7 +89,7 @@ export const LightCurve = (
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
     const areaWidth = svgWidth - margin.left - margin.right;
     const [mjdRange, setMJDRange] = useState(props.preferences.mjdRange);
-    const [xTicks, setXTicks] = useState(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 160));
+    const [xTicks, setXTicks] = useState(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 200));
     const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
     const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * (props.objects.length || 1) - margin.gap + margin.bottom;
     const rangeMJD = mjdRange[1] - mjdRange[0];
@@ -333,6 +333,15 @@ export const LightCurve = (
                     `${xTicks.date.toString(date)}`,
                 );
             }),
+            createElement(
+                'text',
+                {
+                    'className': classnames(classes.alignBottom, classes.alignRight),
+                    'x': right,
+                    'y': margin.top - 4,
+                },
+                'UTC',
+            ),
             ...xTicks.mjd.main.map((mjd, index) => {
                 const x = X(mjd);
                 return createElement(
@@ -347,6 +356,15 @@ export const LightCurve = (
                     `${mjd.toFixed(0)}`,
                 );
             }),
+            createElement(
+                'text',
+                {
+                    'className': classnames(classes.alignTop, classes.alignRight),
+                    'x': right,
+                    'y': svgHeight - margin.bottom + 4,
+                },
+                'MJD',
+            ),
         ),
         ...[Band.$2_20, Band.$2_4, Band.$4_10, Band.$10_20].map((band) => {
             const bandTitle = BandTitles[band];
@@ -384,6 +402,16 @@ export const LightCurve = (
                         ),
                     ];
                     const object = props.objectMap && props.objectMap.get(id);
+                    elements.push(createElement(
+                        'text',
+                        {
+                            key: 'subTitle',
+                            className: classnames(classes.alignTop, classes.alignLeft),
+                            x: left + mainTickSize + 4,
+                            y: top + mainTickSize + 20,
+                        },
+                        `bin size: ${props.preferences.binSize} day${props.preferences.binSize === 1 ? '' : 's'}`,
+                    ));
                     if (object) {
                         elements.push(createElement(
                             'text',
@@ -429,7 +457,7 @@ export const LightCurve = (
                                         x: left - 4,
                                         y: Y(flux),
                                     },
-                                    `${flux.toFixed(1)}`,
+                                    `${flux.toFixed(2)}`,
                                 )),
                             );
                         }
