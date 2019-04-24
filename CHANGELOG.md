@@ -1,3 +1,13 @@
+<a name="1.1.4"></a>
+## [1.1.4](https://github.com/kei-ito/maxi/compare/v1.1.3...v1.1.4) (2019-04-24)
+
+
+### Features
+
+* create invalidation after release ([#9](https://github.com/kei-ito/maxi/issues/9)) ([5266790](https://github.com/kei-ito/maxi/commit/5266790))
+
+
+
 <a name="1.1.3"></a>
 ## [1.1.3](https://github.com/kei-ito/maxi/compare/v1.1.2...v1.1.3) (2019-04-23)
 
