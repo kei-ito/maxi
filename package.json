@@ -14,7 +14,7 @@
         "build:server:tsc": "tsc --project server/tsconfig.json",
         "build:server": "run-s build:server:cleanup build:server:tsc",
         "build": "run-p build:server build:client",
-        "test:client": "",
+        "test:client": "eslint client/script/**/*.ts",
         "test:server": "ava server/**/*.test.ts",
         "test": "run-p test:server test:client",
         "lint": "eslint client/script/**/*.ts server/src/**/*.ts",
