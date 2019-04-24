@@ -1,3 +1,21 @@
+<a name="1.2.0"></a>
+# [1.2.0](https://github.com/kei-ito/maxi/compare/v1.1.5...v1.2.0) (2019-04-24)
+
+
+### Bug Fixes
+
+* change the format of the range of MJD ([48f26cf](https://github.com/kei-ito/maxi/commit/48f26cf))
+* fix scales of delta on wheen events ([#11](https://github.com/kei-ito/maxi/issues/11)) ([24e015d](https://github.com/kei-ito/maxi/commit/24e015d))
+
+
+### Features
+
+* add error area to plot ([90a6ed5](https://github.com/kei-ito/maxi/commit/90a6ed5))
+* optimize the initial values ([430cfc4](https://github.com/kei-ito/maxi/commit/430cfc4))
+* scroll to the selected object at start ([ebf44a5](https://github.com/kei-ito/maxi/commit/ebf44a5))
+
+
+
 <a name="1.1.5"></a>
 ## [1.1.5](https://github.com/kei-ito/maxi/compare/v1.1.4...v1.1.5) (2019-04-24)
 
