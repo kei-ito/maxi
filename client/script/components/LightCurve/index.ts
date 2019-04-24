@@ -1,4 +1,4 @@
-import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment, MouseEvent as ReactMouseEvent} from 'react';
+import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment} from 'react';
 import classes from './style.css';
 import {IPreferences, Band, BandTitles, IObjectMap, IRollingAverageData, PlotType, IRollingAverageBin, BandColors, Color} from '../../types';
 import {getTicks} from '../../util/getTicks';
@@ -82,7 +82,7 @@ export const getXTicks = (
 export const LightCurve = (
     props: ILightCurveProps,
 ) => {
-    const svgRef = useRef<HTMLCanvasElement>(null);
+    const svgRef = useRef<SVGSVGElement>(null);
     const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.94);
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
     const areaWidth = svgWidth - margin.left - margin.right;
@@ -263,7 +263,7 @@ export const LightCurve = (
         };
     }, [svgRef, areaWidth]);
 
-    const svgComponent = createElement(
+    return createElement(
         'svg',
         {
             width: svgWidth,
@@ -335,11 +335,9 @@ export const LightCurve = (
                         'x': x,
                         'y': margin.top - 4,
                         'ref': createTextPositionFixer(index, xTicks.date.main.length, margin),
-                        'style': {
-                            fill: Color.black,
-                            dominantBaseline: 'baseline',
-                            textAnchor: 'middle',
-                        },
+                        'fill': Color.black,
+                        'dominantBaseline': 'baseline',
+                        'textAnchor': 'middle',
                     },
                     `${xTicks.date.toString(date)}`,
                 );
@@ -364,11 +362,9 @@ export const LightCurve = (
                         'x': x,
                         'y': svgHeight - margin.bottom + 4,
                         'ref': createTextPositionFixer(index, xTicks.mjd.main.length, margin),
-                        'style': {
-                            fill: Color.black,
-                            dominantBaseline: 'hanging',
-                            textAnchor: 'middle',
-                        },
+                        'fill': Color.black,
+                        'dominantBaseline': 'hanging',
+                        'textAnchor': 'middle',
                     },
                     `${mjd.toFixed(0)}`,
                 );
@@ -601,48 +597,5 @@ export const LightCurve = (
                 }),
             );
         }),
-    );
-    return createElement(
-        Fragment,
-        null,
-        svgComponent,
-        createElement(
-            'div',
-            {className: classes.download},
-            'Download as ',
-            createElement(
-                'a',
-                {
-                    href: '#',
-                    onClick: (event: ReactMouseEvent<HTMLAnchorElement>) => {
-                        event.preventDefault();
-                        const svgElement = svgRef.current;
-                        if (svgElement) {
-                            const svgDataString = new XMLSerializer().serializeToString(svgElement);
-                            const svgBlob = new Blob([svgDataString], {type: 'image/svg+xml;charset=utf-8'});
-                            const objectUrl = URL.createObjectURL(svgBlob);
-                            window.open(objectUrl, '_blank');
-                            URL.revokeObjectURL(objectUrl);
-                        }
-                    },
-                },
-                'SVG',
-            ),
-            // ', ',
-            // createElement(
-            //     'a',
-            //     {
-            //         href: '#',
-            //         onClick: (event: ReactMouseEvent<HTMLAnchorElement>) => {
-            //             event.preventDefault();
-            //             const svgElement = svgRef.current;
-            //             if (svgElement) {
-            //                 alert('Download PDF');
-            //             }
-            //         },
-            //     },
-            //     'PDF',
-            // ),
-        ),
     );
 };

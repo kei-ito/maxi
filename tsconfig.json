@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2017",
+        "esModuleInterop": true,
         "declaration": true,
         "strict": true,
         "removeComments": true,
