@@ -2,78 +2,11 @@
     display: block;
     width: 100%;
     margin: 0 auto;
-    font-size: 85%;
     break-inside: avoid;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    fill: none;
     box-sizing: border-box;
 }
 
-.alignBottom {
-    dominant-baseline: baseline;
-}
-
-.alignMiddle {
-    dominant-baseline: middle;
-}
-
-.alignTop {
-    dominant-baseline: hanging;
-}
-
-.alignLeft {
-    text-anchor: start;
-}
-
-.alignCenter {
-    text-anchor: middle;
-}
-
-.alignRight {
-    text-anchor: end;
-}
-
-[data-band='2-20keV']>.plot {
-    --stroke: black;
-}
-
-[data-band='2-4keV']>.plot {
-    --stroke: red;
-}
-
-[data-band='4-10keV']>.plot {
-    --stroke: green;
-}
-
-[data-band='10-20keV']>.plot {
-    --stroke: blue;
-}
-
-.plot {
-    stroke: var(--stroke);
-}
-
-.plot.error {
-    stroke: none;
-    fill: var(--stroke);
-    opacity: 0.2;
-}
-
-.yLabel {
-    fill: currentColor;
-    stroke: none;
-}
-
-.cursorLine {
-    stroke: currentColor;
-    opacity: 0.3;
-}
-
-.cursorText {
-    font-size: 80%;
-    pointer-events: none;
-    fill: currentColor;
-    opacity: 0.5;
+.download {
+    position: relative;
+    margin: 0 0 -1em auto;
 }

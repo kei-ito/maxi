@@ -157,3 +157,17 @@ export const BandTitles = {
     [Band.$4_10]: '4-10keV',
     [Band.$10_20]: '10-20keV',
 };
+
+export enum Color {
+    black = '#000000',
+    red = '#ff0000',
+    green = '#007f00',
+    blue = '#0000ff',
+}
+
+export const BandColors = {
+    [Band.$2_20]: Color.black,
+    [Band.$2_4]: Color.red,
+    [Band.$4_10]: Color.green,
+    [Band.$10_20]: Color.blue,
+};
