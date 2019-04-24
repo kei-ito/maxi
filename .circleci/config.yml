@@ -68,7 +68,7 @@ jobs:
     docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
     steps:
       - attach_workspace: {at: .}
-      - run: aws s3 cp dist/ s3://maxi.wemo.me/ --recursive
+      - run: aws s3 cp client/output s3://maxi.wemo.me/ --recursive
 workflows:
   version: 2
   run-tests:
