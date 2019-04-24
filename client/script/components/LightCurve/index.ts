@@ -83,11 +83,9 @@ export const LightCurve = (
     const areaWidth = svgWidth - margin.left - margin.right;
     const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * objectCount - margin.gap + margin.bottom;
     const rangeMJD = mjdMinMax[1] - mjdMinMax[0];
-    const scaleX = areaWidth / rangeMJD;
-    const isReady = 0 < scaleX;
     const left = margin.left;
     const right = left + areaWidth;
-    const X = (mjd: number) => left + scaleX * (mjd - mjdMinMax[0]);
+    const X = (mjd: number) => left + (areaWidth / rangeMJD) * (mjd - mjdMinMax[0]);
     const xToMJD = (x: number) => mjdMinMax[0] + (x - margin.left) * rangeMJD / areaWidth;
 
     useEffect(() => {
@@ -141,7 +139,7 @@ export const LightCurve = (
                 const rect = svgElement.getBoundingClientRect();
                 const x = event.clientX - rect.left;
                 if (left <= x && x <= right) {
-                    const dy = event.deltaY / scaleX;
+                    const dy = (rangeMJD - dMin + dMax) * event.deltaY / areaWidth;
                     if (event.ctrlKey) {
                         const r = (x - left) / areaWidth;
                         dMin += dy * -r;
@@ -273,21 +271,17 @@ export const LightCurve = (
             ref: svgRef,
             viewBox: `0 0 ${svgWidth} ${svgHeight}`,
             onMouseMove: (event) => {
-                if (isReady) {
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    const x = event.clientX - rect.left;
-                    if (left <= x && x <= right) {
-                        const y = event.clientY - rect.top;
-                        setCursor({x, y});
-                    } else {
-                        setCursor(null);
-                    }
+                const rect = event.currentTarget.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                if (left <= x && x <= right) {
+                    const y = event.clientY - rect.top;
+                    setCursor({x, y});
+                } else {
+                    setCursor(null);
                 }
             },
             onMouseLeave: () => {
-                if (isReady) {
-                    setCursor(null);
-                }
+                setCursor(null);
             },
         },
         cursor && createElement(
