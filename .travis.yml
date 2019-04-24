@@ -1,0 +1,23 @@
+language: node_js
+cache: npm
+os:
+- linux
+- osx
+- windows
+node_js:
+- '10'
+- '8'
+before_install:
+- |
+  if [[ $TRAVIS_OS_NAME == windows ]]; then
+    git config --global core.autocrlf false
+    cd ../..
+    mv $TRAVIS_REPO_SLUG _old
+    git clone _old $TRAVIS_REPO_SLUG
+    cd $TRAVIS_REPO_SLUG
+  fi
+install:
+- npm ci
+script:
+- npm run build
+- npm test

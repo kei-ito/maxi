@@ -46,7 +46,7 @@ jobs:
     docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
     steps:
       - attach_workspace: {at: .}
-      - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $BUCKET
+      - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $S3_SERVERAPP_BUCKET
       - run: aws cloudformation deploy
               --template-file server/output-template.yml
               --stack-name maxiapp-server
@@ -68,7 +68,8 @@ jobs:
     docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
     steps:
       - attach_workspace: {at: .}
-      - run: aws s3 cp dist/ s3://maxi.wemo.me/ --recursive
+      - run: aws s3 cp client/output s3://$S3_CLIENTAPP_BUCKET/ --recursive
+      - run: aws create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths /index.html
 workflows:
   version: 2
   run-tests:

@@ -12,11 +12,9 @@ interface ISearchElement extends HTMLFormElement {
     words: HTMLInputElement,
 }
 
-interface ISearchElementProps extends HTMLAttributes<ISearchElement> {}
-
 export const SearchForm = (
     props: ISearchFormProps,
-) => createElement<ISearchElementProps, ISearchElement>(
+) => createElement<HTMLAttributes<ISearchElement>, ISearchElement>(
     'form',
     {
         className: classes.form,
