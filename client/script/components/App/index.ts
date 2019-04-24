@@ -5,7 +5,7 @@ import {getLightCurveData} from '../../util/getData';
 import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
 import {getDefaultPreferences, filterBinSize, filterMJDRange, filterPlotType} from '../../util/getDefaultPreferences';
-import {URLParameterKey, AvailablePlotTypes} from '../../util/constants';
+import {URLParameterKey, AvailablePlotTypes, pageTitle} from '../../util/constants';
 import {ObjectList} from '../ObjectList/index';
 import {LightCurve} from '../LightCurve/index';
 import {SearchForm} from '../SearchForm/index';
@@ -115,11 +115,17 @@ export const App = () => {
     }, [selected, preferences, loading]);
 
     useEffect(() => history.replaceState(null, '', `${currentURL}`), [currentURL]);
+    useEffect(() => {
+        document.title = `${selected.map((objectId) => {
+            const object = objectMap && objectMap.get(objectId);
+            return object ? object.name : objectId;
+        }).join(', ')} | ${pageTitle}`;
+    }, [selected, objectMap]);
 
     return createElement(
         Fragment,
         null,
-        createElement('header', null, createElement('h1', null, 'MAXI GSC Data Viewer')),
+        createElement('header', null, createElement('h1', null, pageTitle)),
         createElement(
             'article',
             null,

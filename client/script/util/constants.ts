@@ -12,3 +12,4 @@ export enum URLParameterKey {
 }
 export const epochMJD = dateToMJD(new Date('2009-08-01T00:00:00Z'));
 export const nowMJD = dateToMJD(new Date());
+export const pageTitle = document.title;
