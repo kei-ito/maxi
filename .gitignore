@@ -5,3 +5,11 @@ node_modules
 client/output
 server/lib
 server/output-template.yml
+*.aux
+*.dvi
+*.log
+*.pdf
+*.nav
+*.out
+*.snm
+*.toc

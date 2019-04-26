@@ -2,6 +2,7 @@
     "private": true,
     "version": "1.2.3",
     "scripts": {
+        "dev:doc": "cd docs && chokidar 'index.tex' --initial --command 'pdflatex -interaction=nonstopmode index.tex'",
         "dev:client": "parcel client/index.html --out-dir client/output",
         "dev:server:tsc": "tsc --project server/tsconfig.json --watch --preserveWatchOutput",
         "dev:server": "run-p dev:server:*",
@@ -32,6 +33,7 @@
         "@typescript-eslint/eslint-plugin": "^1.7.0",
         "autoprefixer": "^9.5.1",
         "ava": "^1.4.1",
+        "chokidar-cli": "^1.2.2",
         "conventional-changelog-cli": "^2.0.12",
         "eslint": "^5.16.0",
         "husky": "^1.3.1",
