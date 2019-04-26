@@ -1,6 +1,6 @@
 {
     "private": true,
-    "version": "1.2.2",
+    "version": "1.2.3",
     "scripts": {
         "dev:client": "parcel client/index.html --out-dir client/output",
         "dev:server:tsc": "tsc --project server/tsconfig.json --watch --preserveWatchOutput",

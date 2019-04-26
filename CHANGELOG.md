@@ -1,3 +1,13 @@
+<a name="1.2.3"></a>
+## [1.2.3](https://github.com/kei-ito/maxi/compare/v1.2.2...v1.2.3) (2019-04-26)
+
+
+### Performance Improvements
+
+* split the main component ([5e2d4c0](https://github.com/kei-ito/maxi/commit/5e2d4c0))
+
+
+
 <a name="1.2.2"></a>
 ## [1.2.2](https://github.com/kei-ito/maxi/compare/v1.2.1...v1.2.2) (2019-04-26)
 
