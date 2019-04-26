@@ -239,7 +239,7 @@ export const LightCurve = (
                         const newRangeMJD = (rangeMJD - dMin0 + dMax0) / scale;
                         dMin = dMin0 + newRangeMJD * dL;
                         dMax = dMax0 + newRangeMJD * -dR;
-                        setMJDRange([mjdRange[0] + dMin, mjdRange[0] + dMax]);
+                        setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
                     } else {
                         onTouchEnd(event);
                     }
