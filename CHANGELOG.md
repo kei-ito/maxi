@@ -1,3 +1,13 @@
+<a name="1.2.2"></a>
+## [1.2.2](https://github.com/kei-ito/maxi/compare/v1.2.1...v1.2.2) (2019-04-26)
+
+
+### Bug Fixes
+
+* fix the touch event handler ([#16](https://github.com/kei-ito/maxi/issues/16)) ([c0d4bdc](https://github.com/kei-ito/maxi/commit/c0d4bdc))
+
+
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/kei-ito/maxi/compare/v1.2.0...v1.2.1) (2019-04-24)
 
