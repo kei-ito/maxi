@@ -128,14 +128,9 @@ export interface ITicks {
     stepOffset: number,
     sub: Array<number>,
     main: Array<number>,
-}
-
-export interface IDateTicks {
-    step: number,
-    stepOffset: number,
-    sub: Array<Date>,
-    main: Array<Date>,
-    toString: (date: Date) => string,
+    min: number,
+    max: number,
+    toString: (value: number) => string,
 }
 
 export enum Mode {
@@ -171,3 +166,20 @@ export const BandColors = {
     [Band.$4_10]: Color.green,
     [Band.$10_20]: Color.blue,
 };
+
+export interface IRect {
+    left: number,
+    right: number,
+    top: number,
+    bottom: number,
+    width: number,
+    height: number,
+}
+
+export interface IMargin {
+    left: number,
+    right: number,
+    top: number,
+    bottom: number,
+    gap: number,
+}

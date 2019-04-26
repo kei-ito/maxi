@@ -140,7 +140,7 @@ export const App = () => {
                     SearchForm,
                     {
                         label: 'Search for:',
-                        placeholder: 'All (Click here to change)',
+                        placeholder: 'All (Click here to set words)',
                         defaultValue: '',
                         onChange: (words) => setSearchWords(normalizeSearchText(words)),
                     },
