@@ -5,6 +5,7 @@ export const getTicks = (
     min: number,
     max: number,
     numberOfTicks: number,
+    toString: (value: number) => string = (value) => value.toFixed(0),
 ): ITicks | null => {
     const tickData = getTickScale(min, max, numberOfTicks, [1, 2, 5]);
     if (tickData) {
@@ -21,6 +22,9 @@ export const getTicks = (
             stepOffset: tickData.stepOffset,
             main,
             sub,
+            min,
+            max,
+            toString,
         };
     }
     return null;

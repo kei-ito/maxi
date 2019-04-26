@@ -1,10 +1,11 @@
-import {useRef, useEffect, createElement, useState, ReactSVGElement, Fragment} from 'react';
+import {useRef, useEffect, createElement, useState} from 'react';
 import classes from './style.css';
-import {IPreferences, Band, BandTitles, IObjectMap, IRollingAverageData, PlotType, IRollingAverageBin, BandColors, Color} from '../../types';
-import {getTicks} from '../../util/getTicks';
-import {getDateTicks} from '../../util/getDateTicks';
-import {mjdToDate, dateToMJD} from '../../util/mjd';
-interface ILightCurveProps {
+import {IPreferences, IObjectMap, IRollingAverageData, IMargin} from '../../types';
+import {getAreaHeight, bandCount} from '../../util/constants';
+import {Cursor} from './Cursor';
+import {Body} from './Body';
+
+export interface ILightCurveProps {
     preferences: IPreferences,
     objects: Array<string>,
     objectMap: IObjectMap | null,
@@ -12,71 +13,12 @@ interface ILightCurveProps {
     setPreferences: (newPreferences: Partial<IPreferences>) => void,
 }
 
-interface IMargin {
-    left: number,
-    right: number,
-    top: number,
-    bottom: number,
-    gap: number,
-}
-
-const bandCount = 4;
 const margin: IMargin = {
-    left: 50,
+    left: 60,
     right: 0.5,
-    top: 18,
-    bottom: 18,
+    top: 32,
+    bottom: 32,
     gap: 6,
-};
-const mainTickSize = 10;
-const subTickSize = 5;
-const getAreaHeight = () => window.innerHeight * 0.2;
-
-export const createTextPositionFixer = (
-    index: number,
-    length: number,
-    margin: IMargin,
-) => {
-    if (index === 0) {
-        return (element: SVGTextElement | null) => {
-            if (!element) {
-                return;
-            }
-            const parent = element.parentElement;
-            if (!parent) {
-                return;
-            }
-            const x = Number(element.getAttribute('data-x'));
-            const minMJD = margin.left + element.getBoundingClientRect().width * 0.5;
-            element.setAttribute('x', `${Math.max(x, minMJD)}`);
-        };
-    }
-    if (index === length - 1) {
-        return (element: SVGTextElement | null) => {
-            if (!element) {
-                return;
-            }
-            const parent = element.parentElement;
-            if (!parent) {
-                return;
-            }
-            const x = Number(element.getAttribute('data-x'));
-            const right = x + element.getBoundingClientRect().width * 0.5;
-            const d = parent.getBoundingClientRect().width - right - 40;
-            element.setAttribute('x', `${Math.min(x, x + d)}`);
-        };
-    }
-    return null;
-};
-
-export const getXTicks = (
-    minMJD: number,
-    maxMJD: number,
-    numberOfTicks: number,
-) => {
-    const mjd = getTicks(minMJD, maxMJD, numberOfTicks);
-    const date = getDateTicks(mjdToDate(minMJD), mjdToDate(maxMJD), numberOfTicks);
-    return mjd && date ? {mjd, date} : null;
 };
 
 export const LightCurve = (
@@ -87,18 +29,24 @@ export const LightCurve = (
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
     const areaWidth = svgWidth - margin.left - margin.right;
     const [mjdRange, setMJDRange] = useState(props.preferences.mjdRange);
-    const [xTicks, setXTicks] = useState(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 200));
-    const [cursor, setCursor] = useState<{x: number, y: number} | null>(null);
+    const [cursor, __setCursor] = useState<{x: number, y: number} | null>(null);
+    const setCursor = (
+        event: MouseEvent | Touch,
+    ) => {
+        const svgElement = svgRef.current;
+        if (svgElement) {
+            const rect = svgElement.getBoundingClientRect();
+            const x = event.clientX - rect.left - margin.left;
+            if (0 < x && x < areaWidth) {
+                const y = event.clientY - rect.top;
+                __setCursor({x, y});
+                return;
+            }
+        }
+        __setCursor(null);
+    };
     const svgHeight = margin.top + (areaHeight + margin.gap) * bandCount * (props.objects.length || 1) - margin.gap + margin.bottom;
     const rangeMJD = mjdRange[1] - mjdRange[0];
-    const left = margin.left;
-    const right = left + areaWidth;
-    const X = (mjd: number) => left + (areaWidth / rangeMJD) * (mjd - mjdRange[0]);
-    const xToMJD = (x: number) => mjdRange[0] + (x - margin.left) * rangeMJD / areaWidth;
-
-    useEffect(() => {
-        setXTicks(getXTicks(mjdRange[0], mjdRange[1], areaWidth / 160));
-    }, [mjdRange, areaWidth]);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => props.setPreferences({mjdRange}), 800);
@@ -132,69 +80,64 @@ export const LightCurve = (
     }, []);
 
     useEffect(() => {
+        const svgElement = svgRef.current;
+        if (!svgElement) {
+            return;
+        }
         let dMin = 0;
         let dMax = 0;
         const onWheel = (event: WheelEvent) => {
-            const svgElement = svgRef.current;
-            if (svgElement) {
-                const rect = svgElement.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                if (left <= x && x <= right) {
-                    const dy = (rangeMJD - dMin + dMax) * event.deltaY / areaWidth;
-                    if (event.ctrlKey) {
-                        const r = (x - left) / areaWidth;
-                        dMin += dy * -r;
-                        dMax += dy * (1 - r);
-                        setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
-                        event.preventDefault();
-                    } else if (event.shiftKey) {
-                        dMin += dy;
-                        dMax += dy;
-                        setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
-                        event.preventDefault();
-                    }
-                }
+            const rect = svgElement.getBoundingClientRect();
+            const x = event.clientX - rect.left - margin.left;
+            const dy = (rangeMJD - dMin + dMax) * event.deltaY / areaWidth;
+            if (event.ctrlKey) {
+                const r = x / areaWidth;
+                dMin += dy * -r;
+                dMax += dy * (1 - r);
+                setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
+                event.preventDefault();
+            } else if (event.shiftKey) {
+                dMin += dy;
+                dMax += dy;
+                setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
+                event.preventDefault();
             }
         };
         const onMouseDown = (event: MouseEvent) => {
-            const svgElement = svgRef.current;
-            if (svgElement) {
-                event.preventDefault();
-                const rect = svgElement.getBoundingClientRect();
-                const x0 = rect.left + margin.left;
-                const x1 = event.clientX - x0;
-                const y1 = event.clientY;
-                const L1 = x1 / areaWidth;
-                const R1 = 1 - L1;
-                const onMouseUp = () => {
-                    removeEventListener('mouseup', onMouseUp);
-                    removeEventListener('mousemove', onMouseMove);
-                };
-                const dMin0 = dMin;
-                const dMax0 = dMax;
-                const onMouseMove = (event: MouseEvent) => {
-                    const x2 = event.clientX - x0;
-                    const y2 = event.clientY;
-                    const dy = y2 - y1;
-                    const scale = 1.005 ** dy;
-                    const L2 = x2 / areaWidth;
-                    const R2 = 1 - L2;
-                    const dL = L1 * scale - L2;
-                    const dR = R1 * scale - R2;
-                    const newRangeMJD = (rangeMJD - dMin0 + dMax0) / scale;
-                    dMin = dMin0 + newRangeMJD * dL;
-                    dMax = dMax0 + newRangeMJD * -dR;
-                    setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
-                };
-                addEventListener('mouseup', onMouseUp, {passive: true});
-                addEventListener('mousemove', onMouseMove, {passive: true});
-            }
+            event.preventDefault();
+            const rect = svgElement.getBoundingClientRect();
+            const x0 = rect.left + margin.left;
+            const x1 = event.clientX - x0;
+            const y1 = event.clientY;
+            const L1 = x1 / areaWidth;
+            const R1 = 1 - L1;
+            const onMouseUp = () => {
+                removeEventListener('mouseup', onMouseUp);
+                removeEventListener('mousemove', onMouseMove);
+            };
+            const dMin0 = dMin;
+            const dMax0 = dMax;
+            const onMouseMove = (event: MouseEvent) => {
+                const x2 = event.clientX - x0;
+                const y2 = event.clientY;
+                const dy = y2 - y1;
+                const scale = 1.005 ** dy;
+                const L2 = x2 / areaWidth;
+                const R2 = 1 - L2;
+                const dL = L1 * scale - L2;
+                const dR = R1 * scale - R2;
+                const newRangeMJD = (rangeMJD - dMin0 + dMax0) / scale;
+                dMin = dMin0 + newRangeMJD * dL;
+                dMax = dMax0 + newRangeMJD * -dR;
+                setMJDRange([mjdRange[0] + dMin, mjdRange[1] + dMax]);
+            };
+            addEventListener('mouseup', onMouseUp, {passive: true});
+            addEventListener('mousemove', onMouseMove, {passive: true});
         };
         const onTouchStart = (event: TouchEvent) => {
-            const svgElement = svgRef.current;
             const touch11 = event.touches.item(0);
             const touch12 = event.touches.item(1);
-            if (svgElement && touch11 && touch12) {
+            if (touch11 && touch12) {
                 event.preventDefault();
                 const rect = svgElement.getBoundingClientRect();
                 const x0 = rect.left + margin.left;
@@ -248,20 +191,19 @@ export const LightCurve = (
                 addEventListener('touchmove', onToucheMove, {passive: true});
             }
         };
-        const svg = svgRef.current;
-        if (svg) {
-            svg.addEventListener('wheel', onWheel);
-            svg.addEventListener('mousedown', onMouseDown);
-            svg.addEventListener('touchstart', onTouchStart);
-        }
+        svgElement.addEventListener('wheel', onWheel);
+        svgElement.addEventListener('mousedown', onMouseDown);
+        svgElement.addEventListener('touchstart', onTouchStart);
+        svgElement.addEventListener('mousemove', setCursor, {passive: true});
+        svgElement.addEventListener('mouseleave', setCursor, {passive: true});
         return () => {
-            if (svg) {
-                svg.removeEventListener('wheel', onWheel);
-                svg.removeEventListener('mousedown', onMouseDown);
-                svg.removeEventListener('touchstart', onTouchStart);
-            }
+            svgElement.removeEventListener('wheel', onWheel);
+            svgElement.removeEventListener('mousedown', onMouseDown);
+            svgElement.removeEventListener('touchstart', onTouchStart);
+            svgElement.removeEventListener('mousemove', setCursor);
+            svgElement.removeEventListener('mouseleave', setCursor);
         };
-    }, [svgRef, areaWidth]);
+    }, [svgRef.current, areaWidth]);
 
     return createElement(
         'svg',
@@ -275,327 +217,32 @@ export const LightCurve = (
             strokeLinecap: 'round',
             strokeLinejoin: 'round',
             fill: 'none',
-            onMouseMove: (event) => {
-                const rect = event.currentTarget.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                if (left <= x && x <= right) {
-                    const y = event.clientY - rect.top;
-                    setCursor({x, y});
-                } else {
-                    setCursor(null);
-                }
-            },
-            onMouseLeave: () => {
-                setCursor(null);
-            },
         },
-        cursor && createElement(
-            Fragment,
-            null,
-            createElement(
-                'path',
-                {
-                    d: `M${cursor.x},1V${svgHeight - 1}`,
-                    stroke: Color.black,
-                    opacity: 0.3,
-                },
-            ),
-            createElement(
-                'text',
-                {
-                    x: cursor.x + 2,
-                    y: cursor.y - 12,
-                    fontSize: '80%',
-                    fill: Color.black,
-                    opacity: 0.7,
-                },
-                `${xToMJD(cursor.x).toFixed(0)}MJD`,
-            ),
-            createElement(
-                'text',
-                {
-                    x: cursor.x + 2,
-                    y: cursor.y - 2,
-                    fontSize: '80%',
-                    fill: Color.black,
-                    opacity: 0.7,
-                },
-                `${mjdToDate(xToMJD(cursor.x)).toISOString().split('T')[0]}`,
-            ),
+        createElement(
+            Cursor,
+            {
+                cursor,
+                svgHeight,
+                left: margin.left,
+                areaWidth,
+                minMJD: mjdRange[0],
+                maxMJD: mjdRange[1],
+            },
         ),
-        xTicks && createElement(
-            Fragment,
-            null,
-            ...xTicks.date.main.map((date, index) => {
-                const x = X(dateToMJD(date));
-                return createElement(
-                    'text',
-                    {
-                        'data-x': x,
-                        'x': x,
-                        'y': margin.top - 4,
-                        'ref': createTextPositionFixer(index, xTicks.date.main.length, margin),
-                        'fill': Color.black,
-                        'dominantBaseline': 'baseline',
-                        'textAnchor': 'middle',
-                    },
-                    `${xTicks.date.toString(date)}`,
-                );
-            }),
-            createElement(
-                'text',
-                {
-                    x: right,
-                    y: margin.top - 4,
-                    fill: Color.black,
-                    dominantBaseline: 'baseline',
-                    textAnchor: 'end',
-                },
-                'UTC',
-            ),
-            ...xTicks.mjd.main.map((mjd, index) => {
-                const x = X(mjd);
-                return createElement(
-                    'text',
-                    {
-                        'data-x': x,
-                        'x': x,
-                        'y': svgHeight - margin.bottom + 4,
-                        'ref': createTextPositionFixer(index, xTicks.mjd.main.length, margin),
-                        'fill': Color.black,
-                        'dominantBaseline': 'hanging',
-                        'textAnchor': 'middle',
-                    },
-                    `${mjd.toFixed(0)}`,
-                );
-            }),
-            createElement(
-                'text',
-                {
-                    x: right,
-                    y: svgHeight - margin.bottom + 4,
-                    fill: Color.black,
-                    dominantBaseline: 'hanging',
-                    textAnchor: 'end',
-                },
-                'MJD',
-            ),
+        createElement(
+            Body,
+            {
+                objects: props.objects,
+                objectMap: props.objectMap,
+                cache: props.cache,
+                minMJD: mjdRange[0],
+                maxMJD: mjdRange[1],
+                plotType: props.preferences.plotType,
+                binSize: props.preferences.binSize,
+                svgWidth,
+                areaHeight,
+                margin,
+            },
         ),
-        ...[Band.$2_20, Band.$2_4, Band.$4_10, Band.$10_20].map((band) => {
-            const bandTitle = BandTitles[band];
-            const bandColor = BandColors[band];
-            return createElement(
-                Fragment,
-                null,
-                ...props.objects.map((id, objectIndex) => {
-                    const index = props.objects.length * band + objectIndex;
-                    const fluxIndex = band * 2 + 3;
-                    const errorIndex = band * 2 + 4;
-                    const bottom = margin.top + areaHeight * (index + 1) + margin.gap * index;
-                    const top = bottom - areaHeight;
-                    const centerY = (top + bottom) * 0.5;
-                    const elements: Array<ReactSVGElement> = [
-                        createElement(
-                            'text',
-                            {
-                                key: 'yTitle',
-                                x: 4,
-                                y: centerY,
-                                transform: `rotate(-90, 3,${centerY})`,
-                                fill: Color.black,
-                                dominantBaseline: 'hanging',
-                                textAnchor: 'middle',
-                            },
-                            'Photons cm\u207B\u00B2 s\u207B\u00B9',
-                        ),
-                        createElement(
-                            'rect',
-                            {
-                                key: 'frame',
-                                x: left,
-                                y: top,
-                                width: areaWidth,
-                                height: areaHeight,
-                                stroke: Color.black,
-                            },
-                        ),
-                    ];
-                    const object = props.objectMap && props.objectMap.get(id);
-                    elements.push(createElement(
-                        'text',
-                        {
-                            key: 'subTitle',
-                            x: left + mainTickSize + 4,
-                            y: top + mainTickSize + 20,
-                            fill: Color.black,
-                            dominantBaseline: 'hanging',
-                            textAnchor: 'start',
-                        },
-                        `bin size: ${props.preferences.binSize} day${props.preferences.binSize === 1 ? '' : 's'}`,
-                    ));
-                    if (object) {
-                        elements.push(createElement(
-                            'text',
-                            {
-                                key: 'title',
-                                x: left + mainTickSize + 4,
-                                y: top + mainTickSize + 3,
-                                fill: Color.black,
-                                dominantBaseline: 'hanging',
-                                textAnchor: 'start',
-                            },
-                            `${object.name} (${object.id}) ${bandTitle}`,
-                        ));
-                    }
-                    const mjdTicks = xTicks && xTicks.mjd;
-                    const dateTicks = xTicks && xTicks.date;
-                    const data = props.cache.get(id);
-                    if (data) {
-                        const minY = data.minY[band];
-                        const maxY = data.maxY[band];
-                        const rangeY = maxY - minY;
-                        const scaleY = areaHeight / rangeY;
-                        const Y = (flux: number) => bottom - scaleY * (flux - minY);
-                        const yTicks = getTicks(minY, maxY, areaHeight / 100);
-                        elements.push(
-                            createElement(
-                                'path',
-                                {
-                                    key: 'ticks',
-                                    d: [
-                                        (yTicks ? yTicks.sub.map((flux, index) => `M${left},${Y(flux)}h${(index - yTicks.stepOffset) % yTicks.step === 0 ? mainTickSize : subTickSize}`).join('') : ''),
-                                        (dateTicks ? dateTicks.sub.map((date, index) => `M${X(dateToMJD(date))},${top}v${(index - dateTicks.stepOffset) % dateTicks.step === 0 ? mainTickSize : subTickSize}`).join('') : ''),
-                                        (mjdTicks ? mjdTicks.sub.map((mjd, index) => `M${X(mjd)},${bottom}v${-((index - mjdTicks.stepOffset) % mjdTicks.step === 0 ? mainTickSize : subTickSize)}`).join('') : ''),
-                                    ].join(''),
-                                    stroke: Color.black,
-                                },
-                            ),
-                        );
-                        if (yTicks) {
-                            elements.push(
-                                ...yTicks.main.map((flux, index) => createElement(
-                                    'text',
-                                    {
-                                        key: `yLabel-${index}`,
-                                        x: left - 4,
-                                        y: Y(flux),
-                                        fill: Color.black,
-                                        dominantBaseline: 'middle',
-                                        textAnchor: 'end',
-                                    },
-                                    `${flux.toFixed(2)}`,
-                                )),
-                            );
-                        }
-                        if (props.preferences.plotType === PlotType.Line) {
-                            let previousBinEndMJD = -1;
-                            let bins: Array<IRollingAverageBin> = [];
-                            const errorD: Array<string> = [];
-                            const flushErrorPath = () => {
-                                if (0 < bins.length) {
-                                    errorD.push([
-                                        `M${bins.map((bin) => `${X(bin[0])},${Y(bin[fluxIndex] + bin[fluxIndex + 1])}`).join('L')}`,
-                                        `L${bins.reverse().map((bin) => `${X(bin[0])},${Y(bin[fluxIndex] - bin[fluxIndex + 1])}`).join('L')}z`,
-                                        'z',
-                                    ].join(''));
-                                }
-                                bins = [];
-                            };
-                            const rollingAverageD = data.bins.map((bin) => {
-                                const x = X(bin[0]);
-                                const y = Y(bin[fluxIndex]);
-                                const jump = previousBinEndMJD < bin[1];
-                                previousBinEndMJD = bin[2];
-                                if (left <= x && x <= right) {
-                                    if (jump) {
-                                        flushErrorPath();
-                                        bins.push(bin);
-                                        return `M${x},${y}`;
-                                    } else {
-                                        bins.push(bin);
-                                        return `L${x},${y}`;
-                                    }
-                                }
-                                return '';
-                            }).join('');
-                            flushErrorPath();
-                            if (rollingAverageD) {
-                                elements.push(
-                                    createElement(
-                                        'path',
-                                        {
-                                            key: `${PlotType.Line}-error`,
-                                            d: errorD.join(''),
-                                            fill: bandColor,
-                                            opacity: 0.2,
-                                        },
-                                    ),
-                                    createElement(
-                                        'path',
-                                        {
-                                            key: PlotType.Line,
-                                            d: `M${rollingAverageD.slice(1)}`,
-                                            stroke: bandColor,
-                                        },
-                                    ),
-                                );
-                            }
-                        } else {
-                            let previousBinEndMJD = -1;
-                            elements.push(
-                                createElement(
-                                    'path',
-                                    {
-                                        key: PlotType.Point,
-                                        d: data.bins.map((bin) => {
-                                            if (bin[1] < previousBinEndMJD) {
-                                                return '';
-                                            }
-                                            previousBinEndMJD = bin[2];
-                                            const x = X(bin[0]);
-                                            const xL = X(bin[1]);
-                                            const xR = X(bin[2]);
-                                            const y = Y(bin[fluxIndex]);
-                                            const e = bin[errorIndex] * scaleY;
-                                            const fragments: Array<string> = [];
-                                            if (left < xR && xL < right) {
-                                                fragments.push(`M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
-                                                if (left <= x && x <= right) {
-                                                    fragments.push(`M${x},${y - e}V${y + e}M${Math.max(left, xL)},${y}H${Math.min(right, xR)}`);
-                                                }
-                                            }
-                                            return fragments.join('');
-                                        }).join(''),
-                                        stroke: bandColor,
-                                    },
-                                ),
-                            );
-                        }
-                    } else {
-                        elements.push(
-                            createElement(
-                                'path',
-                                {
-                                    key: 'ticks',
-                                    d: [
-                                        (dateTicks ? dateTicks.sub.map((date, index) => `M${X(dateToMJD(date))},${top}v${(index - dateTicks.stepOffset) % dateTicks.step === 0 ? mainTickSize : subTickSize}`).join('') : ''),
-                                        (mjdTicks ? mjdTicks.sub.map((mjd, index) => `M${X(mjd)},${bottom}v${-((index - mjdTicks.stepOffset) % mjdTicks.step === 0 ? mainTickSize : subTickSize)}`).join('') : ''),
-                                    ].join(''),
-                                    stroke: Color.black,
-                                },
-                            ),
-                        );
-                    }
-                    return createElement(
-                        'g',
-                        {
-                            'data-object': id,
-                            'data-band': bandTitle,
-                            'children': elements,
-                        },
-                    );
-                }),
-            );
-        }),
     );
 };
