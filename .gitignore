@@ -13,3 +13,4 @@ server/output-template.yml
 *.out
 *.snm
 *.toc
+modules-*/*/lib

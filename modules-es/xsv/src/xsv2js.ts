@@ -1,4 +1,4 @@
-import {IXSVMapper} from '../types';
+import {IXSVMapper} from './types';
 
 export const isNonEmptyString = (input: string) => Boolean(input.match(/\S/));
 

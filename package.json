@@ -1,6 +1,6 @@
 {
     "private": true,
-    "version": "1.2.3",
+    "license": "Apache-2.0",
     "scripts": {
         "dev:doc": "cd docs && chokidar 'index.tex' --initial --command 'pdflatex -interaction=nonstopmode index.tex'",
         "dev:client": "parcel client/index.html --out-dir client/output",
@@ -26,8 +26,9 @@
     "devDependencies": {
         "@commitlint/cli": "^7.5.2",
         "@commitlint/config-conventional": "^7.5.0",
+        "@maxi-js/ci-tools": "file:modules-node/ci-tools",
         "@types/aws-lambda": "^8.10.24",
-        "@types/node": "^11.13.7",
+        "@types/node": "^11.13.8",
         "@types/react": "^16.8.14",
         "@types/react-dom": "^16.8.4",
         "@typescript-eslint/eslint-plugin": "^1.7.0",
@@ -36,7 +37,10 @@
         "chokidar-cli": "^1.2.2",
         "conventional-changelog-cli": "^2.0.12",
         "eslint": "^5.16.0",
+        "globby": "^9.2.0",
         "husky": "^1.3.1",
+        "lerna": "^3.13.4",
+        "lint-staged": "^8.1.5",
         "npm-run-all": "^4.1.5",
         "parcel-bundler": "^1.12.3",
         "postcss-modules": "^1.4.1",
@@ -51,6 +55,9 @@
             "eslint:recommended",
             "plugin:@typescript-eslint/recommended"
         ],
+        "env": {
+            "es6": true
+        },
         "rules": {
             "no-constant-condition": [
                 "error",
@@ -113,10 +120,10 @@
             },
             {
                 "files": [
+                    "modules-dom/**/*.ts",
                     "client/**/*.ts"
                 ],
                 "env": {
-                    "es6": true,
                     "browser": true
                 },
                 "globals": {
@@ -125,15 +132,17 @@
             },
             {
                 "files": [
+                    "modules-node/**/*.ts",
+                    "ci-scripts/**/*.ts",
                     "server/**/*.ts"
                 ],
                 "env": {
-                    "es6": true,
                     "node": true
                 }
             },
             {
                 "files": [
+                    "modules-node/cli-tools/src/run.ts",
                     "server/src/types.ts",
                     "client/script/types.ts",
                     "client/script/util/isAvailablePlotType.ts",
