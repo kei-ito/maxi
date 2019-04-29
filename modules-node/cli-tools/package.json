@@ -1,0 +1,37 @@
+{
+    "name": "@maxi-js/cli-tools",
+    "author": {
+        "name": "Kei Ito",
+        "email": "kei.itof@gmail.com",
+        "url": "https://github.com/kei-ito"
+    },
+    "homepage": "https://github.com/kei-ito/maxi/tree/master/modules-node/cli-tools",
+    "repository": "https://github.com/kei-ito/maxi",
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "version": "0.0.0",
+    "license": "Apache-2.0",
+    "main": "lib/index.js",
+    "files": [
+        "lib"
+    ],
+    "bin": {
+        "validate-packages": "lib/validate-packages.js"
+    },
+    "scripts": {
+        "cleanup": "rimraf lib",
+        "build": "tsc",
+        "test": "echo TBW"
+    },
+    "dependencies": {
+        "@maxi-js/config-validator": "0.0.0",
+        "commander": "2.20.0"
+    },
+    "devDependencies": {
+        "@types/node": "11.13.8"
+    }
+}

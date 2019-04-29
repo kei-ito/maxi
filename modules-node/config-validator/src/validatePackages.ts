@@ -1,7 +1,7 @@
 import * as path from 'path';
 import globby from 'globby';
+import {readJSON} from '@maxi-js/fs-tools';
 import {validatePackageJSON} from './validatePackageJSON';
-import {readJSON} from './readJSON';
 import {IMAXIJSLernaJSON, IMAXIJSRootPackageJSON, IMAXIJSPackageJSON} from './types';
 import {validateLernaJSON} from './validateLernaJSON';
 import {validateRootPackageJSON} from './validateRootPackageJSON';

@@ -1,11 +1,11 @@
 {
-    "name": "@maxi-js/ci-tools",
+    "name": "@maxi-js/config-validator",
     "author": {
         "name": "Kei Ito",
         "email": "kei.itof@gmail.com",
         "url": "https://github.com/kei-ito"
     },
-    "homepage": "https://github.com/kei-ito/maxi/tree/master/modules-node/ci-tools",
+    "homepage": "https://github.com/kei-ito/maxi/tree/master/modules-node/config-validator",
     "repository": "https://github.com/kei-ito/maxi",
     "publishConfig": {
         "access": "public"
@@ -19,18 +19,19 @@
     "files": [
         "lib"
     ],
-    "bin": {
-        "validate-packages": "lib/validate-packages.js"
-    },
     "scripts": {
+        "cleanup": "rimraf lib",
         "build": "tsc",
-        "test": "echo TBW"
+        "test": "ava"
     },
     "dependencies": {
-        "@types/eslint": "^4.16.6",
-        "@types/semver": "^6.0.0",
-        "commander": "^2.20.0",
-        "globby": "^9.2.0",
-        "semver": "^6.0.0"
+        "@maxi-js/fs-tools": "0.0.0",
+        "globby": "9.2.0",
+        "semver": "6.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "11.13.8",
+        "@types/eslint": "4.16.6",
+        "@types/semver": "6.0.0"
     }
 }
