@@ -2,9 +2,7 @@
 node_modules
 .aws-sam
 .cache
-client/output
-server/lib
-server/output-template.yml
+output
 *.aux
 *.dvi
 *.log
@@ -14,3 +12,4 @@ server/output-template.yml
 *.snm
 *.toc
 modules-*/*/lib
+output-template.yml
