@@ -37,11 +37,11 @@ jobs:
     steps:
       - attach_workspace: {at: .}
       - run: npm run lint
-  build-server:
+  build:
     docker: [{image: "circleci/node:lts"}]
     steps:
       - attach_workspace: {at: .}
-      - run: npm run build:server
+      - run: npm run build
       - run: git diff --exit-code
       - persist_to_workspace: {root: ., paths: [.]}
   test-server:
@@ -59,13 +59,6 @@ jobs:
               --stack-name maxiapp-server
               --capabilities CAPABILITY_IAM
               --no-fail-on-empty-changeset
-  build-client:
-    docker: [{image: "circleci/node:lts"}]
-    steps:
-      - attach_workspace: {at: .}
-      - run: npm run build:client
-      - run: git diff --exit-code
-      - persist_to_workspace: {root: ., paths: [.]}
   test-client:
     docker: [{image: "circleci/node:lts"}]
     steps:
@@ -85,10 +78,9 @@ workflows:
           filters: {branches: {ignore: master}, tags: {ignore: /.*/}}
       - setup: {requires: [onDevelopBranch]}
       - lint: {requires: [setup]}
-      - build-server: {requires: [setup]}
-      - test-server: {requires: [build-server]}
-      - build-client: {requires: [setup]}
-      - test-client: {requires: [build-client]}
+      - build: {requires: [setup]}
+      - test-server: {requires: [build]}
+      - test-client: {requires: [build]}
   release:
     jobs:
       - isTagged:
@@ -99,20 +91,17 @@ workflows:
       - lint:
           requires: [setup]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
-      - build-server:
+      - build:
           requires: [setup]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
       - test-server:
-          requires: [build-server]
+          requires: [build]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
       - deploy-server:
           requires: [test-server]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
-      - build-client:
-          requires: [setup]
-          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
       - test-client:
-          requires: [build-client]
+          requires: [build]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
       - deploy-client:
           requires: [test-client]
