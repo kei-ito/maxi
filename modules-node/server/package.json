@@ -20,8 +20,9 @@
         "lib"
     ],
     "scripts": {
-        "start-server": "sam local start-api --region ap-northeast-1 --template server/template.yml",
-        "dev": "tsc --watch --preserveWatchOutput",
+        "dev:sam": "sam local start-api --region ap-northeast-1 --template server/template.yml",
+        "dev:tsc": "tsc --watch --preserveWatchOutput",
+        "dev": "run-p dev:*",
         "cleanup": "rimraf lib",
         "build": "tsc",
         "test": "ava"

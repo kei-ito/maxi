@@ -24,6 +24,7 @@
     },
     "scripts": {
         "cleanup": "rimraf lib",
+        "dev": "tsc --watch --preserveWatchOutput",
         "build": "tsc",
         "test": "echo TBW"
     },

@@ -2,17 +2,13 @@
     "private": true,
     "license": "Apache-2.0",
     "scripts": {
-        "dev:client": "parcel client/index.html --out-dir client/output",
-        "dev:server:tsc": "tsc --project server/tsconfig.json --watch --preserveWatchOutput",
-        "dev:server": "run-p dev:server:*",
-        "dev:start-server": "sam local start-api --region ap-northeast-1 --template server/template.yml",
-        "dev": "run-p dev:server dev:client",
+        "dev": "lerna run dev",
         "build": "lerna run build",
         "test": "lerna run test",
         "lint": "eslint 'modules-*/*/src/**/*.ts'",
         "version:changelog": "conventional-changelog --preset angular --infile CHANGELOG.md --same-file --release-count 0",
         "version:add": "git add .",
-        "version": "npm-run-all --sequential version:changelog version:add"
+        "version": "run-s version:changelog version:add"
     },
     "devDependencies": {
         "@commitlint/cli": "7.5.2",
