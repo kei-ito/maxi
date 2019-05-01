@@ -20,7 +20,7 @@ jobs:
           keys:
             - dependencies-{{ checksum "package-lock.json" }}
             - dependencies-
-      - run: npm ci
+      - run: npm ci --no-ci
       - run: npx lerna bootstrap
       - save_cache:
           paths:
