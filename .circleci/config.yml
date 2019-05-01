@@ -48,26 +48,28 @@ jobs:
     docker: [{image: "circleci/node:lts"}]
     steps:
       - attach_workspace: {at: .}
-      - run: npm test
+      - run: npx lerna run test --scope @maxi-js/server
+  test-data-viewer:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: npx lerna run test --scope @maxi-js/data-viewer
   deploy-server:
     docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
     steps:
       - attach_workspace: {at: .}
+      - run: cd modules-node/server
       - run: sam package --template-file server/template.yml --output-template-file server/output-template.yml --s3-bucket $S3_SERVERAPP_BUCKET
       - run: aws cloudformation deploy
               --template-file server/output-template.yml
               --stack-name maxiapp-server
               --capabilities CAPABILITY_IAM
               --no-fail-on-empty-changeset
-  test-client:
-    docker: [{image: "circleci/node:lts"}]
-    steps:
-      - attach_workspace: {at: .}
-      - run: echo "TBW"
-  deploy-client:
+  deploy-data-viewer:
     docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
     steps:
       - attach_workspace: {at: .}
+      - run: cd modules-dom/data-viewer
       - run: aws s3 cp client/output s3://$S3_CLIENTAPP_BUCKET/ --recursive
       - run: aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths /index.html
 workflows:
@@ -80,7 +82,7 @@ workflows:
       - lint: {requires: [setup]}
       - build: {requires: [setup]}
       - test-server: {requires: [build]}
-      - test-client: {requires: [build]}
+      - test-data-viewer: {requires: [build]}
   release:
     jobs:
       - isTagged:
@@ -97,12 +99,12 @@ workflows:
       - test-server:
           requires: [build]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+      - test-data-viewer:
+          requires: [build]
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
       - deploy-server:
           requires: [test-server]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
-      - test-client:
-          requires: [build]
-          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
-      - deploy-client:
-          requires: [test-client]
+      - deploy-data-viewer:
+          requires: [test-data-viewer]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
