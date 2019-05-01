@@ -21,8 +21,15 @@ jobs:
             - dependencies-{{ checksum "package-lock.json" }}
             - dependencies-
       - run: npm ci
+      - run: npx lerna bootstrap
       - save_cache:
-          paths: [node_modules]
+          paths:
+            - node_modules
+            - modules-dom/data-viewer/node_modules
+            - modules-node/cli-tools/node_modules
+            - modules-node/config-validator/node_modules
+            - modules-node/fs-tools/node_modules
+            - modules-node/server/node_modules
           key: dependencies-{{ checksum "package-lock.json" }}
       - persist_to_workspace: {root: ., paths: [.]}
   lint:
