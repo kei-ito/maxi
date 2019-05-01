@@ -15,7 +15,7 @@
         "build:server": "run-s build:server:cleanup build:server:tsc",
         "build": "lerna run build",
         "test": "lerna run test",
-        "lint": "eslint client/script/**/*.ts server/src/**/*.ts",
+        "lint": "eslint modules-*/**/*.ts",
         "version:changelog": "conventional-changelog --preset angular --infile CHANGELOG.md --same-file --release-count 0",
         "version:add": "git add .",
         "version": "npm-run-all --sequential version:changelog version:add"
@@ -105,8 +105,7 @@
             },
             {
                 "files": [
-                    "modules-dom/**/*.ts",
-                    "client/**/*.ts"
+                    "modules-dom/**/*.ts"
                 ],
                 "env": {
                     "browser": true
@@ -117,9 +116,7 @@
             },
             {
                 "files": [
-                    "modules-node/**/*.ts",
-                    "ci-scripts/**/*.ts",
-                    "server/**/*.ts"
+                    "modules-node/**/*.ts"
                 ],
                 "env": {
                     "node": true
@@ -128,10 +125,10 @@
             {
                 "files": [
                     "modules-node/cli-tools/src/run.ts",
-                    "server/src/types.ts",
-                    "client/script/types.ts",
-                    "client/script/util/isAvailablePlotType.ts",
-                    "client/script/util/useCache.ts"
+                    "modules-node/server/src/types.ts",
+                    "modules-dom/data-viewer/src/script/types.ts",
+                    "modules-dom/data-viewer/src/script/util/isAvailablePlotType.ts",
+                    "modules-dom/data-viewer/src/script/util/useCache.ts"
                 ],
                 "rules": {
                     "@typescript-eslint/no-explicit-any": "off"
