@@ -18,6 +18,7 @@ before_install:
   fi
 install:
 - npm ci
+- npx lerna bootstrap
 script:
 - npm run build
 - npm test
