@@ -1,0 +1,15 @@
+{
+    "packages": [
+        "modules-*/*"
+    ],
+    "version": "1.2.3",
+    "command": {
+        "publish": {
+            "allowBranch": "master",
+            "ignoreChanges": [
+                "*.md",
+                "*.test.ts"
+            ]
+        }
+    }
+}

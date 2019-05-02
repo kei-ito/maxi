@@ -1,0 +1,40 @@
+{
+    "name": "@maxi-js/data-viewer",
+    "author": {
+        "name": "Kei Ito",
+        "email": "kei.itof@gmail.com",
+        "url": "https://github.com/kei-ito"
+    },
+    "homepage": "https://github.com/kei-ito/maxi/tree/master/modules-node/data-viewer",
+    "repository": "https://github.com/kei-ito/maxi",
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "version": "0.0.0",
+    "license": "Apache-2.0",
+    "main": "lib/index.js",
+    "files": [
+        "lib"
+    ],
+    "bin": {
+        "validate-packages": "lib/validate-packages.js"
+    },
+    "scripts": {
+        "cleanup": "rimraf output",
+        "dev": "parcel src/index.html --out-dir output",
+        "build": "parcel build src/index.html --no-source-maps --out-dir output",
+        "test": "echo TBW"
+    },
+    "devDependencies": {
+        "@types/react": "16.8.14",
+        "@types/react-dom": "16.8.4",
+        "parcel-bundler": "1.12.3",
+        "postcss-modules": "1.4.1",
+        "react": "16.8.6",
+        "react-dom": "16.8.6"
+    },
+    "dependencies": {}
+}
