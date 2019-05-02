@@ -1,31 +1,34 @@
 import * as assert from 'assert';
+import {URL} from 'url';
 import {IPerson} from './types';
 
 export const validatePerson = (
-    person: IPerson,
+    person: Partial<IPerson>,
     objectName: string,
-) => {
+): void => {
     assert.equal(
         typeof person,
         'object',
         `${objectName} is invalid: ${person}.`,
     );
-    const {name, email, url} = person;
-    assert.equal(
-        typeof email,
-        'string',
-        `${objectName}.email is invalid: ${email}.`,
+    assert.ok(
+        typeof person.email === 'string' && (/^[^@]+@[^@]+$/).test(person.email),
+        `${objectName}.email is invalid: ${person.email}.`,
     );
-    assert.equal(
-        typeof name,
-        'string',
-        `${objectName}.name is invalid: ${name}.`,
+    assert.ok(
+        typeof person.name === 'string' && person.name === person.name.trim(),
+        `${objectName}.name is invalid: ${person.name}.`,
     );
-    if (url) {
-        assert.equal(
-            typeof url,
-            'string',
-            `${objectName}.url is invalid: ${url}.`,
+    if (person.url) {
+        let url: URL | null = null;
+        try {
+            url = new URL(person.url);
+        } catch (error) {
+            url = null;
+        }
+        assert.ok(
+            person.url === `${url}`,
+            `${objectName}.url is invalid: ${person.url}.`,
         );
     }
 };

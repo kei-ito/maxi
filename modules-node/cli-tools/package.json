@@ -26,10 +26,11 @@
         "cleanup": "rimraf lib",
         "dev": "tsc --watch --preserveWatchOutput",
         "build": "tsc",
-        "test": "echo TBW"
+        "test": "ava"
     },
     "dependencies": {
         "@maxi-js/config-validator": "0.0.0",
+        "@maxi-js/fs-tools": "0.0.0",
         "commander": "2.20.0"
     },
     "devDependencies": {
