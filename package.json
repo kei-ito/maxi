@@ -2,8 +2,8 @@
     "private": true,
     "license": "Apache-2.0",
     "scripts": {
-        "dev": "lerna run dev",
-        "build": "lerna run build",
+        "dev": "lerna run dev --parallel",
+        "build": "lerna run build --parallel",
         "test": "lerna run test",
         "lint": "eslint 'modules-*/*/src/**/*.ts'",
         "version:changelog": "conventional-changelog --preset angular --infile CHANGELOG.md --same-file --release-count 0",
@@ -16,6 +16,7 @@
         "@typescript-eslint/eslint-plugin": "1.7.0",
         "ava": "1.4.1",
         "conventional-changelog-cli": "2.0.17",
+        "cpy-cli": "^2.0.0",
         "eslint": "5.16.0",
         "husky": "2.1.0",
         "lerna": "3.13.4",
@@ -106,6 +107,7 @@
             },
             {
                 "files": [
+                    "modules-*/*/scripts/**/*.ts",
                     "modules-node/**/*.ts"
                 ],
                 "env": {
@@ -115,7 +117,7 @@
             {
                 "files": [
                     "modules-node/cli-tools/src/run.ts",
-                    "modules-node/server/src/types.ts",
+                    "modules-node/stream-tools/src/types.ts",
                     "modules-dom/data-viewer/src/script/types.ts",
                     "modules-dom/data-viewer/src/script/util/isAvailablePlotType.ts",
                     "modules-dom/data-viewer/src/script/util/useCache.ts"
