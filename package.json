@@ -3,7 +3,7 @@
     "license": "Apache-2.0",
     "scripts": {
         "dev": "lerna run dev --parallel",
-        "build": "lerna run build --parallel",
+        "build": "lerna run build",
         "test:lerna": "lerna run test --parallel",
         "test:repo": "ts-node modules-node/cli-tools/src/validate-packages.ts",
         "test": "run-p test:*",
