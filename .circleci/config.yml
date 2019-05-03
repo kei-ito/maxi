@@ -1,5 +1,9 @@
 version: 2.1
 jobs:
+  onBranch:
+    docker: [{image: "circleci/node:lts"}]
+    steps:
+      - run: if [[ -z $CIRCLE_BRANCH ]]; then exit 1; fi
   onDevelopBranch:
     docker: [{image: "circleci/node:lts"}]
     steps:
@@ -76,9 +80,9 @@ workflows:
   version: 2
   run-tests:
     jobs:
-      - onDevelopBranch:
+      - onBranch:
           filters: {branches: {only: /.*/}, tags: {ignore: /.*/}}
-      - setup: {requires: [onDevelopBranch]}
+      - setup: {requires: [onBranch]}
       - lint: {requires: [setup]}
       - build: {requires: [setup]}
       - test-server: {requires: [build]}
