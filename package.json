@@ -8,20 +8,17 @@
         "test:repo": "ts-node modules-node/cli-tools/src/validate-packages.ts",
         "test": "run-p test:*",
         "lint": "eslint 'modules-*/*/src/**/*.ts'",
-        "version:changelog": "conventional-changelog --preset angular --infile CHANGELOG.md --same-file --release-count 0",
-        "version:add": "git add .",
-        "version": "run-s version:changelog version:add"
+        "bump": "lerna version --conventional-commits --sign-git-commit --sign-git-tag --no-push"
     },
     "devDependencies": {
         "@commitlint/cli": "7.5.2",
         "@commitlint/config-conventional": "7.5.0",
         "@typescript-eslint/eslint-plugin": "1.7.0",
         "ava": "1.4.1",
-        "conventional-changelog-cli": "2.0.17",
         "eslint": "5.16.0",
-        "husky": "2.1.0",
+        "husky": "^2.2.0",
         "lerna": "3.13.4",
-        "lint-staged": "8.1.5",
+        "lint-staged": "^8.1.6",
         "make-dir-cli": "^2.0.0",
         "npm-run-all": "4.1.5",
         "rimraf": "2.6.3",
