@@ -77,7 +77,7 @@ workflows:
   run-tests:
     jobs:
       - onDevelopBranch:
-          filters: {branches: {ignore: master}, tags: {ignore: /.*/}}
+          filters: {branches: {only: /.*/}, tags: {ignore: /.*/}}
       - setup: {requires: [onDevelopBranch]}
       - lint: {requires: [setup]}
       - build: {requires: [setup]}
