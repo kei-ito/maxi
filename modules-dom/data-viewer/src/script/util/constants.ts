@@ -7,7 +7,6 @@ export const APIBaseURL = new URL(developMode ? `http://${location.hostname}:300
 export const AvailablePlotTypes: Array<PlotType> = [PlotType.Point, PlotType.Line];
 export enum URLParameterKey {
     mjdRange = 'mjd',
-    selected = 'objects',
     binSize = 'bin',
     plotType = 'plot',
 }

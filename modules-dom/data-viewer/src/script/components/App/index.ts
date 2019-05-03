@@ -9,17 +9,17 @@ import {ObjectList} from '../ObjectList/index';
 import {LightCurve} from '../LightCurve/index';
 import {SearchForm} from '../SearchForm/index';
 import {normalizeSearchText} from '../../util/normalizeSearchText';
-import {catalog} from '../../util/catalog';
+import * as catalog from '../../util/catalog';
 import classes from './style.css';
 
 export const getInitialSelectedObjects = (): Array<string> => {
-    const urlParameters = new URLSearchParams(location.search);
-    const parameter = urlParameters.get(URLParameterKey.selected);
-    const list = parameter
-    ? parameter.trim().split(/\s*,\s*/).filter((id) => catalog.map.has(id))
-    : [];
+    const matched = location.pathname.match(/^\/objects\/([^/]+)$/);
+    let list: Array<string> = [];
+    if (matched) {
+        list = matched[1].split(/\s*,\s*/).filter((id) => catalog.map.has(id));
+    }
     if (list.length === 0) {
-        list.push(catalog.firstObject.id);
+        list.push(catalog.firstObjectId);
     }
     return list;
 };
@@ -60,7 +60,10 @@ export const App = () => {
         (
             currentURL: URL,
             urlParameters: URLSearchParams,
-        ): URL => new URL(`?${urlParameters}`, currentURL),
+        ): URL => new URL(
+            `objects/${selected.join(',')}?${urlParameters}`,
+            `${currentURL.protocol}//${currentURL.host}`,
+        ),
         new URL(location.href),
     );
     const lightCurveCache = useCache<ILightCurveData>({
@@ -88,8 +91,6 @@ export const App = () => {
 
     useEffect(() => {
         const urlParameters = new URLSearchParams();
-        const selectedObjectsCSV = selected.join(',');
-        urlParameters.set(URLParameterKey.selected, selectedObjectsCSV);
         urlParameters.set(URLParameterKey.mjdRange, preferences.mjdRange.map((mjd) => mjd.toFixed(0)).join('-'));
         urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
         urlParameters.set(URLParameterKey.plotType, `${preferences.plotType}`);

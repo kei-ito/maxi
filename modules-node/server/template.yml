@@ -8,6 +8,20 @@ Globals:
     Runtime: nodejs8.10
 
 Resources:
+  FunctionExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'lambda.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
   ServerDependenciesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -24,10 +38,15 @@ Resources:
       Layers: [!Ref ServerDependenciesLayer]
       Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
-        HttpGet:
+        HttpGetRoot:
           Type: Api
           Properties:
             Path: /
+            Method: get
+        HttpGetObject:
+          Type: Api
+          Properties:
+            Path: /objects/{objectId}
             Method: get
   FluxFunction:
     Type: AWS::Serverless::Function
@@ -42,17 +61,16 @@ Resources:
           Properties:
             Path: /objects/{objectId}/flux
             Method: get
-  FunctionExecutionRole:
-    Type: 'AWS::IAM::Role'
+  SitemapFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: 'Allow'
-            Principal:
-              Service:
-                - 'lambda.amazonaws.com'
-            Action:
-              - 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      CodeUri: lib/
+      Handler: sitemap.handler
+      Layers: [!Ref ServerDependenciesLayer]
+      Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
+      Events:
+        HttpGet:
+          Type: Api
+          Properties:
+            Path: /sitemap.xml
+            Method: get

@@ -2,7 +2,7 @@ import {createElement, PointerEvent, KeyboardEvent, useRef, useState} from 'reac
 import {IObjectData} from '@maxi-js/catalog';
 import {Mode} from '../../types';
 import classes from './style.css';
-import {catalog} from '../../util/catalog';
+import * as catalog from '../../util/catalog';
 
 export interface IObjectListProps {
     selected: Array<string>,

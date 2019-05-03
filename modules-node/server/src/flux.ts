@@ -1,11 +1,11 @@
 import {APIGatewayProxyHandler} from 'aws-lambda';
 import {request} from '@maxi-js/net-tools';
 import {asString} from '@maxi-js/stream-tools';
-import {catalog} from '@maxi-js/catalog';
+import * as catalog from '@maxi-js/catalog';
 import {stringifyTable, ssv2js} from '@maxi-js/string-tools';
-import {filterHeadersForAPIGateway} from './filterHeadersForAPIGateway';
-import {createErrorResponse} from './createErrorResponse';
-import {generateCommonHeaders} from './generateCommonHeaders';
+import {filterHeadersForAPIGateway} from './util/filterHeadersForAPIGateway';
+import {createErrorResponse} from './util/createErrorResponse';
+import {generateCommonHeaders} from './util/generateCommonHeaders';
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     const objectId = event.pathParameters && event.pathParameters.objectId;
@@ -15,7 +15,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             body: `The requested objectId (${objectId}) is invalid`,
         };
     }
-    const object = catalog.list.find((object) => object.id === objectId);
+    const object = catalog.map.get(objectId);
     if (!object) {
         return {
             statusCode: 404,

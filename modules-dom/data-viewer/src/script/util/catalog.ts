@@ -1,11 +1,14 @@
-import {catalog as $catalog, IObjectData} from '@maxi-js/catalog';
+import * as $catalog from '@maxi-js/catalog';
 
-export const catalog = {
-    createdAt: new Date($catalog.createdAt),
-    source: $catalog.source,
-    firstObject: $catalog.list[0],
-    map: new Map(
-        $catalog.list.map<[string, IObjectData & {hash: string}]>((object) => [
+export const createdAt = new Date($catalog.createdAt);
+export const source = $catalog.source;
+export let firstObjectId = '';
+export const map = new Map(
+    Array.from($catalog.map).map<[string, $catalog.IObjectData & {hash: string}]>(([, object], index) => {
+        if (index === 0) {
+            firstObjectId = object.id;
+        }
+        return [
             object.id,
             {
                 ...object,
@@ -15,6 +18,6 @@ export const catalog = {
                     object.category,
                 ].join(' '),
             },
-        ]),
-    ),
-};
+        ];
+    }),
+);

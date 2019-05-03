@@ -2,7 +2,7 @@ import {createElement, ReactElement} from 'react';
 import {Band, IRollingAverageData, PlotType, IMargin} from '../../types';
 import {bandCount} from '../../util/constants';
 import {Area} from './Area';
-import {catalog} from '../../util/catalog';
+import * as catalog from '../../util/catalog';
 
 interface IBodyProps {
     objects: Array<string>,
