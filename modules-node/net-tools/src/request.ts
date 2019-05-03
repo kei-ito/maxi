@@ -15,10 +15,12 @@ export const getResponse = (
 ): Promise<http.IncomingMessage> => new Promise((resolve, reject) => {
     const requestId = `${++counter}`.padStart(4);
     const {stdout} = options;
+    const family = url.hostname.includes(':') ? 6 : 4;
     const parameters = {
         ...options,
+        family,
         protocol: url.protocol,
-        host: url.host,
+        host: url.hostname.replace(/^\[(.*?)\]$/, '$1'),
         port: url.port,
         path: url.pathname,
         auth: `${url.username}:${url.password}`,
