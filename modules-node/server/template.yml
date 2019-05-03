@@ -1,41 +1,46 @@
+# https://aws.amazon.com/jp/blogs/compute/working-with-aws-lambda-and-lambda-layers-in-aws-sam/
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-# More info about Globals:
-# https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 6
     Runtime: nodejs8.10
 
 Resources:
-  IndexFunction:
-    # More info about Function Resource:
-    # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  ServerDependenciesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: maxi-server-dependencies
+      ContentUri: layer/
+      CompatibleRuntimes:
+        - nodejs8.10
+      RetentionPolicy: Retain
+  AppHTMLFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lib
-      Handler: index.handler
+      CodeUri: lib/
+      Handler: app.handler
+      Layers: [!Ref ServerDependenciesLayer]
       Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
         HttpGet:
-          # More info about API Event Source:
-          # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Type: Api
           Properties:
-            Path: /objects
+            Path: /
             Method: get
-  ObjectFunction:
+  FluxFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lib
-      Handler: object.handler
+      CodeUri: lib/
+      Handler: flux.handler
+      Layers: [!Ref ServerDependenciesLayer]
       Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
         HttpGet:
           Type: Api
           Properties:
-            Path: /objects/{objectId}
+            Path: /objects/{objectId}/flux
             Method: get
   FunctionExecutionRole:
     Type: 'AWS::IAM::Role'

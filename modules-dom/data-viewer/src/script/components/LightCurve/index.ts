@@ -1,6 +1,6 @@
 import {useRef, useEffect, createElement, useState} from 'react';
 import classes from './style.css';
-import {IPreferences, IObjectMap, IRollingAverageData, IMargin} from '../../types';
+import {IPreferences, IRollingAverageData, IMargin} from '../../types';
 import {getAreaHeight, bandCount} from '../../util/constants';
 import {Cursor} from './Cursor';
 import {Body} from './Body';
@@ -8,7 +8,6 @@ import {Body} from './Body';
 export interface ILightCurveProps {
     preferences: IPreferences,
     objects: Array<string>,
-    objectMap: IObjectMap | null,
     cache: Map<string, IRollingAverageData>,
     setPreferences: (newPreferences: Partial<IPreferences>) => void,
 }
@@ -233,7 +232,6 @@ export const LightCurve = (
             Body,
             {
                 objects: props.objects,
-                objectMap: props.objectMap,
                 cache: props.cache,
                 minMJD: mjdRange[0],
                 maxMJD: mjdRange[1],

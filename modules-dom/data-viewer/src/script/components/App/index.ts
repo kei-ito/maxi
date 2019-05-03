@@ -1,6 +1,5 @@
 import {useState, createElement, useEffect, Fragment, useReducer, ChangeEvent} from 'react';
-import {getObjectMap} from '../../util/getObjectMap';
-import {Mode, ILightCurveData, IError, IObjectMap, IRollingAverageData, IPreferences} from '../../types';
+import {Mode, ILightCurveData, IError, IRollingAverageData, IPreferences} from '../../types';
 import {getLightCurveData} from '../../util/getData';
 import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
@@ -10,12 +9,19 @@ import {ObjectList} from '../ObjectList/index';
 import {LightCurve} from '../LightCurve/index';
 import {SearchForm} from '../SearchForm/index';
 import {normalizeSearchText} from '../../util/normalizeSearchText';
+import {catalog} from '../../util/catalog';
 import classes from './style.css';
 
 export const getInitialSelectedObjects = (): Array<string> => {
     const urlParameters = new URLSearchParams(location.search);
     const parameter = urlParameters.get(URLParameterKey.selected);
-    return parameter ? parameter.trim().split(/\s*,\s*/) : [];
+    const list = parameter
+    ? parameter.trim().split(/\s*,\s*/).filter((id) => catalog.map.has(id))
+    : [];
+    if (list.length === 0) {
+        list.push(catalog.firstObject.id);
+    }
+    return list;
 };
 
 export const App = () => {
@@ -48,10 +54,8 @@ export const App = () => {
         }),
         getDefaultPreferences(new URLSearchParams(location.search)),
     );
-    const [objectMap, setObjectMap] = useState<IObjectMap | null>(null);
     const [searchWords, setSearchWords] = useState('');
     const [selected, setSelected] = useState<Array<string>>(getInitialSelectedObjects());
-    const [loading, setLoading] = useState(-1);
     const [currentURL, setURLParameters] = useReducer(
         (
             currentURL: URL,
@@ -83,44 +87,19 @@ export const App = () => {
     }, [preferencesBuffer]);
 
     useEffect(() => {
-        if (loading === -1 && !objectMap) {
-            setLoading(1);
-            getObjectMap()
-            .then((newObjectMap) => {
-                const newSelected = selected.filter((objectId) => newObjectMap.has(objectId));
-                if (newSelected.length === 0) {
-                    const firstIteratorResult = newObjectMap.keys().next();
-                    if (!firstIteratorResult.done) {
-                        newSelected.push(firstIteratorResult.value);
-                    }
-                }
-                setSelected(newSelected);
-                setObjectMap(newObjectMap);
-                setLoading(0);
-            })
-            .catch(onError);
-        }
-    }, []);
-
-    useEffect(() => {
-        if (loading === 0) {
-            const urlParameters = new URLSearchParams();
-            const selectedObjectsCSV = selected.join(',');
-            urlParameters.set(URLParameterKey.selected, selectedObjectsCSV);
-            urlParameters.set(URLParameterKey.mjdRange, preferences.mjdRange.map((mjd) => mjd.toFixed(0)).join('-'));
-            urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
-            urlParameters.set(URLParameterKey.plotType, `${preferences.plotType}`);
-            setURLParameters(urlParameters);
-        }
-    }, [selected, preferences, loading]);
+        const urlParameters = new URLSearchParams();
+        const selectedObjectsCSV = selected.join(',');
+        urlParameters.set(URLParameterKey.selected, selectedObjectsCSV);
+        urlParameters.set(URLParameterKey.mjdRange, preferences.mjdRange.map((mjd) => mjd.toFixed(0)).join('-'));
+        urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
+        urlParameters.set(URLParameterKey.plotType, `${preferences.plotType}`);
+        setURLParameters(urlParameters);
+    }, [selected, preferences]);
 
     useEffect(() => history.replaceState(null, '', `${currentURL}`), [currentURL]);
     useEffect(() => {
-        document.title = `${selected.map((objectId) => {
-            const object = objectMap && objectMap.get(objectId);
-            return object ? object.name : objectId;
-        }).join(', ')} | ${pageTitle}`;
-    }, [selected, objectMap]);
+        document.title = `${selected.join(', ')} | ${pageTitle}`;
+    }, [selected]);
 
     return createElement(
         Fragment,
@@ -131,7 +110,7 @@ export const App = () => {
             null,
             createElement('h1', null, [
                 'Object selector',
-                objectMap ? `(${objectMap.size} object${objectMap.size === 0 ? '' : 's'})` : '(Loading...)',
+                `(${catalog.map.size} object${catalog.map.size === 0 ? '' : 's'})`,
             ].join(' ')),
             createElement(
                 'figure',
@@ -146,9 +125,7 @@ export const App = () => {
                     },
                 ),
                 createElement(ObjectList, {
-                    loading: loading !== 0,
                     searchWords,
-                    objectMap,
                     selected,
                     onSelect: (object, mode) => {
                         const newSelected = new Set(selected);
@@ -229,7 +206,6 @@ export const App = () => {
                 createElement(LightCurve, {
                     preferences,
                     objects: 0 < selected.length ? selected : [''],
-                    objectMap,
                     cache: rollingAverageCache,
                     setPreferences: __setPreferences,
                 }),
@@ -269,14 +245,14 @@ export const App = () => {
             createElement(
                 'ol',
                 null,
-                objectMap && createElement(
+                createElement(
                     'li',
                     {id: 'List'},
-                    `${objectMap.sourceTitle}. Retrieved ${objectMap.createdAt.toLocaleString()}. `,
+                    `${catalog.source.title}. Retrieved ${catalog.createdAt.toLocaleString()}. `,
                     createElement(
                         'a',
-                        {href: objectMap.sourceURL, target: '_blank'},
-                        objectMap.sourceURL,
+                        {href: catalog.source.urls.html, target: '_blank'},
+                        catalog.source.urls.html,
                     ),
                 ),
                 ...selected.map((objectId) => {

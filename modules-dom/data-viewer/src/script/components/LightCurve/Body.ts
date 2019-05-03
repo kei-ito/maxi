@@ -1,11 +1,11 @@
 import {createElement, ReactElement} from 'react';
-import {Band, IObjectMap, IRollingAverageData, PlotType, IMargin} from '../../types';
+import {Band, IRollingAverageData, PlotType, IMargin} from '../../types';
 import {bandCount} from '../../util/constants';
 import {Area} from './Area';
+import {catalog} from '../../util/catalog';
 
 interface IBodyProps {
     objects: Array<string>,
-    objectMap: IObjectMap | null,
     cache: Map<string, IRollingAverageData>,
     minMJD: number,
     maxMJD: number,
@@ -19,7 +19,6 @@ interface IBodyProps {
 export const Body = (
     {
         objects,
-        objectMap,
         cache,
         minMJD,
         maxMJD,
@@ -51,7 +50,7 @@ export const Body = (
                     minMJD,
                     maxMJD,
                     binSize,
-                    object: objectMap && objectMap.get(objectId),
+                    object: catalog.map.get(objectId),
                     data: cache.get(objectId),
                     plotType,
                     isFirst: index === 0,

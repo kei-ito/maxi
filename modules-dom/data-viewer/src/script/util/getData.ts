@@ -6,7 +6,7 @@ import {extractResponseData} from './extractResponseData';
 export const getLightCurveData = async (
     objectId: string,
 ): Promise<ILightCurveData> => {
-    const response = await fetch(`${new URL(`objects/${objectId}`, APIBaseURL)}`);
+    const response = await fetch(`${new URL(`objects/${objectId}/flux`, APIBaseURL)}`);
     if (response.status !== 200) {
         throw createError(
             'FETCH_OBJECT_DATA',

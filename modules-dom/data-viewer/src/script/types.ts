@@ -7,39 +7,12 @@ export interface IForEachable<TValue, TKey = string | number> {
     forEach: (fn: (value: TValue, key: TKey) => void) => void,
 }
 
-export type IObjectSource = [
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-];
-
-export interface IObject {
-    id: string,
-    name: string,
-    category: string,
-    /** Right Ascension (Equatorial coordinate system) */
-    RA: number,
-    /** Declination (Equatorial coordinate system) */
-    Dec: number,
-    /** Galactic longitude (Galactic coordinate system) */
-    L: number,
-    /** Galactic latitude (Galactic coordinate system) */
-    B: number,
-    hash: string,
-}
-
 export interface IResponseData {
     sourceTitle: string | null,
     sourceURL: string | null,
     createdAt: Date,
     elapsedSeconds: number,
 }
-
-export interface IObjectMap extends Map<string, IObject>, IResponseData {}
 
 export type ILightCurveBin = [
     number, // MJD

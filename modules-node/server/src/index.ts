@@ -1,15 +1,12 @@
 import {URL} from 'url';
 import {APIGatewayProxyHandler} from 'aws-lambda';
-import {request} from './util/request';
-import {asString} from './util/streamReader';
-import {getMatchedStrings} from './util/getMatchedStrings';
-import {filterHeadersForAPIGateway} from './util/filterHeadersForAPIGateway';
-import {getTableFromHTML} from './util/getTableFromHTML';
-import {stringifyTable} from './util/stringifyTable';
+import {request} from '@maxi-js/net-tools';
+import {asString} from '@maxi-js/stream-tools';
+import {getMatchedStrings, stringifyTable, getTitleFromHTML, getTableFromHTML} from '@maxi-js/string-tools';
+import {filterHeadersForAPIGateway} from './filterHeadersForAPIGateway';
 import {ITableLike} from './types';
-import {createErrorResponse} from './util/createErrorResponse';
-import {generateCommonHeaders} from './util/generateCommonHeaders';
-import {getTitleFromHTML} from './util/getTitleFromHTML';
+import {createErrorResponse} from './createErrorResponse';
+import {generateCommonHeaders} from './generateCommonHeaders';
 
 const removeHeading = <TType>(
     table: ITableLike<TType>,
