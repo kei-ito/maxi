@@ -1,5 +1,5 @@
 import {IObjectData} from './types';
-export const createdAt = '2019-05-03T14:08:17.719Z';
+export const createdAt = '2019-05-03T23:19:38.034Z';
 export const source = {
     title: 'MAXI GSC All-Sky Monitor Index (v3)',
     urls: {html: 'http://maxi.riken.jp/pubdata/v3/'},

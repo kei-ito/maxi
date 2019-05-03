@@ -13,11 +13,11 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     ].join('\n');
     return {
         statusCode: 200,
-        headers: {
+        multiValueHeaders: {
             ...generateCommonHeaders(event, context),
-            'content-length': body.length,
-            'content-type': 'text/xml; charset=utf-8',
-            'cache-control': 'max-age=43200',
+            'content-length': [body.length],
+            'content-type': ['text/xml; charset=utf-8'],
+            'cache-control': ['max-age=43200'],
         },
         body,
     };

@@ -5,6 +5,7 @@ import {generateCommonHeaders} from './util/generateCommonHeaders';
 import * as catalog from '@maxi-js/catalog';
 import {sanitizeHTMLAttribute} from '@maxi-js/string-tools';
 import {cdnBaseURL, viewerBaseURL, baseTitle} from './util/constants';
+import {filterHeaders} from './util/filterHeaders';
 
 export const appHTMLPromise = new Promise<string>((resolve, reject) => {
     const appHTMLPath = '/opt/nodejs/node_modules/@maxi-js/data-viewer/output/index.html';
@@ -77,12 +78,12 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     .join('\n');
     return {
         statusCode: 200,
-        headers: {
+        multiValueHeaders: filterHeaders({
             ...generateCommonHeaders(event, context),
             'content-length': body.length,
             'content-type': 'text/html; charset=utf-8',
             'cache-control': 'max-age=43200',
-        },
+        }),
         body,
     };
 };

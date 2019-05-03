@@ -3,9 +3,9 @@ import {request} from '@maxi-js/net-tools';
 import {asString} from '@maxi-js/stream-tools';
 import * as catalog from '@maxi-js/catalog';
 import {stringifyTable, ssv2js} from '@maxi-js/string-tools';
-import {filterHeadersForAPIGateway} from './util/filterHeadersForAPIGateway';
 import {createErrorResponse} from './util/createErrorResponse';
 import {generateCommonHeaders} from './util/generateCommonHeaders';
+import {filterHeaders} from './util/filterHeaders';
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     const objectId = event.pathParameters && event.pathParameters.objectId;
@@ -29,8 +29,8 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     const body = stringifyTable(ssv2js(response.body, Number));
     return {
         statusCode: 200,
-        headers: {
-            ...filterHeadersForAPIGateway(response.headers),
+        multiValueHeaders: filterHeaders({
+            ...response.headers,
             ...generateCommonHeaders(event, context, {
                 'x-source-title': object.source.title,
                 'x-source-url': object.source.urls.html,
@@ -38,7 +38,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             'content-length': body.length,
             'content-type': 'application/json; charset=utf-8',
             'cache-control': 'max-age=43200',
-        },
+        }),
         body,
     };
 };

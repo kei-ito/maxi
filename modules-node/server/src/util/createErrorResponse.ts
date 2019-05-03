@@ -1,7 +1,7 @@
 import * as http from 'http';
 import * as util from 'util';
 import {APIGatewayProxyResult} from 'aws-lambda';
-import {filterHeadersForAPIGateway} from './filterHeadersForAPIGateway';
+import {filterHeaders} from './filterHeaders';
 
 export const createErrorResponse = (
     response: http.IncomingMessage
@@ -10,10 +10,10 @@ export const createErrorResponse = (
     process.stderr.write(`${util.inspect(response)}\n`);
     return {
         statusCode: response.statusCode || 500,
-        headers: {
-            ...filterHeadersForAPIGateway(response.headers),
+        multiValueHeaders: filterHeaders({
+            ...response.headers,
             'content-length': body.length,
-        },
+        }),
         body,
     };
 };
