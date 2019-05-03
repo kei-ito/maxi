@@ -67,7 +67,16 @@ export interface IMAXIJSRootPackageJSON {
         overrides: Array<ESLint.Linter.Config & {files: Array<string>}>,
     },
     ava: {},
-    commitlint: {},
+    commitlint: {
+        extends: Array<string>,
+        rules: {
+            'scope-enum': [
+                number,
+                string,
+                Array<string>,
+            ],
+        },
+    },
     husky: {},
     'renovate-config': {},
 }

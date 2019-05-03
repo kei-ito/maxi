@@ -29,4 +29,12 @@ export const validateRootPackageJSON = async (
         'string',
         `(package.json).license is invalid: ${rootPackageJSON.license}`,
     );
+    assert.ok(
+        rootPackageJSON.commitlint.rules['scope-enum'][2].includes('deps'),
+        '(package.json).commitlint.rules.scope-enum[2] should include "deps".',
+    );
+    assert.ok(
+        rootPackageJSON.commitlint.rules['scope-enum'][2].includes('repo'),
+        '(package.json).commitlint.rules.scope-enum[2] should include "repo".',
+    );
 };

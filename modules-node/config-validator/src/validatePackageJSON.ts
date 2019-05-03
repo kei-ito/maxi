@@ -104,4 +104,8 @@ export const validatePackageJSON = async (
         'string',
         `(${relativePath}).scripts.test is invalid: ${packageJSON.scripts.test}`,
     );
+    assert.ok(
+        rootPackageJSON.commitlint.rules['scope-enum'][2].includes(path.basename(packageDirectory)),
+        `(package.json).commitlint.rules.scope-enum[2] should include "${path.basename(packageDirectory)}".`,
+    );
 };
