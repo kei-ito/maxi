@@ -99,7 +99,14 @@ export const App = () => {
 
     useEffect(() => history.replaceState(null, '', `${currentURL}`), [currentURL]);
     useEffect(() => {
-        document.title = `${selected.join(', ')} | ${pageTitle}`;
+        const names: Array<string> = [];
+        selected.forEach((objectId) => {
+            const object = catalog.map.get(objectId);
+            if (object) {
+                names.push(object.name);
+            }
+        });
+        document.title = names.length === 0 ? pageTitle : `${names.join(', ')} | ${pageTitle}`;
     }, [selected]);
 
     return createElement(

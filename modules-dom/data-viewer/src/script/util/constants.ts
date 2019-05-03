@@ -12,7 +12,7 @@ export enum URLParameterKey {
 }
 export const epochMJD = dateToMJD(new Date('2009-08-01T00:00:00Z'));
 export const nowMJD = dateToMJD(new Date());
-export const pageTitle = document.title;
+export const pageTitle = 'MAXI GSC Data Viewer';
 export const mainTickSize = 10;
 export const subTickSize = 5;
 export const getAreaHeight = () => window.innerHeight * 0.2;
