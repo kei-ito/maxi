@@ -21,9 +21,10 @@
     ],
     "scripts": {
         "cleanup": "rimraf lib",
-        "build:layer:cleanup": "rimraf layer/nodejs/node_modules",
+        "build:layer:cleanup": "rimraf layer",
+        "build:layer:mkdir": "make-dir layer/nodejs",
         "build:layer:cpr": "cp -r node_modules layer/nodejs/node_modules",
-        "build:layer": "run-s build:layer:cleanup build:layer:cpr",
+        "build:layer": "run-s build:layer:cleanup build:layer:mkdir build:layer:cpr",
         "build:tsc": "tsc",
         "build": "run-p build:layer build:tsc",
         "test": "ava",
