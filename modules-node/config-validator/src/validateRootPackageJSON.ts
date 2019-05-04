@@ -1,8 +1,10 @@
+import * as path from 'path';
 import * as assert from 'assert';
 import {IMAXIJSRootPackageJSON} from './types';
 
 export const validateRootPackageJSON = async (
     rootPackageJSON: IMAXIJSRootPackageJSON,
+    packageDirectoryList: Array<string>,
 ): Promise<void> => {
     assert.deepEqual(
         new Set(Object.keys(rootPackageJSON)),
@@ -37,4 +39,14 @@ export const validateRootPackageJSON = async (
         rootPackageJSON.commitlint.rules['scope-enum'][2].includes('repo'),
         '(package.json).commitlint.rules.scope-enum[2] should include "repo".',
     );
+    const allowedScopeList = rootPackageJSON.commitlint.rules['scope-enum'][2];
+    packageDirectoryList
+    .map((packageDirectory) => path.basename(packageDirectory))
+    .concat('deps', 'repo')
+    .forEach((scope) => {
+        assert.ok(
+            allowedScopeList.includes(scope),
+            `(package.json).commitlint.rules.scope-enum[2] should include "${scope}".`,
+        );
+    });
 };

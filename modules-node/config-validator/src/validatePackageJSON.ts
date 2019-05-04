@@ -1,16 +1,18 @@
 import * as path from 'path';
 import * as assert from 'assert';
 import * as semver from 'semver';
-import {IMAXIJSPackageJSON, IMAXIJSLernaJSON, IMAXIJSRootPackageJSON} from './types';
+import {IPackageTestParameters} from './types';
 import {repositoryURL, repositoryTreeURL} from './constants';
 import {validatePerson} from './validatePerson';
 
 export const validatePackageJSON = async (
-    lernaProjectDirectory: string,
-    lernaJSON: IMAXIJSLernaJSON,
-    rootPackageJSON: IMAXIJSRootPackageJSON,
-    packageDirectory: string,
-    packageJSON: IMAXIJSPackageJSON,
+    {
+        lernaProjectDirectory,
+        lernaJSON,
+        rootPackageJSON,
+        packageDirectory,
+        packageJSON,
+    }: IPackageTestParameters,
 ): Promise<void> => {
     const relativePath = path.relative(lernaProjectDirectory, packageDirectory);
     assert.equal(
@@ -103,9 +105,5 @@ export const validatePackageJSON = async (
         typeof packageJSON.scripts.test,
         'string',
         `(${relativePath}).scripts.test is invalid: ${packageJSON.scripts.test}`,
-    );
-    assert.ok(
-        rootPackageJSON.commitlint.rules['scope-enum'][2].includes(path.basename(packageDirectory)),
-        `(package.json).commitlint.rules.scope-enum[2] should include "${path.basename(packageDirectory)}".`,
     );
 };
