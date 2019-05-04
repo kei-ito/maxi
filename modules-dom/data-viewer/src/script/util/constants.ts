@@ -3,7 +3,7 @@ import {dateToMJD} from './mjd';
 
 export const SVGNS = 'http://www.w3.org/2000/svg';
 export const developMode = 80 < Number(location.port);
-export const APIBaseURL = new URL(developMode ? `http://${location.hostname}:3000` : 'https://elgijkhadd.execute-api.ap-northeast-1.amazonaws.com/Prod/');
+export const APIBaseURL = new URL(developMode ? `http://${location.hostname}:3000` : `https://${location.hostname}/`);
 export const AvailablePlotTypes: Array<PlotType> = [PlotType.Point, PlotType.Line];
 export enum URLParameterKey {
     mjdRange = 'mjd',
