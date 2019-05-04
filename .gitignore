@@ -12,5 +12,6 @@ output
 *.snm
 *.toc
 modules-*/*/lib
+modules-*/*/package-lock.json
 layer.zip
 output-template.yml

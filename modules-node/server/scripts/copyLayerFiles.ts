@@ -10,10 +10,11 @@ const copyLayerFiles = async (
 ) => {
     await rimraf(path.join(projectDirectory, 'layer'));
     const files = await globby(
-        path.join(projectDirectory, 'node_modules/**/*.{js,html}'),
+        path.join(projectDirectory, 'node_modules/**/*.{js,html,json}'),
         {
             ignore: [
                 path.join(projectDirectory, 'node_modules/@maxi-js/data-viewer/node_modules/**/*'),
+                '**/@types/**/*',
                 '**/*.test.js',
             ],
         },
