@@ -87,10 +87,9 @@ jobs:
     docker: [{image: "keiitof/maxi:latest"}]
     steps:
       - attach_workspace: {at: .}
-      - run: cd modules-node/server
-      - run: sam package --output-template-file output-template.yml --s3-bucket $S3_SERVERAPP_BUCKET
+      - run: sam package --template-file modules-node/server/template.yml --output-template-file modules-node/server/output-template.yml --s3-bucket $S3_SERVERAPP_BUCKET
       - run: aws cloudformation deploy
-              --template-file output-template.yml
+              --template-file modules-node/server/output-template.yml
               --stack-name maxiapp-server
               --capabilities CAPABILITY_IAM
               --no-fail-on-empty-changeset
@@ -98,8 +97,7 @@ jobs:
     docker: [{image: "keiitof/maxi:latest"}]
     steps:
       - attach_workspace: {at: .}
-      - run: cd modules-dom/data-viewer
-      - run: aws s3 cp output s3://$S3_CLIENTAPP_BUCKET/ --recursive
+      - run: aws s3 cp modules-dom/data-viewer/output s3://$S3_CLIENTAPP_BUCKET/ --recursive
       - run: aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths /index.html
 workflows:
   version: 2
