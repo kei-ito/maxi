@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/kei-ito/maxi/compare/v1.3.2...v1.4.0) (2019-05-04)
+
+
+### Features
+
+* **server:** add custom domain configurations ([03dad78](https://github.com/kei-ito/maxi/commit/03dad78))
+
+
+
+
+
 ## [1.3.2](https://github.com/kei-ito/maxi/compare/v1.3.1...v1.3.2) (2019-05-04)
 
 
