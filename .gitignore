@@ -12,4 +12,5 @@ output
 *.snm
 *.toc
 modules-*/*/lib
+layer.zip
 output-template.yml
