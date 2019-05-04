@@ -23,27 +23,30 @@ export const buildCatalog = async (
     }
     const coverageMap = new Map(currentCatalog.map);
     const addedObjects: Array<IObjectData> = [];
-    const list: Array<IObjectData> = [];
-    for (const row of removeHeading(table)) {
-        try {
-            const [id, name] = getObjectIdAndName(row);
-            let object = coverageMap.get(id);
-            coverageMap.delete(id);
-            if (!object) {
-                object = await getObjectData(row, stdout);
-                stdout.write(`${name} (${id}) is added.\n`);
-                addedObjects.push(object);
-            }
-            list.push(object);
-            await new Promise((resolve) => setTimeout(resolve, 40));
-        } catch (error) {
-            if (stderr) {
-                stderr.write(`${util.inspect(error)}\n`);
-            } else {
-                throw error;
-            }
-        }
-    }
+    const list = await Promise.all(
+        removeHeading(table).map(
+            async (row) => {
+                try {
+                    const [id, name] = getObjectIdAndName(row);
+                    let object = coverageMap.get(id);
+                    coverageMap.delete(id);
+                    if (!object) {
+                        object = await getObjectData(row, stdout);
+                        stdout.write(`${name} (${id}) is added.\n`);
+                        addedObjects.push(object);
+                    }
+                    return object;
+                } catch (error) {
+                    if (stderr) {
+                        stderr.write(`${util.inspect(error)}\n`);
+                        return null;
+                    } else {
+                        throw error;
+                    }
+                }
+            },
+        ),
+    );
     coverageMap.forEach((object) => {
         stdout.write(`${object.name} (${object.id}) is deleted.\n`);
     });
@@ -51,7 +54,7 @@ export const buildCatalog = async (
         return null;
     }
     return {
-        list,
+        list: list.filter((object) => !util.isNull(object)) as Array<IObjectData>,
         createdAt: new Date().toISOString(),
         source: {
             title: getTitleFromHTML(response.body),
