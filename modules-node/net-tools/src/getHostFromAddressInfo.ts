@@ -6,8 +6,12 @@ export const getHostFromAddressInfo = (
     if (!addressInfo || typeof addressInfo !== 'object') {
         throw new Error(`Invalid addressInfo: ${addressInfo}`);
     }
-    if (addressInfo.family.includes('v6')) {
-        return `[${addressInfo.address}]:${addressInfo.port}`;
+    let {address} = addressInfo;
+    if (address === '::') {
+        address = '::1';
     }
-    return `${addressInfo.address}:${addressInfo.port}`;
+    if (addressInfo.family.includes('v6')) {
+        return `[${address}]:${addressInfo.port}`;
+    }
+    return `${address}:${addressInfo.port}`;
 };
