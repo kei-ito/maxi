@@ -68,7 +68,9 @@ export const validateCircleCIConfiguration = async (
                     );
                     assert.deepEqual(
                         reportConfiguration.requires,
-                        packageDirectoryList.map((packageDirectory) => `test-${path.basename(packageDirectory)}`),
+                        [
+                            'test-configurations',
+                        ].concat(packageDirectoryList.map((packageDirectory) => `test-${path.basename(packageDirectory)}`)),
                         `(.circleci/config.yml).workflows.${workflowName}.${reportJobName}.requires is invalid`,
                     );
                 } else {
