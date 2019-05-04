@@ -1,3 +1,4 @@
+import * as os from 'os';
 import {Server} from 'net';
 
 const allowedErrorCodes = new Set([
@@ -7,12 +8,21 @@ const allowedErrorCodes = new Set([
 
 export const listen = (
     server: Server,
-    port: number = 3000,
+    {
+        hostname = os.hostname(),
+        port = 3000,
+    }: {
+        hostname?: string,
+        port?: number,
+    } = {},
 ): Promise<Server> => new Promise((resolve, reject) => {
     const onError = (error: Error & {code: string}) => {
         removeListeners();
         if (allowedErrorCodes.has(error.code) && port < 0x10000) {
-            resolve(listen(server, port + 1));
+            resolve(listen(server, {
+                port: port + 1,
+                hostname,
+            }));
         } else {
             reject(error);
         }
@@ -28,5 +38,5 @@ export const listen = (
     server
     .once('error', onError)
     .once('listening', onListening)
-    .listen(port);
+    .listen(port, hostname);
 });

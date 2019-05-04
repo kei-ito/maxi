@@ -42,22 +42,47 @@ jobs:
       - attach_workspace: {at: .}
       - run: npm run lint
   build:
-    docker: [{image: "circleci/node:lts"}]
+    docker: [{image: "keiitof/maxi:sitemap"}]
     steps:
       - attach_workspace: {at: .}
       - run: npm run build
       - run: git diff --exit-code
       - persist_to_workspace: {root: ., paths: [.]}
-  test-server:
+  test-configurations:
     docker: [{image: "circleci/node:lts"}]
-    steps:
-      - attach_workspace: {at: .}
-      - run: npx lerna run test --scope @maxi-js/server
+    steps: [{attach_workspace: {at: .}}, {run: npm run test:repo}]
   test-data-viewer:
     docker: [{image: "circleci/node:lts"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/data-viewer}]
+  test-catalog:
+    docker: [{image: "circleci/node:lts"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/catalog}]
+  test-string-tools:
+    docker: [{image: "circleci/node:lts"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/string-tools}]
+  test-cli-tools:
+    docker: [{image: "circleci/node:lts"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/cli-tools}]
+  test-config-validator:
+    docker: [{image: "circleci/node:lts"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/config-validator}]
+  test-fs-tools:
+    docker: [{image: "circleci/node:lts"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/fs-tools}]
+  test-net-tools:
+    docker: [{image: "circleci/node:lts"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/net-tools}]
+  test-server:
+    docker: [{image: "circleci/node:lts"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/server}]
+  test-stream-tools:
+    docker: [{image: "circleci/node:lts"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/stream-tools}]
+  report-test-results:
+    docker: [{image: "circleci/node:lts"}]
     steps:
       - attach_workspace: {at: .}
-      - run: npx lerna run test --scope @maxi-js/data-viewer
+      - run: echo 'All tests were passed successfully.'
   deploy-server:
     docker: [{image: "keiitof/awscli-nodejs:0.0.2"}]
     steps:
@@ -85,30 +110,87 @@ workflows:
       - setup: {requires: [onBranch]}
       - lint: {requires: [setup]}
       - build: {requires: [setup]}
-      - test-server: {requires: [build]}
+      - test-configurations: {requires: [build]}
       - test-data-viewer: {requires: [build]}
+      - test-catalog: {requires: [build]}
+      - test-string-tools: {requires: [build]}
+      - test-cli-tools: {requires: [build]}
+      - test-config-validator: {requires: [build]}
+      - test-fs-tools: {requires: [build]}
+      - test-net-tools: {requires: [build]}
+      - test-server: {requires: [build]}
+      - test-stream-tools: {requires: [build]}
+      - report-test-results:
+          requires:
+            - test-configurations
+            - test-data-viewer
+            - test-catalog
+            - test-string-tools
+            - test-cli-tools
+            - test-config-validator
+            - test-fs-tools
+            - test-net-tools
+            - test-server
+            - test-stream-tools
   release:
     jobs:
       - isTagged:
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
       - setup:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
           requires: [isTagged]
-          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
       - lint:
-          requires: [setup]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [setup]
       - build:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
           requires: [setup]
+      - test-configurations:
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
-      - test-server:
           requires: [build]
-          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
       - test-data-viewer:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
           requires: [build]
+      - test-catalog:
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
+      - test-string-tools:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
+      - test-cli-tools:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
+      - test-config-validator:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
+      - test-fs-tools:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
+      - test-net-tools:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
+      - test-server:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
+      - test-stream-tools:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
+      - report-test-results:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires:
+            - test-configurations
+            - test-data-viewer
+            - test-catalog
+            - test-string-tools
+            - test-cli-tools
+            - test-config-validator
+            - test-fs-tools
+            - test-net-tools
+            - test-server
+            - test-stream-tools
       - deploy-server:
-          requires: [test-server]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [report-test-results]
       - deploy-data-viewer:
-          requires: [test-data-viewer]
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [report-test-results]

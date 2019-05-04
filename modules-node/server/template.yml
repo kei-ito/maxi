@@ -26,7 +26,7 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: maxi-server-dependencies
-      ContentUri: layer/
+      ContentUri: layer
       CompatibleRuntimes:
         - nodejs8.10
       RetentionPolicy: Retain

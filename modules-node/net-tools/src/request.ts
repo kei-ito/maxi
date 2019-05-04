@@ -9,6 +9,10 @@ export const ensureURL = (
     urlOrString: string | URL,
 ): URL => typeof urlOrString === 'string' ? new URL(urlOrString) : urlOrString;
 
+export const filterHostname = (
+    hostname: string,
+): string => hostname.replace(/^\[(.*?)\]$/, '$1');
+
 export const getResponse = (
     url: URL,
     options: IRequestOptions,
@@ -20,7 +24,7 @@ export const getResponse = (
         ...options,
         family,
         protocol: url.protocol,
-        host: url.hostname.replace(/^\[(.*?)\]$/, '$1'),
+        host: filterHostname(url.hostname),
         port: url.port,
         path: url.pathname,
         auth: `${url.username}:${url.password}`,
