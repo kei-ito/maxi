@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.2](https://github.com/kei-ito/maxi/compare/v1.3.1...v1.3.2) (2019-05-04)
+
+
+### Bug Fixes
+
+* **server:** include package.json ([558ea02](https://github.com/kei-ito/maxi/commit/558ea02))
+
+
+
+
+
 ## [1.3.1](https://github.com/kei-ito/maxi/compare/v1.3.0...v1.3.1) (2019-05-04)
 
 **Note:** Version bump only for package maxi
