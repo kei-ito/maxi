@@ -21,9 +21,9 @@
     ],
     "scripts": {
         "cleanup": "rimraf lib",
-        "build:layer": "./rsync.sh",
+        "build:layer": "bash rsync.sh",
         "build:tsc": "tsc",
-        "build": "run-p build:layer build:tsc",
+        "build": "run-s build:layer build:tsc",
         "test": "ava",
         "dev:layer": "npm run build:layer",
         "dev:sam": "sam local start-api --region ap-northeast-1",
