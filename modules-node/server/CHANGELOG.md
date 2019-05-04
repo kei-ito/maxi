@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.2](https://github.com/kei-ito/maxi/compare/v1.4.1...v1.4.2) (2019-05-04)
+
+
+### Bug Fixes
+
+* **server:** change the domain ([f3fd223](https://github.com/kei-ito/maxi/commit/f3fd223))
+
+
+
+
+
 ## [1.4.1](https://github.com/kei-ito/maxi/compare/v1.4.0...v1.4.1) (2019-05-04)
 
 
