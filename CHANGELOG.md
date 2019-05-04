@@ -1,3 +1,32 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.3.0](https://github.com/kei-ito/maxi/compare/v1.2.3...v1.3.0) (2019-05-04)
+
+
+### Bug Fixes
+
+* **data-viewer:** fix title ([f2543e3](https://github.com/kei-ito/maxi/commit/f2543e3))
+* **repo:** builds cannot be parallel ([ca01f76](https://github.com/kei-ito/maxi/commit/ca01f76))
+* **repo:** fix Dockerfile ([f41a29d](https://github.com/kei-ito/maxi/commit/f41a29d))
+* **server:** add mkdir command ([e812c51](https://github.com/kei-ito/maxi/commit/e812c51))
+
+
+### Features
+
+* add catalog ([6c08b0c](https://github.com/kei-ito/maxi/commit/6c08b0c))
+* **stream-tools:** add stream-tools ([3940cdc](https://github.com/kei-ito/maxi/commit/3940cdc))
+* **string-tools:** add sanitizeHTMLAttribute ([d49cde3](https://github.com/kei-ito/maxi/commit/d49cde3))
+* add catalog.map ([28bec15](https://github.com/kei-ito/maxi/commit/28bec15))
+* add net-tools ([55a4ffe](https://github.com/kei-ito/maxi/commit/55a4ffe))
+* add string-tools ([781f7bd](https://github.com/kei-ito/maxi/commit/781f7bd))
+
+
+
+
+
 <a name="1.2.3"></a>
 ## [1.2.3](https://github.com/kei-ito/maxi/compare/v1.2.2...v1.2.3) (2019-04-26)
 
@@ -135,6 +164,3 @@
 * pinch works ([76a249e](https://github.com/kei-ito/maxi/commit/76a249e))
 * scale with mouse ([55947a9](https://github.com/kei-ito/maxi/commit/55947a9))
 * wip tick getter ([f2e3928](https://github.com/kei-ito/maxi/commit/f2e3928))
-
-
-
