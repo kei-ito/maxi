@@ -14,7 +14,7 @@ test('source.urls', (t) => {
 });
 
 map.forEach((object, objectId) => {
-    test(objectId, (t) => {
+    test(`${object.name} (${objectId})`, (t) => {
         t.is(typeof object.id, 'string');
         t.is(typeof object.name, 'string');
         t.is(typeof object.category, 'string');

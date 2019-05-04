@@ -1,16 +1,17 @@
 import {request} from '@maxi-js/net-tools';
 import {asString} from '@maxi-js/stream-tools';
-import {getMatchedStrings, getTitleFromHTML} from '@maxi-js/string-tools';
+import {getTitleFromHTML} from '@maxi-js/string-tools';
 import {dataBaseURL} from './constants';
 import {IObjectData} from '../src/types';
 import {getDataURLFromHTML} from './getDataURLFromHTML';
 import {getImageURLFromHTML} from './getImageURLFromHTML';
+import {getObjectIdAndName} from './getObjectIdAndName';
 
 export const getObjectData = async (
     row: Array<string>,
     stdout: NodeJS.WritableStream = process.stdout,
 ): Promise<IObjectData> => {
-    const [id, name] = getMatchedStrings(row[1], /href="([\w+-]*?)\/[^>]*>([^<]*?)</g);
+    const [id, name] = getObjectIdAndName(row);
     const category = row[6];
     const ra = Number(row[2]);
     const dec = Number(row[3]);
