@@ -42,7 +42,7 @@ jobs:
       - attach_workspace: {at: .}
       - run: npm run lint
   build:
-    docker: [{image: "kei-ito/maxi:sitemap"}]
+    docker: [{image: "keiitof/maxi:sitemap"}]
     steps:
       - attach_workspace: {at: .}
       - run: npm run build
