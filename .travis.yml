@@ -14,6 +14,7 @@ before_install:
     mv $TRAVIS_REPO_SLUG _old
     git clone _old $TRAVIS_REPO_SLUG
     cd $TRAVIS_REPO_SLUG
+    choco install rsync
   fi
 install:
 - npm ci
