@@ -5,7 +5,7 @@ Transform: AWS::Serverless-2016-10-31
 Parameters:
   DomainName:
     Type: String
-    Default: maxi2.wemo.me
+    Default: maxi.wemo.me
   HostedZoneName:
     Type: String
     Default: wemo.me.
