@@ -21,7 +21,7 @@
     ],
     "scripts": {
         "cleanup": "rimraf lib",
-        "build:layer": "bash rsync.sh",
+        "build:layer": "ts-node scripts/copyLayerFiles.ts",
         "build:tsc": "tsc",
         "build": "run-s build:layer build:tsc",
         "test": "ava",
