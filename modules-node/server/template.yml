@@ -6,6 +6,9 @@ Parameters:
   DomainName:
     Type: String
     Default: maxi.wemo.me
+  DomainCertificateArn:
+    Type: String
+    Default: arn:aws:acm:us-east-1:524477122200:certificate/1be240ce-cbae-4099-b57f-3d66e61d8c99
   HostedZoneName:
     Type: String
     Default: wemo.me.
@@ -19,7 +22,7 @@ Resources:
   APIDomainName:
     Type: AWS::ApiGateway::DomainName
     Properties:
-      CertificateArn: arn:aws:acm:us-east-1:524477122200:certificate/d687595f-88f0-4921-8355-26aaa33a4263
+      CertificateArn: !Ref DomainCertificateArn
       DomainName: !Ref DomainName
   APIBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
