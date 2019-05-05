@@ -97,7 +97,8 @@ jobs:
     docker: [{image: "keiitof/maxi:latest"}]
     steps:
       - attach_workspace: {at: .}
-      - run: aws s3 cp modules-dom/data-viewer/output s3://$S3_CLIENTAPP_BUCKET/ --recursive
+      - run: aws s3 sync modules-dom/data-viewer/output s3://$S3_CLIENTAPP_BUCKET/
+              --cache-control "max-age=31536000"
 workflows:
   version: 2
   run-tests:
