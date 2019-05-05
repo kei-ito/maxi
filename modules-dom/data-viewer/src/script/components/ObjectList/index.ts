@@ -1,9 +1,9 @@
 import {createElement, PointerEvent, KeyboardEvent, useRef, useState} from 'react';
 import {IObjectData} from '@maxi-js/catalog';
+import {classnames} from '@maxi-js/string-tools';
 import {Mode} from '../../types';
 import classes from './style.css';
 import * as catalog from '../../util/catalog';
-import {classnames} from '../../util/classnames';
 
 export interface IObjectListProps {
     selected: Array<string>,
