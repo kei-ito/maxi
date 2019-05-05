@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.5](https://github.com/kei-ito/maxi/compare/v1.4.4...v1.4.5) (2019-05-05)
+
+
+### Bug Fixes
+
+* **server:** change cdnBaseURL ([0fc444e](https://github.com/kei-ito/maxi/commit/0fc444e))
+
+
+
+
+
 ## [1.4.4](https://github.com/kei-ito/maxi/compare/v1.4.3...v1.4.4) (2019-05-05)
 
 
