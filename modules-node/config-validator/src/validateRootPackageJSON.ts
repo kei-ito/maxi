@@ -17,7 +17,7 @@ export const validateRootPackageJSON = async (
             'ava',
             'commitlint',
             'husky',
-            'renovate-config',
+            'renovate',
         ]),
         `The package.json at the root directory is invalid.`,
     );
