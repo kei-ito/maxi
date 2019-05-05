@@ -1,24 +1,33 @@
 :root {
-    --fontSerif: Computer Modern Serif, Times, serif;
-    --fontSans: Computer Modern Sans, sans-serif;
-    --fontMonospace: Computer Modern Typewriter Light, Monaco, monospace;
+    --fontSans: Open Sans, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+    --fontMonospace: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+    --fontCMSerif: Computer Modern Serif, Times, serif;
+    --fontCMSans: Computer Modern Sans, sans-serif;
+    --fontCMMonospace: Computer Modern Typewriter Light, monospace;
     height: 100%;
+    font-size: 16px;
+    font-family: var(--fontSans);
+    font-weight: 400;
+    color: #333333;
+}
+
+[data-font=sans] {
+    font-family: var(--fontSans);
+}
+
+[data-font=serif] {
+    font-family: var(--fontCMSerif);
 }
 
 body {
-    --fontSize: 16px;
-    font-family: var(--fontSerif);
-    font-size: var(--fontSize);
-    font-weight: 400;
-    color: #333333;
     min-height: 100%;
     margin: 0 auto;
     counter-reset: h1;
 }
 
 @media (max-width: 700px) {
-    body {
-        --fontSize: 14px;
+    :root {
+        font-size: 13px;
     }
 }
 
@@ -26,17 +35,19 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2em 0 1.5em 0;
+    padding: 2rem 0 1.5rem 0;
 }
 
 header h1 {
     margin: 0 auto;
-    font-size: 140%;
+    font-size: 1.8rem;
 }
 
 h1 {
     margin: 2rem auto 0.5rem auto;
-    font-size: 130%;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.4;
 }
 
 h1:first-child {
@@ -45,14 +56,17 @@ h1:first-child {
 
 h2 {
     margin: 1rem auto 0.5rem auto;
-    font-size: 110%;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.4;
     counter-increment: h2;
     counter-reset: h3;
 }
 
 h3 {
     margin: 1rem auto 0.5rem auto;
-    font-size: 100%;
+    font-size: 1rem;
+    line-height: 1.4;
     counter-increment: h3;
 }
 
@@ -60,7 +74,7 @@ article {
     width: 94%;
     max-width: 1200px;
     margin: 0 auto;
-    padding-bottom: 4em;
+    padding-bottom: 4rem;
     counter-reset: h1;
 }
 
@@ -96,7 +110,7 @@ figure {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    margin: 1em auto;
+    margin: 1rem auto;
 }
 
 table {
@@ -143,28 +157,14 @@ tr[tabindex]:hover>th {
     background-color: rgb(236, 236, 236);
 }
 
-tr:nth-child(2n)[data-selected]>td,
-tr:nth-child(2n)[data-selected]>th {
-    background-color: rgb(255, 227, 184);
-}
-
-tr:nth-child(2n+1)[data-selected]>td,
-tr:nth-child(2n+1)[data-selected]>th {
-    background-color: rgb(255, 208, 137);
-}
-
 td,th {
     --backgroundColor: white;
-    padding: 1ex 1ex 0.8ex 1ex;
-    line-height: 1.2;
+    padding: 0.5rem 0.5rem 0.4rem 0.5rem;
+    line-height: 1.2rem;
     vertical-align: top;
-    font-size: var(--fontSize);
+    font-size: 1rem;
     transition: background-color 0.1s;
     background-color: var(--backgroundColor);
-}
-
-th {
-    padding: 0.7ex 1ex 0.5ex 1ex;
 }
 
 figure {
@@ -173,7 +173,7 @@ figure {
 }
 
 figure+figure {
-    margin-top: 2em;
+    margin-top: 2rem;
 }
 
 canvas {
@@ -181,7 +181,8 @@ canvas {
 }
 
 figcaption {
-    margin-top: 0.8em;
+    margin-top: 0.8rem;
+    line-height: 1.4;
 }
 
 figcaption::before {
@@ -200,12 +201,13 @@ text {
 select,
 input {
     font: inherit;
-
 }
 
 input[type=text],
 input[type=number] {
+    height: 1.4rem;
     min-width: 50px;
+    margin: 0;
     border: none;
     border-bottom: solid currentColor 1px;
     border-radius: 0;
@@ -216,6 +218,11 @@ input[type=number] {
     text-align: right;
 }
 
+input[type=radio] {
+    margin: 0 4px;
+}
+
 li {
-    margin: 0.4em;
+    margin: 0.4rem;
+    line-height: 1.4rem;
 }

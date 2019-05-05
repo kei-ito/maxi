@@ -81,10 +81,16 @@ export enum PlotType {
     Line = 'line',
 }
 
+export enum Font {
+    sans = 'sans',
+    serif = 'serif',
+}
+
 export interface IPreferences {
     binSize: number,
     mjdRange: IMJDRange,
     plotType: PlotType,
+    font: Font,
 }
 
 export interface ITickData {

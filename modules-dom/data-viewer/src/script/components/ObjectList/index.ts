@@ -3,6 +3,7 @@ import {IObjectData} from '@maxi-js/catalog';
 import {Mode} from '../../types';
 import classes from './style.css';
 import * as catalog from '../../util/catalog';
+import {classnames} from '../../util/classnames';
 
 export interface IObjectListProps {
     selected: Array<string>,
@@ -53,27 +54,26 @@ export const ObjectList = (
         rows.push(createElement(
             'tr',
             {
-                'key': rows.length,
-                'tabIndex': 100 + rows.length,
-                'onClick': (event: PointerEvent<HTMLTableRowElement>) => {
+                key: rows.length,
+                className: classnames(isSelected && classes.selected),
+                tabIndex: 100 + rows.length,
+                onClick: (event: PointerEvent<HTMLTableRowElement>) => {
                     event.preventDefault();
                     props.onSelect(object, getModeFromEvent(event));
                 },
-                'onKeyDown': (event: KeyboardEvent<HTMLTableRowElement>) => {
+                onKeyDown: (event: KeyboardEvent<HTMLTableRowElement>) => {
                     if (event.key === 'Enter') {
                         props.onSelect(object, getModeFromEvent(event));
                     }
                 },
-                'data-selected': isSelected ? '' : null,
-                'ref': selectedObjectIsFound || initialSelected || !isSelected ? null : (trElement) => {
+                ref: selectedObjectIsFound || initialSelected || !isSelected ? null : (trElement) => {
                     const containerElement = containerRef.current;
                     if (containerElement && trElement) {
                         const containerRect = containerElement.getBoundingClientRect();
                         const trTop = trElement.getBoundingClientRect().top;
-                        const diff = trTop - (containerRect.top + containerRect.height * 0.3);
+                        const diff = trTop - (containerRect.top + containerRect.height * 0.2);
                         containerElement.scrollTop = diff;
                         setInitialSelected(object.id);
-
                     }
                 },
             },

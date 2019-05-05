@@ -120,6 +120,7 @@
                     "modules-node/stream-tools/src/types.ts",
                     "modules-dom/data-viewer/src/script/types.ts",
                     "modules-dom/data-viewer/src/script/util/isAvailablePlotType.ts",
+                    "modules-dom/data-viewer/src/script/util/isAvailableFont.ts",
                     "modules-dom/data-viewer/src/script/util/useCache.ts"
                 ],
                 "rules": {

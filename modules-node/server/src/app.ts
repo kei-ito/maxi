@@ -61,8 +61,6 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         '<!doctype html>',
         `<html prefix="og: http://ogp.me/ns#"${developMode ? ' data-develop-mode="1"' : ''}>`,
         `<base href="${base}">`,
-        '<meta charset="utf-8">',
-        '<meta name="viewport" content="width=device-width initial-scale=1">',
         '<meta property="og:type" content="website">',
         `<meta property="og:title" content="${title}">`,
         `<meta property="og:description" content="${description}">`,

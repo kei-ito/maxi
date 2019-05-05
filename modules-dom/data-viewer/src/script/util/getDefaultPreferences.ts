@@ -1,7 +1,8 @@
-import {IPreferences, IMJDRange, PlotType} from '../types';
+import {IPreferences, IMJDRange, PlotType, Font} from '../types';
 import {clamp} from './clamp';
 import {URLParameterKey, epochMJD, nowMJD} from './constants';
 import {isAvailablePlotType} from './isAvailablePlotType';
+import {isAvailableFont} from './isAvailableFont';
 
 export const filterBinSize = (
     binSize: string | number | null,
@@ -28,10 +29,15 @@ export const filterPlotType = (
     plot: string | number | null,
 ): PlotType => isAvailablePlotType(plot) ? plot : PlotType.Line;
 
+export const filterFont = (
+    plot: string | number | null,
+): Font => isAvailableFont(plot) ? plot : Font.sans;
+
 export const getDefaultPreferences = (
     searchParameters: URLSearchParams,
 ): IPreferences => ({
     binSize: filterBinSize(searchParameters.get(URLParameterKey.binSize)),
     mjdRange: filterMJDRange(searchParameters.get(URLParameterKey.mjdRange)),
     plotType: filterPlotType(searchParameters.get(URLParameterKey.plotType)),
+    font: filterFont(searchParameters.get(URLParameterKey.font)),
 });

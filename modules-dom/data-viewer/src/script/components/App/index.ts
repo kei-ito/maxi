@@ -3,8 +3,8 @@ import {Mode, ILightCurveData, IError, IRollingAverageData, IPreferences} from '
 import {getLightCurveData} from '../../util/getData';
 import {getRollingAverage} from '../../util/getRollingAverage';
 import {useCache} from '../../util/useCache';
-import {getDefaultPreferences, filterBinSize, filterMJDRange, filterPlotType} from '../../util/getDefaultPreferences';
-import {URLParameterKey, AvailablePlotTypes, pageTitle} from '../../util/constants';
+import {getDefaultPreferences, filterBinSize, filterMJDRange, filterPlotType, filterFont} from '../../util/getDefaultPreferences';
+import {URLParameterKey, AvailablePlotTypes, pageTitle, AvailablePlotTypeTitles, AvailableFonts, AvailableFontTitles} from '../../util/constants';
 import {ObjectList} from '../ObjectList/index';
 import {LightCurve} from '../LightCurve/index';
 import {SearchForm} from '../SearchForm/index';
@@ -40,6 +40,7 @@ export const App = () => {
             binSize: filterBinSize(nextPreferences.binSize || currentPreferences.binSize),
             mjdRange: filterMJDRange(nextPreferences.mjdRange || currentPreferences.mjdRange),
             plotType: filterPlotType(nextPreferences.plotType || currentPreferences.plotType),
+            font: filterFont(nextPreferences.font || currentPreferences.font),
         }),
         getDefaultPreferences(new URLSearchParams(location.search)),
     );
@@ -51,6 +52,7 @@ export const App = () => {
             binSize: updates.binSize || currentPreferencesBuffer.binSize,
             mjdRange: updates.mjdRange || currentPreferencesBuffer.mjdRange,
             plotType: updates.plotType || currentPreferencesBuffer.plotType,
+            font: updates.font || currentPreferencesBuffer.font,
         }),
         getDefaultPreferences(new URLSearchParams(location.search)),
     );
@@ -90,14 +92,20 @@ export const App = () => {
     }, [preferencesBuffer]);
 
     useEffect(() => {
+        document.documentElement.setAttribute('data-font', preferencesBuffer.font || preferences.font);
+    }, [preferencesBuffer.font]);
+
+    useEffect(() => {
         const urlParameters = new URLSearchParams();
         urlParameters.set(URLParameterKey.mjdRange, preferences.mjdRange.map((mjd) => mjd.toFixed(0)).join('-'));
         urlParameters.set(URLParameterKey.binSize, `${preferences.binSize}`);
         urlParameters.set(URLParameterKey.plotType, `${preferences.plotType}`);
+        urlParameters.set(URLParameterKey.font, `${preferences.font}`);
         setURLParameters(urlParameters);
     }, [selected, preferences]);
 
     useEffect(() => history.replaceState(null, '', `${currentURL}`), [currentURL]);
+
     useEffect(() => {
         const names: Array<string> = [];
         selected.forEach((objectId) => {
@@ -203,7 +211,7 @@ export const App = () => {
                                 },
                             },
                         ),
-                        plotType,
+                        AvailablePlotTypeTitles[plotType],
                     )),
                     '.',
                 ),
@@ -247,6 +255,29 @@ export const App = () => {
                     'The URL ',
                     createElement('a', {href: `${currentURL}`}, `${currentURL}`),
                     ' contains the current state of this app. You can share it to others and reproduce what you see now on their devices.',
+                ),
+                createElement(
+                    'li',
+                    null,
+                    createElement('label', null, 'Font: '),
+                    ...AvailableFonts.map((font) => createElement(
+                        'label',
+                        {className: classes.radioLabel},
+                        createElement(
+                            'input',
+                            {
+                                type: 'radio',
+                                name: URLParameterKey.font,
+                                value: font,
+                                defaultChecked: preferences.font === font,
+                                onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                                    requestPreferenceUpdate({font: filterFont(event.currentTarget.value)});
+                                },
+                            },
+                        ),
+                        AvailableFontTitles[font],
+                    )),
+                    '.',
                 ),
             ),
             createElement('h1', null, 'References'),
