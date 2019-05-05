@@ -10,7 +10,7 @@ export const createErrorResponse = (
     process.stderr.write(`${util.inspect(response)}\n`);
     return {
         statusCode: response.statusCode || 500,
-        multiValueHeaders: filterHeaders({
+        ...filterHeaders({
             ...response.headers,
             'content-length': body.length,
         }),

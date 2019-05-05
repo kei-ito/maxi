@@ -1,6 +1,7 @@
 import {APIGatewayProxyHandler} from 'aws-lambda';
 import * as catalog from '@maxi-js/catalog';
 import {generateCommonHeaders} from './util/generateCommonHeaders';
+import {filterHeaders} from './util/filterHeaders';
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     const body = [
@@ -13,12 +14,12 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     ].join('\n');
     return {
         statusCode: 200,
-        multiValueHeaders: {
+        ...filterHeaders({
             ...generateCommonHeaders(event, context),
             'content-length': [body.length],
-            'content-type': ['text/xml; charset=utf-8'],
+            'content-type': 'text/xml; charset=utf-8',
             'cache-control': ['max-age=43200'],
-        },
+        }),
         body,
     };
 };

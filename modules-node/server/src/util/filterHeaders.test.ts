@@ -1,36 +1,47 @@
 import test from 'ava';
-import {APIGatewayProxyResult} from 'aws-lambda';
 import {IHeader} from './types';
-import {filterHeaders} from './filterHeaders';
+import {filterHeaders, IHeaders} from './filterHeaders';
 
 interface ITest {
     input: IHeader,
-    expected: APIGatewayProxyResult['multiValueHeaders'],
+    expected: IHeaders,
 }
 
 ([
     {
         input: {},
-        expected: {},
+        expected: {
+            headers: {},
+            multiValueHeaders: {},
+        },
     },
     {
         input: {
             foo: null,
         },
-        expected: {},
+        expected: {
+            headers: {},
+            multiValueHeaders: {},
+        },
     },
     {
         input: {
             foo: undefined,
         },
-        expected: {},
+        expected: {
+            headers: {},
+            multiValueHeaders: {},
+        },
     },
     {
         input: {
             foo: 1,
         },
         expected: {
-            foo: [1],
+            headers: {
+                foo: 1,
+            },
+            multiValueHeaders: {},
         },
     },
     {
@@ -38,7 +49,10 @@ interface ITest {
             foo: '1',
         },
         expected: {
-            foo: ['1'],
+            headers: {
+                foo: '1',
+            },
+            multiValueHeaders: {},
         },
     },
     {
@@ -46,7 +60,10 @@ interface ITest {
             foo: ['1'],
         },
         expected: {
-            foo: ['1'],
+            headers: {
+                foo: '1',
+            },
+            multiValueHeaders: {},
         },
     },
     {
@@ -54,7 +71,10 @@ interface ITest {
             foo: ['1', 0, undefined, null],
         },
         expected: {
-            foo: ['1', 0],
+            headers: {},
+            multiValueHeaders: {
+                foo: ['1', 0],
+            },
         },
     },
 ] as Array<ITest>).forEach(({input, expected}, index) => {

@@ -4,7 +4,7 @@ import {APIGatewayProxyHandler} from 'aws-lambda';
 import {generateCommonHeaders} from './util/generateCommonHeaders';
 import * as catalog from '@maxi-js/catalog';
 import {sanitizeHTMLAttribute} from '@maxi-js/string-tools';
-import {cdnBaseURL, viewerBaseURL, baseTitle} from './util/constants';
+import {cdnBaseURL, viewerBaseURL, baseTitle, developMode} from './util/constants';
 import {filterHeaders} from './util/filterHeaders';
 
 export const appHTMLPromise = new Promise<string>((resolve, reject) => {
@@ -35,7 +35,6 @@ export const getObjectsFromPath = (
 };
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
-    const developMode = event.headers.Host.includes(':');
     const base = developMode ? `http://${event.headers.Host.split(':')[0]}:1234/` : cdnBaseURL;
     const objects = getObjectsFromPath(event.path);
     const url = new URL(
@@ -60,7 +59,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     );
     const body = [
         '<!doctype html>',
-        '<html prefix="og: http://ogp.me/ns#">',
+        `<html prefix="og: http://ogp.me/ns#"${developMode ? ' data-develop-mode="1"' : ''}>`,
         `<base href="${base}">`,
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width initial-scale=1">',
@@ -78,7 +77,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     .join('\n');
     return {
         statusCode: 200,
-        multiValueHeaders: filterHeaders({
+        ...filterHeaders({
             ...generateCommonHeaders(event, context),
             'content-length': body.length,
             'content-type': 'text/html; charset=utf-8',

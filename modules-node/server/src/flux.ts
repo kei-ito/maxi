@@ -29,7 +29,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     const body = stringifyTable(ssv2js(response.body, Number));
     return {
         statusCode: 200,
-        multiValueHeaders: filterHeaders({
+        ...filterHeaders({
             ...response.headers,
             ...generateCommonHeaders(event, context, {
                 'x-source-title': object.source.title,

@@ -1,5 +1,6 @@
 import {APIGatewayProxyEvent, Context} from 'aws-lambda';
 import {IHeader} from './types';
+import {developMode} from './constants';
 
 export const generateCommonHeaders = (
     event: APIGatewayProxyEvent,
@@ -7,10 +8,9 @@ export const generateCommonHeaders = (
     exposes: IHeader = {},
 ): IHeader => {
     const origin = event.headers && event.headers.Origin || '';
-    const allowedOrigin = origin.match(/http:\/\/[\w.]+:1234/) ? origin : 'https://maxi.wemo.me';
     const exposedHeaderNames = Object.keys(exposes).concat('x-elapsed-seconds', 'x-created-at');
     return {
-        'access-control-allow-origin': allowedOrigin,
+        'access-control-allow-origin': developMode ? origin : 'https://maxi.wemo.me',
         'access-control-allow-methods': 'GET, OPTIONS',
         'access-control-expose-headers': exposedHeaderNames.join(', '),
         ...exposes,
