@@ -1,4 +1,6 @@
 # https://aws.amazon.com/jp/blogs/compute/working-with-aws-lambda-and-lambda-layers-in-aws-sam/
+
+# https://github.com/awslabs/serverless-application-model/issues/251
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
@@ -8,17 +10,13 @@ Globals:
     Runtime: nodejs8.10
 
 Resources:
-  MAXIProdunctionAPI:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: production
   APIBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
-    DependsOn: MAXIProdunctionAPI
+    DependsOn: ServerlessRestApi
     Properties:
       DomainName: maxi.wemo.me
-      RestApiId: {Ref: MAXIProdunctionAPI}
-      Stage: production
+      RestApiId: {Ref: ServerlessRestApi}
+      Stage: {Ref: ServerlessRestApiProdStage}
   FunctionExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -57,7 +55,6 @@ Resources:
         HttpGetObject:
           Type: Api
           Properties:
-            RestApiId: {Ref: MAXIProdunctionAPI}
             Path: /objects/{objectId}
             Method: get
   FluxFunction:
@@ -71,7 +68,6 @@ Resources:
         HttpGet:
           Type: Api
           Properties:
-            RestApiId: {Ref: MAXIProdunctionAPI}
             Path: /objects/{objectId}/flux
             Method: get
   SitemapFunction:
@@ -85,6 +81,5 @@ Resources:
         HttpGet:
           Type: Api
           Properties:
-            RestApiId: {Ref: MAXIProdunctionAPI}
             Path: /sitemap.xml
             Method: get
