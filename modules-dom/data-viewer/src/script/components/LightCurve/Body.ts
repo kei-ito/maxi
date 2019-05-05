@@ -45,6 +45,7 @@ export const Body = (
                     right: svgWidth - margin.right,
                     top,
                     bottom,
+                    lineHeight: margin.lineHeight,
                     width: areaWidth,
                     height: areaHeight,
                     minMJD,

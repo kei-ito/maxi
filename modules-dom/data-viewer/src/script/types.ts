@@ -161,4 +161,5 @@ export interface IMargin {
     top: number,
     bottom: number,
     gap: number,
+    lineHeight: number,
 }

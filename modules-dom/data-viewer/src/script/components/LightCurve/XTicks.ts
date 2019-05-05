@@ -12,6 +12,7 @@ export interface IXTicksProps extends IRect {
     dateLabel: boolean,
     mjdToString?: (value: number) => string,
     dateToString?: (value: number) => string,
+    lineHeight: number,
 }
 
 const createPositionFixer = (
@@ -60,6 +61,7 @@ export const XTicks = memo((
         dateLabel,
         mjdToString,
         dateToString,
+        lineHeight,
     }: IXTicksProps,
 ) => {
     const mjdTicks = getTicks(min, max, width / 200);
@@ -68,7 +70,6 @@ export const XTicks = memo((
         return null;
     }
     const margin = 4;
-    const lineHeight = 16;
     const range = max - min;
     const scale = width / range;
     const X = (value: number) => left + scale * (value - min);

@@ -1,19 +1,21 @@
 import {createElement, ReactElement, memo} from 'react';
-import {Band, BandTitles, PlotType, IRollingAverageBin, BandColors, Color, IRect, IObject, IRollingAverageData} from '../../types';
+import {Band, BandTitles, PlotType, IRollingAverageBin, BandColors, Color, IRect, IRollingAverageData} from '../../types';
 import {mainTickSize} from '../../util/constants';
 import {YTicks} from './YTicks';
 import {XTicks} from './XTicks';
+import {IObjectData} from '@maxi-js/catalog';
 
 export interface IAreaProps extends IRect {
     band: Band,
     minMJD: number,
     maxMJD: number,
     binSize: number,
-    object: IObject | null | undefined,
+    object: IObjectData | null | undefined,
     data: IRollingAverageData | null | undefined,
     plotType: PlotType,
     isFirst: boolean,
     isLast: boolean,
+    lineHeight: number,
 }
 
 export const Area = memo((
@@ -25,6 +27,7 @@ export const Area = memo((
         bottom,
         width,
         height,
+        lineHeight,
         minMJD,
         maxMJD,
         binSize,
@@ -75,6 +78,7 @@ export const Area = memo((
             height,
             mjdLabel: isLast,
             dateLabel: isFirst,
+            lineHeight,
         }),
     ];
     elements.push(createElement(
@@ -82,7 +86,7 @@ export const Area = memo((
         {
             key: 'subTitle',
             x: left + mainTickSize + 4,
-            y: top + mainTickSize + 20,
+            y: top + mainTickSize + lineHeight * 1.2,
             fill: Color.black,
             dominantBaseline: 'hanging',
             textAnchor: 'start',
@@ -95,7 +99,7 @@ export const Area = memo((
             {
                 key: 'title',
                 x: left + mainTickSize + 4,
-                y: top + mainTickSize + 3,
+                y: top + mainTickSize + lineHeight * 0.2,
                 fill: Color.black,
                 dominantBaseline: 'hanging',
                 textAnchor: 'start',

@@ -12,12 +12,16 @@ export interface ILightCurveProps {
     setPreferences: (newPreferences: Partial<IPreferences>) => void,
 }
 
-const margin: IMargin = {
-    left: 60,
-    right: 0.5,
-    top: 32,
-    bottom: 32,
-    gap: 6,
+export const getMargin = (
+    svgWidth: number,
+): IMargin => {
+    if (svgWidth < 470) {
+        return {left: 56, right: 0.5, top: 32, bottom: 32, gap: 6, lineHeight: 12};
+    }
+    if (svgWidth < 658) {
+        return {left: 64, right: 0.5, top: 32, bottom: 32, gap: 6, lineHeight: 14};
+    }
+    return {left: 70, right: 0.5, top: 32, bottom: 32, gap: 6, lineHeight: 16};
 };
 
 export const LightCurve = (
@@ -25,6 +29,7 @@ export const LightCurve = (
 ) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const [svgWidth, setSVGWidth] = useState(window.innerWidth * 0.94);
+    const margin = getMargin(svgWidth);
     const [areaHeight, setAreaHeight] = useState(getAreaHeight());
     const areaWidth = svgWidth - margin.left - margin.right;
     const [mjdRange, setMJDRange] = useState(props.preferences.mjdRange);
@@ -212,7 +217,7 @@ export const LightCurve = (
             className: classes.svg,
             ref: svgRef,
             viewBox: `0 0 ${svgWidth} ${svgHeight}`,
-            fontSize: '14px',
+            fontSize: '1rem',
             strokeLinecap: 'round',
             strokeLinejoin: 'round',
             fill: 'none',
