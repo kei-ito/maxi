@@ -2,44 +2,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-Parameters:
-  DomainName:
-    Type: String
-    Default: maxi.wemo.me
-  DomainCertificateArn:
-    Type: String
-    Default: arn:aws:acm:us-east-1:524477122200:certificate/1be240ce-cbae-4099-b57f-3d66e61d8c99
-  HostedZoneName:
-    Type: String
-    Default: wemo.me.
-
 Globals:
   Function:
     Timeout: 6
     Runtime: nodejs8.10
 
 Resources:
-  APIDomainName:
-    Type: AWS::ApiGateway::DomainName
-    Properties:
-      CertificateArn: !Ref DomainCertificateArn
-      DomainName: !Ref DomainName
   APIBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      DomainName: !Ref APIDomainName
+      DomainName: maxi.wemo.me
       RestApiId: !Ref ServerlessRestApi
       Stage: Prod
-  APIDomain:
-    Type: AWS::Route53::RecordSetGroup
-    Properties:
-      HostedZoneName: !Ref HostedZoneName
-      RecordSets:
-      - Name: !Ref DomainName
-        Type: A
-        AliasTarget:
-          DNSName: !GetAtt APIDomainName.DistributionDomainName
-          HostedZoneId: !GetAtt APIDomainName.DistributionHostedZoneId
   FunctionExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
