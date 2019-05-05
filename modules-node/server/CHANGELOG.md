@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/kei-ito/maxi/compare/v1.4.5...v1.5.0) (2019-05-05)
+
+
+### Features
+
+* **server:** change return value of filterHeaders ([641c90b](https://github.com/kei-ito/maxi/commit/641c90b))
+
+
+
+
+
 ## [1.4.5](https://github.com/kei-ito/maxi/compare/v1.4.4...v1.4.5) (2019-05-05)
 
 

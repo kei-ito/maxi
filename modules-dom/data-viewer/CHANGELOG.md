@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/kei-ito/maxi/compare/v1.4.5...v1.5.0) (2019-05-05)
+
+
+### Bug Fixes
+
+* **data-viewer:** link favicon ([70cce9f](https://github.com/kei-ito/maxi/commit/70cce9f))
+
+
+
+
+
 ## [1.4.2](https://github.com/kei-ito/maxi/compare/v1.4.1...v1.4.2) (2019-05-04)
 
 
