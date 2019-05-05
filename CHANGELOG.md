@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/kei-ito/maxi/compare/v1.5.0...v1.6.0) (2019-05-05)
+
+
+### Bug Fixes
+
+* **config-validator:** fix the field name ([b14600a](https://github.com/kei-ito/maxi/commit/b14600a))
+* **data-viewer:** update styles ([269f53c](https://github.com/kei-ito/maxi/commit/269f53c))
+
+
+### Features
+
+* **date-tools:** add date-tools ([54e732f](https://github.com/kei-ito/maxi/commit/54e732f))
+* **number-tools:** add number-tools ([99725fa](https://github.com/kei-ito/maxi/commit/99725fa))
+* **string-tools:** add classnames ([733e1da](https://github.com/kei-ito/maxi/commit/733e1da))
+
+
+
+
+
 # [1.5.0](https://github.com/kei-ito/maxi/compare/v1.4.5...v1.5.0) (2019-05-05)
 
 
