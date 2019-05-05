@@ -195,8 +195,19 @@ figcaption::before {
     content: 'Fig.' counter(figure) ' ';
 }
 
+[data-appearance=a],
 a {
+    margin: 0;
+    padding: 0;
     word-break: break-all;
+    text-decoration: underline;
+    color: blue;
+    border: none;
+    background: none;
+}
+
+a:visited {
+    color: rgb(100, 0, 100);
 }
 
 text {
@@ -205,6 +216,7 @@ text {
 }
 
 select,
+button,
 input {
     font: inherit;
 }

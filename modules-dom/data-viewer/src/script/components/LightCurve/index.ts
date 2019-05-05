@@ -231,6 +231,7 @@ export const LightCurve = (
                 areaWidth,
                 minMJD: mjdRange[0],
                 maxMJD: mjdRange[1],
+                lineHeight: margin.lineHeight,
             },
         ),
         createElement(

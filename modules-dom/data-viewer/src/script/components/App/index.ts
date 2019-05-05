@@ -58,6 +58,7 @@ export const App = () => {
         }),
         getDefaultPreferences(new URLSearchParams(location.search)),
     );
+    const [hideAll, setHideAll] = useState(false);
     const [searchWords, setSearchWords] = useState('');
     const [selected, setSelected] = useState<Array<string>>(getInitialSelectedObjects());
     const [currentURL, setURLParameters] = useReducer(
@@ -118,6 +119,33 @@ export const App = () => {
         });
         document.title = names.length === 0 ? pageTitle : `${names.join(', ')} | ${pageTitle}`;
     }, [selected]);
+
+    const lightCurve = createElement(LightCurve, {
+        preferences,
+        objects: 0 < selected.length ? selected : [''],
+        cache: rollingAverageCache,
+        setPreferences: __setPreferences,
+    });
+
+    if (hideAll) {
+        return createElement(
+            Fragment,
+            null,
+            lightCurve,
+            createElement(
+                'div',
+                {className: classes.showAllButtonWrap},
+                createElement(
+                    'button',
+                    {
+                        className: classes.showAllButton,
+                        onClick: () => setHideAll(false),
+                    },
+                    'Back',
+                ),
+            ),
+        );
+    }
 
     return createElement(
         Fragment,
@@ -221,12 +249,7 @@ export const App = () => {
             createElement(
                 'figure',
                 null,
-                createElement(LightCurve, {
-                    preferences,
-                    objects: 0 < selected.length ? selected : [''],
-                    cache: rollingAverageCache,
-                    setPreferences: __setPreferences,
-                }),
+                lightCurve,
                 createElement(
                     'figcaption',
                     null,
@@ -280,6 +303,20 @@ export const App = () => {
                         AvailableFontTitles[font],
                     )),
                     '.',
+                ),
+                createElement(
+                    'li',
+                    null,
+                    'If you need print-out of the Fig. 2, ',
+                    createElement(
+                        'button',
+                        {
+                            'data-appearance': 'a',
+                            'onClick': () => setHideAll(true),
+                        },
+                        'click here',
+                    ),
+                    ' to hide all elements except the figure and print out this page.',
                 ),
             ),
             createElement('h1', null, 'References'),

@@ -12,6 +12,7 @@ export interface ICursorProps {
     areaWidth: number,
     minMJD: number,
     maxMJD: number,
+    lineHeight: number,
 }
 
 export const Cursor = memo((
@@ -22,6 +23,7 @@ export const Cursor = memo((
         areaWidth,
         minMJD,
         maxMJD,
+        lineHeight,
     }: ICursorProps,
 ) => {
     if (!cursor) {
@@ -44,7 +46,7 @@ export const Cursor = memo((
             'text',
             {
                 x: left + cursor.x + 2,
-                y: cursor.y - 12,
+                y: cursor.y - 2 - lineHeight * 0.9,
                 fontSize: '80%',
                 fill: Color.black,
                 opacity: 0.7,
