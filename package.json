@@ -169,7 +169,7 @@
             "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
         }
     },
-    "renovate-config": {
+    "renovate": {
         "extends": [
             ":ignoreModulesAndTests",
             ":unpublishSafe",
@@ -178,8 +178,7 @@
             ":prConcurrentLimit10",
             ":prHourlyLimitNone",
             ":label(dependencies)",
-            ":automergeMinor",
-            "group:monorepos"
+            ":automergeMinor"
         ]
     }
 }
