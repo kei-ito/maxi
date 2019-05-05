@@ -12,17 +12,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: production
-  MAXIStagingAPI:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: staging
   APIBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     DependsOn: MAXIProdunctionAPI
     Properties:
       DomainName: maxi.wemo.me
-      RestApiId: !Ref MAXIProdunctionAPI
-      Stage: !Ref MAXIProdunctionAPI
+      RestApiId: {Ref: MAXIProdunctionAPI}
+      Stage: {Ref: MAXIProdunctionAPI}
   FunctionExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -50,7 +46,7 @@ Resources:
     Properties:
       CodeUri: lib/
       Handler: app.handler
-      Layers: [!Ref ServerDependenciesLayer]
+      Layers: [{Ref: ServerDependenciesLayer}]
       Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
         HttpGetRoot:
@@ -61,6 +57,7 @@ Resources:
         HttpGetObject:
           Type: Api
           Properties:
+            RestApiId: {Ref: MAXIProdunctionAPI}
             Path: /objects/{objectId}
             Method: get
   FluxFunction:
@@ -68,12 +65,13 @@ Resources:
     Properties:
       CodeUri: lib/
       Handler: flux.handler
-      Layers: [!Ref ServerDependenciesLayer]
+      Layers: [{Ref: ServerDependenciesLayer}]
       Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
         HttpGet:
           Type: Api
           Properties:
+            RestApiId: {Ref: MAXIProdunctionAPI}
             Path: /objects/{objectId}/flux
             Method: get
   SitemapFunction:
@@ -81,11 +79,12 @@ Resources:
     Properties:
       CodeUri: lib/
       Handler: sitemap.handler
-      Layers: [!Ref ServerDependenciesLayer]
+      Layers: [{Ref: ServerDependenciesLayer}]
       Role: {'Fn::GetAtt': ['FunctionExecutionRole', 'Arn']}
       Events:
         HttpGet:
           Type: Api
           Properties:
+            RestApiId: {Ref: MAXIProdunctionAPI}
             Path: /sitemap.xml
             Method: get
