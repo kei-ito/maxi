@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/kei-ito/maxi/compare/v1.6.0...v1.7.0) (2019-05-05)
+
+
+### Bug Fixes
+
+* **data-viewer:** change fonts ([0660a73](https://github.com/kei-ito/maxi/commit/0660a73))
+
+
+### Features
+
+* **data-viewer:** add hide-all feature ([0de53c3](https://github.com/kei-ito/maxi/commit/0de53c3))
+
+
+### Performance Improvements
+
+* **data-viewer:** load stylesheet asynchronously ([d6b7492](https://github.com/kei-ito/maxi/commit/d6b7492))
+* **data-viewer:** split the main component ([acf0072](https://github.com/kei-ito/maxi/commit/acf0072))
+
+
+
+
+
 # [1.6.0](https://github.com/kei-ito/maxi/compare/v1.5.0...v1.6.0) (2019-05-05)
 
 
