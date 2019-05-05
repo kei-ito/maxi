@@ -1,4 +1,4 @@
-import {createElement, ReactElement} from 'react';
+import {createElement, ReactElement, memo} from 'react';
 import {Band, IRollingAverageData, PlotType, IMargin} from '../../types';
 import {bandCount} from '../../util/constants';
 import {Area} from './Area';
@@ -16,7 +16,7 @@ interface IBodyProps {
     margin: IMargin,
 }
 
-export const Body = (
+export const Body = memo((
     {
         objects,
         cache,
@@ -61,4 +61,4 @@ export const Body = (
         });
     });
     return createElement('g', {children});
-};
+});

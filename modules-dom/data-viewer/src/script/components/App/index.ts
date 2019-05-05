@@ -11,6 +11,8 @@ import {SearchForm} from '../SearchForm/index';
 import {normalizeSearchText} from '../../util/normalizeSearchText';
 import * as catalog from '../../util/catalog';
 import classes from './style.css';
+import {References} from '../References';
+import {Errors} from '../Errors';
 
 export const getInitialSelectedObjects = (): Array<string> => {
     const matched = location.pathname.match(/^\/objects\/([^/]+)$/);
@@ -281,52 +283,8 @@ export const App = () => {
                 ),
             ),
             createElement('h1', null, 'References'),
-            createElement(
-                'ol',
-                null,
-                createElement(
-                    'li',
-                    {id: 'List'},
-                    `${catalog.source.title}. Retrieved ${catalog.createdAt.toLocaleString()}. `,
-                    createElement(
-                        'a',
-                        {href: catalog.source.urls.html, target: '_blank'},
-                        catalog.source.urls.html,
-                    ),
-                ),
-                ...selected.map((objectId) => {
-                    const data = lightCurveCache.get(objectId);
-                    return createElement(
-                        'li',
-                        {id: `Source-${objectId}`},
-                        `${data ? `${data.sourceTitle}. Retrieved ${data.createdAt.toLocaleString()}` : objectId}. `,
-                        createElement(
-                            'a',
-                            {href: data && data.sourceURL, target: '_blank'},
-                            data ? data.sourceURL : 'Loading...',
-                        ),
-                    );
-                }),
-                createElement(
-                    'li',
-                    {id: 'Source-GitHub'},
-                    'Source code of this app. ',
-                    createElement(
-                        'a',
-                        {href: 'https://github.com/kei-ito/maxi', target: '_blank'},
-                        'https://github.com/kei-ito/maxi',
-                    ),
-                ),
-            ),
-            0 < errors.length && createElement(
-                Fragment,
-                null,
-                createElement('h1', null, 'Errors'),
-                ...errors.map((error) => [
-                    createElement('h2', null, error.message),
-                    createElement('pre', null, error.stack),
-                ]),
-            ),
+            createElement(References, {selected, lightCurveCache}),
+            createElement(Errors, {errors}),
         ),
     );
 };
