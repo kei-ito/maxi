@@ -1,8 +1,9 @@
 import {IPreferences, IMJDRange, PlotType, Font} from '../types';
 import {clamp} from './clamp';
-import {URLParameterKey, epochMJD, nowMJD} from './constants';
+import {URLParameterKey, epochMJD} from './constants';
 import {isAvailablePlotType} from './isAvailablePlotType';
 import {isAvailableFont} from './isAvailableFont';
+import {dateToMJD} from '@maxi-js/date-tools';
 
 export const filterBinSize = (
     binSize: string | number | null,
@@ -11,7 +12,7 @@ export const filterBinSize = (
 export const filterMJDRange = (
     mjdRangeStringOrArray: string | IMJDRange | null,
 ): IMJDRange => {
-    const result: IMJDRange = [epochMJD, nowMJD];
+    const result: IMJDRange = [epochMJD, dateToMJD(new Date())];
     if (typeof mjdRangeStringOrArray === 'string') {
         const matched = mjdRangeStringOrArray.match(/\d+(\.\d+)?/g);
         if (matched && matched.length === 2) {

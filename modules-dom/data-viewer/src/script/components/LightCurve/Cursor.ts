@@ -1,5 +1,5 @@
 import {createElement, memo} from 'react';
-import {mjdToDate} from '../../util/mjd';
+import {mjdToDate} from '@maxi-js/date-tools';
 import {Color} from '../../types';
 
 export interface ICursorProps {

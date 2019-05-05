@@ -3,7 +3,7 @@ import {getTicks} from '../../util/getTicks';
 import {Color, IRect} from '../../types';
 import {mainTickSize, subTickSize} from '../../util/constants';
 import {getDateTicks} from '../../util/getDateTicks';
-import {mjdToDate, dateToMJD} from '../../util/mjd';
+import {mjdToDate, dateToMJD} from '@maxi-js/date-tools';
 
 export interface IXTicksProps extends IRect {
     min: number,

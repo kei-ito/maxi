@@ -1,4 +1,4 @@
-import {getNearestValue} from './getNearestValue';
+import {nearest} from '@maxi-js/number-tools';
 import {ITickData} from '../types';
 
 export const getTickScale = (
@@ -11,9 +11,9 @@ export const getTickScale = (
     const range = max - min;
     if (0 < range) {
         const subScale = base ** Math.floor((Math.log(range) / Math.log(base)) - 1);
-        const step = getNearestValue(
-            range / numberOfTicks / subScale,
+        const step = nearest(
             units,
+            range / numberOfTicks / subScale,
         );
         const mainScale = subScale * step;
         const firstSubTick = subScale * Math.ceil(min / subScale);

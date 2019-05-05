@@ -1,5 +1,5 @@
 import {PlotType, Font} from '../types';
-import {dateToMJD} from './mjd';
+import {dateToMJD} from '@maxi-js/date-tools';
 
 export const SVGNS = 'http://www.w3.org/2000/svg';
 export const developMode = !document.querySelector('base');
@@ -21,7 +21,6 @@ export enum URLParameterKey {
     font = 'font',
 }
 export const epochMJD = dateToMJD(new Date('2009-08-01T00:00:00Z'));
-export const nowMJD = dateToMJD(new Date());
 export const pageTitle = 'MAXI GSC Data Viewer';
 export const mainTickSize = 10;
 export const subTickSize = 5;
