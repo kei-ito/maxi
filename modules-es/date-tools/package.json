@@ -1,0 +1,31 @@
+{
+    "name": "@maxi-js/date-tools",
+    "author": {
+        "name": "Kei Ito",
+        "email": "kei.itof@gmail.com",
+        "url": "https://github.com/kei-ito"
+    },
+    "homepage": "https://github.com/kei-ito/maxi/tree/master/modules-es/date-tools",
+    "repository": "https://github.com/kei-ito/maxi",
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "version": "1.3.1",
+    "license": "Apache-2.0",
+    "main": "lib/index.js",
+    "files": [
+        "lib"
+    ],
+    "scripts": {
+        "cleanup": "rimraf lib",
+        "dev": "tsc --watch --preserveWatchOutput",
+        "build": "tsc",
+        "test": "ava"
+    },
+    "devDependencies": {
+        "@types/node": "12.0.0"
+    }
+}

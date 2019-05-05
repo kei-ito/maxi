@@ -149,6 +149,7 @@
                 [
                     "data-viewer",
                     "catalog",
+                    "date-tools",
                     "string-tools",
                     "cli-tools",
                     "config-validator",

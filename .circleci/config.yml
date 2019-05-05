@@ -57,6 +57,9 @@ jobs:
   test-catalog:
     docker: [{image: "keiitof/maxi:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/catalog}]
+  test-date-tools:
+    docker: [{image: "keiitof/maxi:latest"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/date-tools}]
   test-string-tools:
     docker: [{image: "keiitof/maxi:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/string-tools}]
@@ -115,6 +118,7 @@ workflows:
       - test-configurations: {requires: [build]}
       - test-data-viewer: {requires: [build]}
       - test-catalog: {requires: [build]}
+      - test-date-tools: {requires: [build]}
       - test-string-tools: {requires: [build]}
       - test-cli-tools: {requires: [build]}
       - test-config-validator: {requires: [build]}
@@ -127,6 +131,7 @@ workflows:
             - test-configurations
             - test-data-viewer
             - test-catalog
+            - test-date-tools
             - test-string-tools
             - test-cli-tools
             - test-config-validator
@@ -156,6 +161,9 @@ workflows:
       - test-catalog:
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
           requires: [build]
+      - test-date-tools:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
       - test-string-tools:
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
           requires: [build]
@@ -183,6 +191,7 @@ workflows:
             - test-configurations
             - test-data-viewer
             - test-catalog
+            - test-date-tools
             - test-string-tools
             - test-cli-tools
             - test-config-validator
