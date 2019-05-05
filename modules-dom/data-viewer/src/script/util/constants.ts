@@ -2,8 +2,8 @@ import {PlotType} from '../types';
 import {dateToMJD} from './mjd';
 
 export const SVGNS = 'http://www.w3.org/2000/svg';
-export const developMode = 80 < Number(location.port);
-export const APIBaseURL = new URL(developMode ? `http://${location.hostname}:3000` : `https://${location.hostname}/`);
+export const developMode = !document.querySelector('base');
+export const APIBaseURL = new URL(developMode ? `${location.protocol}//${location.hostname}:3000` : `${location.protocol}//${location.host}/`);
 export const AvailablePlotTypes: Array<PlotType> = [PlotType.Point, PlotType.Line];
 export enum URLParameterKey {
     mjdRange = 'mjd',
