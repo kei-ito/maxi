@@ -1,3 +1,3 @@
 export const viewerBaseURL = 'https://maxi.wemo.me/';
-export const cdnBaseURL = 'https://d18srpanx3w5xr.cloudfront.net/';
+export const cdnBaseURL = 'https://cdn.maxi.wemo.me/';
 export const baseTitle = 'MAXI GSC Data Viewer';
