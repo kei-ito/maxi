@@ -18,7 +18,7 @@ Resources:
     Properties:
       DomainName: maxi.wemo.me
       RestApiId: {Ref: MAXIProdunctionAPI}
-      Stage: {Ref: MAXIProdunctionAPI}
+      Stage: production
   FunctionExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
