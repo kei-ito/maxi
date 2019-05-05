@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.4](https://github.com/kei-ito/maxi/compare/v1.4.3...v1.4.4) (2019-05-05)
+
+
+### Bug Fixes
+
+* **server:** add RestApiId ([d7c36c3](https://github.com/kei-ito/maxi/commit/d7c36c3))
+* **server:** define API names ([d3a4ef4](https://github.com/kei-ito/maxi/commit/d3a4ef4))
+* **server:** hardcode the stage ([ff6dc84](https://github.com/kei-ito/maxi/commit/ff6dc84))
+* **server:** remove DomainName from template ([c1cd29d](https://github.com/kei-ito/maxi/commit/c1cd29d))
+* **server:** use ServerlessRestApi ([8e78f6d](https://github.com/kei-ito/maxi/commit/8e78f6d))
+
+
+
+
+
 ## [1.4.3](https://github.com/kei-ito/maxi/compare/v1.4.2...v1.4.3) (2019-05-04)
 
 
