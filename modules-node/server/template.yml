@@ -8,12 +8,21 @@ Globals:
     Runtime: nodejs8.10
 
 Resources:
+  MAXIProdunctionAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: production
+  MAXIStagingAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: staging
   APIBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
+    DependsOn: MAXIProdunctionAPI
     Properties:
       DomainName: maxi.wemo.me
-      RestApiId: !Ref ServerlessRestApi
-      Stage: Prod
+      RestApiId: !Ref MAXIProdunctionAPI
+      Stage: !Ref MAXIProdunctionAPI
   FunctionExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
