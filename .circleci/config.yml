@@ -93,12 +93,16 @@ jobs:
               --stack-name maxiapp-server
               --capabilities CAPABILITY_IAM
               --no-fail-on-empty-changeset
+  deploy-cdn:
+    docker: [{image: "keiitof/maxi:latest"}]
+    steps:
+      - attach_workspace: {at: .}
+      - run: aws s3 sync cdn s3://$S3_CLIENTAPP_BUCKET/ --cache-control "max-age=31536000"
   deploy-data-viewer:
     docker: [{image: "keiitof/maxi:latest"}]
     steps:
       - attach_workspace: {at: .}
-      - run: aws s3 sync modules-dom/data-viewer/output s3://$S3_CLIENTAPP_BUCKET/
-              --cache-control "max-age=31536000"
+      - run: aws s3 sync modules-dom/data-viewer/output s3://$S3_CLIENTAPP_BUCKET/ --cache-control "max-age=31536000"
 workflows:
   version: 2
   run-tests:
@@ -190,5 +194,8 @@ workflows:
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
           requires: [report-test-results]
       - deploy-data-viewer:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [report-test-results]
+      - deploy-cdn:
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
           requires: [report-test-results]
