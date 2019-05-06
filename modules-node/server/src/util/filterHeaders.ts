@@ -1,25 +1,15 @@
 import {APIGatewayProxyResult} from 'aws-lambda';
-import {IHeaderValue, IHeader} from './types';
-
-export interface IHeaders {
-    headers: APIGatewayProxyResult['headers'],
-    multiValueHeaders: APIGatewayProxyResult['multiValueHeaders'],
-}
-
-export const isValidHeaderValue = (
-    value: IHeaderValue,
-): value is (string | number) => {
-    const type = typeof value;
-    return type === 'string' || type === 'number';
-}
+import {ensureArray} from '@maxi-js/object-tools';
+import {IHeader} from './types';
+import {isValidToken} from './isValidToken';
 
 export const filterHeaders = (
     header: IHeader,
-): IHeaders => {
+) => {
     const headers: APIGatewayProxyResult['headers'] = {};
     const multiValueHeaders: APIGatewayProxyResult['multiValueHeaders'] = {};
-    for (const [key, value] of Object.entries(header)) {
-        const values = (Array.isArray(value) ? value : [value]).filter(isValidHeaderValue);
+    for (const key of Object.keys(header)) {
+        const values = ensureArray(header[key]).filter(isValidToken);
         if (1 < values.length) {
             multiValueHeaders[key] = values;
         } else if (values.length === 1) {

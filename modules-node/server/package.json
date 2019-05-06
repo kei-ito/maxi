@@ -38,6 +38,7 @@
         "@maxi-js/catalog": "^1.6.0",
         "@maxi-js/data-viewer": "^1.7.3",
         "@maxi-js/net-tools": "^1.6.0",
+        "@maxi-js/object-tools": "^1.6.0",
         "@maxi-js/stream-tools": "^1.6.0",
         "@maxi-js/string-tools": "^1.6.0"
     }
