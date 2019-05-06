@@ -151,6 +151,7 @@
                     "catalog",
                     "date-tools",
                     "number-tools",
+                    "object-tools",
                     "string-tools",
                     "cli-tools",
                     "config-validator",
