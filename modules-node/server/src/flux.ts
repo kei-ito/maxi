@@ -31,13 +31,17 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         statusCode: 200,
         ...filterHeaders({
             ...response.headers,
-            ...generateCommonHeaders(event, context, {
-                'x-source-title': object.source.title,
-                'x-source-url': object.source.urls.html,
+            ...generateCommonHeaders({
+                event,
+                context,
+                body,
+                exposedHeaders: {
+                    'x-source-title': object.source.title,
+                    'x-source-url': object.source.urls.html,
+                },
             }),
-            'content-length': body.length,
             'content-type': 'application/json; charset=utf-8',
-            'cache-control': 'max-age=43200',
+            'cache-control': 'max-age=43200, public',
         }),
         body,
     };
