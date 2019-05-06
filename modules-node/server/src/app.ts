@@ -76,10 +76,9 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     return {
         statusCode: 200,
         ...filterHeaders({
-            ...generateCommonHeaders(event, context),
-            'content-length': body.length,
+            ...generateCommonHeaders({event, context, body}),
             'content-type': 'text/html; charset=utf-8',
-            'cache-control': 'max-age=43200',
+            'cache-control': 'max-age=300, public',
         }),
         body,
     };
