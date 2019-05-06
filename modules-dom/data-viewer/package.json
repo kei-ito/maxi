@@ -25,8 +25,8 @@
     },
     "scripts": {
         "cleanup": "rimraf output",
-        "dev": "parcel src/index.html --out-dir output",
-        "build": "parcel build src/index.html --no-source-maps --out-dir output",
+        "dev": "parcel src/index.html --out-dir output --public-url ./",
+        "build": "parcel build src/index.html --no-source-maps --out-dir output --public-url ./",
         "test": "echo TBW"
     },
     "devDependencies": {
