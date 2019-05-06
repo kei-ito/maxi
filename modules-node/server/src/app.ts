@@ -4,7 +4,7 @@ import {APIGatewayProxyHandler} from 'aws-lambda';
 import {generateCommonHeaders} from './util/generateCommonHeaders';
 import * as catalog from '@maxi-js/catalog';
 import {sanitizeHTMLAttribute} from '@maxi-js/string-tools';
-import {cdnBaseURL, viewerBaseURL, baseTitle, developMode} from './util/constants';
+import {cdnBaseURL, viewerBaseURL, baseTitle, developMode, siteImageURL} from './util/constants';
 import {filterHeaders} from './util/filterHeaders';
 
 export const appHTMLPromise = new Promise<string>((resolve, reject) => {
@@ -35,15 +35,14 @@ export const getObjectsFromPath = (
 };
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
-    const base = developMode ? `http://${event.headers.Host.split(':')[0]}:1234/` : cdnBaseURL;
     const objects = getObjectsFromPath(event.path);
     const url = new URL(
         0 < objects.length ? `/objects/${objects.map((object) => object.id).join(',')}` : '/',
-        'https://maxi.wemo.me/',
+        viewerBaseURL,
     );
     const imageURL = 0 < objects.length
     ? objects[0].source.urls.image
-    : new URL('/og.8a4a6471.png', viewerBaseURL);
+    : siteImageURL;
     const imageURLAlt = 0 < objects.length
     ? `Light curve of ${objects[0].name}.`
     : '';
@@ -57,6 +56,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         ? `${objects.map((object) => object.name).join(', ')} | ${baseTitle}`
         : baseTitle,
     );
+    const base = developMode ? new URL(`http://${event.headers.Host.split(':')[0]}:1234/`) : new URL('/data-viewer/', cdnBaseURL);
     const body = [
         '<!doctype html>',
         `<html prefix="og: http://ogp.me/ns#"${developMode ? ' data-develop-mode="1"' : ''}>`,
