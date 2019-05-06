@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import console from 'console';
 import {APIGatewayProxyEvent, Context} from 'aws-lambda';
 import {IHeader} from './types';
 import {developMode} from './constants';
@@ -15,6 +16,7 @@ export const generateCommonHeaders = (
         exposedHeaders?: IHeader,
     },
 ): IHeader => {
+    console.log(event.headers);
     const origin = event.headers && event.headers.Origin || '';
     const exposedHeaderNames = Object.keys(exposedHeaders).concat('x-elapsed-seconds', 'x-created-at', 'content-length');
     const etag = crypto.createHash('sha256').update(body).digest('hex');
