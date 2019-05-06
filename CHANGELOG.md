@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/kei-ito/maxi/compare/v1.7.3...v1.8.0) (2019-05-06)
+
+
+### Bug Fixes
+
+* **config-validator:** replace bash slash ([495fab6](https://github.com/kei-ito/maxi/commit/495fab6))
+* **object-tools:** use deepEqual ([0391026](https://github.com/kei-ito/maxi/commit/0391026))
+* **server:** check if-none-match header ([89f4917](https://github.com/kei-ito/maxi/commit/89f4917))
+
+
+### Features
+
+* **config-validator:** validate TravisCI configuration ([6ac4854](https://github.com/kei-ito/maxi/commit/6ac4854))
+* **object-tools:** add object-tools ([894d3f6](https://github.com/kei-ito/maxi/commit/894d3f6))
+
+
+
+
+
 ## [1.7.3](https://github.com/kei-ito/maxi/compare/v1.7.2...v1.7.3) (2019-05-06)
 
 **Note:** Version bump only for package maxi

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/kei-ito/maxi/compare/v1.7.3...v1.8.0) (2019-05-06)
+
+
+### Bug Fixes
+
+* **config-validator:** replace bash slash ([495fab6](https://github.com/kei-ito/maxi/commit/495fab6))
+
+
+### Features
+
+* **config-validator:** validate TravisCI configuration ([6ac4854](https://github.com/kei-ito/maxi/commit/6ac4854))
+
+
+
+
+
 # [1.6.0](https://github.com/kei-ito/maxi/compare/v1.5.0...v1.6.0) (2019-05-05)
 
 
