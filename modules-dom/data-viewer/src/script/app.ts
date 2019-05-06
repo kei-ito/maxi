@@ -1,6 +1,7 @@
 import {createElement} from 'react';
 import * as ReactDOM from 'react-dom';
 import {App} from './components/App';
+import './style.css';
 
 const appContainerElement = document.createElement('div');
 document.body.appendChild(appContainerElement);
