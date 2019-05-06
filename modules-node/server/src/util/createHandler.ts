@@ -21,6 +21,10 @@ export const createHandler = (
     } = await callHandler(handler, filledEvent, context);
     const responseBody = Buffer.isBuffer(body) ? body : Buffer.from(body || '');
     const etag = createHash('sha256').update(responseBody).digest('base64');
+    const ifNoneMatch = filledEvent.headers['if-none-match'] || [];
+    if (ifNoneMatch.includes(etag)) {
+        return {statusCode: 304, body: ''};
+    }
     headers.etag = etag;
     const exposedHeaderNames = Object.keys(exposedHeaders).concat('x-elapsed-seconds', 'x-created-at', 'content-length');
     headers['access-control-allow-origin'] = developMode ? filledEvent.headers.origin : 'https://maxi.wemo.me',
