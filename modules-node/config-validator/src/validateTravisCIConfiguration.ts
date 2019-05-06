@@ -11,7 +11,7 @@ export const validateTravisCIConfiguration = async (
         const modulesDirectory = path.join(
             path.relative(projectDirectory, packageDirectory),
             'node_modules',
-        );
+        ).split(path.sep).join('/');
         assert.ok(
             travisCIConfiguration.cache.directories.includes(modulesDirectory),
             `(.travis.yml).cache.directories does not have ${modulesDirectory}`,
