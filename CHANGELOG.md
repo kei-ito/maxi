@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.2](https://github.com/kei-ito/maxi/compare/v1.7.1...v1.7.2) (2019-05-06)
+
+
+### Bug Fixes
+
+* **data-viewer:** set --public-url option ([51b3c83](https://github.com/kei-ito/maxi/commit/51b3c83))
+
+
+
+
+
 ## [1.7.1](https://github.com/kei-ito/maxi/compare/v1.7.0...v1.7.1) (2019-05-06)
 
 **Note:** Version bump only for package maxi

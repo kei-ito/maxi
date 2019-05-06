@@ -13,7 +13,7 @@
     "engines": {
         "node": ">=10.0.0"
     },
-    "version": "1.7.1",
+    "version": "1.7.2",
     "license": "Apache-2.0",
     "main": "lib/index.js",
     "files": [
@@ -36,7 +36,7 @@
     },
     "dependencies": {
         "@maxi-js/catalog": "^1.6.0",
-        "@maxi-js/data-viewer": "^1.7.0",
+        "@maxi-js/data-viewer": "^1.7.2",
         "@maxi-js/net-tools": "^1.6.0",
         "@maxi-js/stream-tools": "^1.6.0",
         "@maxi-js/string-tools": "^1.6.0"
