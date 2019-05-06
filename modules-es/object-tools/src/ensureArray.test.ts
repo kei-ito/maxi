@@ -12,6 +12,6 @@ interface ITest {
 ] as Array<ITest>).forEach(({input, expected}) => {
     test(`ensureArray(${JSON.stringify(input)}) → ${expected}`, (t) => {
         const actual = ensureArray(input);
-        t.is(actual, expected);
+        t.deepEqual(actual, expected);
     });
 });
