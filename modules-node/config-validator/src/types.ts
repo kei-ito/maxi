@@ -37,6 +37,19 @@ export interface IMAXIJSCircleCIConfig {
     },
 }
 
+export interface IMAXIJSTravisCIConfig {
+    language: string,
+    cache: {
+        directories: Array<string>,
+    },
+    os: Array<string>,
+    node_js: Array<string>,
+    install: Array<string>,
+    script: Array<string>,
+    before_install?: Array<string>,
+    after_install?: Array<string>,
+}
+
 export interface IMAXIJSLernaJSON {
     version: string,
     packages: Array<string>,
