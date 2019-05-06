@@ -1,14 +1,12 @@
 # https://aws.amazon.com/jp/blogs/compute/working-with-aws-lambda-and-lambda-layers-in-aws-sam/
-
 # https://github.com/awslabs/serverless-application-model/issues/251
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-
+Description: https://maxi.wemo.me/
 Globals:
   Function:
     Timeout: 6
     Runtime: nodejs8.10
-
 Resources:
   APIBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
@@ -42,6 +40,7 @@ Resources:
   AppHTMLFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Description: GET /, /objects/{objectId}
       CodeUri: lib/
       Handler: app.handler
       Layers: [{Ref: ServerDependenciesLayer}]
@@ -60,6 +59,7 @@ Resources:
   FluxFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Description: GET /objects/{objectId}/flux
       CodeUri: lib/
       Handler: flux.handler
       Layers: [{Ref: ServerDependenciesLayer}]
@@ -73,6 +73,7 @@ Resources:
   SitemapFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Description: GET /sitemap.xml
       CodeUri: lib/
       Handler: sitemap.handler
       Layers: [{Ref: ServerDependenciesLayer}]

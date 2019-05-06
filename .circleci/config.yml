@@ -63,6 +63,9 @@ jobs:
   test-number-tools:
     docker: [{image: "keiitof/maxi:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/number-tools}]
+  test-object-tools:
+    docker: [{image: "keiitof/maxi:latest"}]
+    steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/object-tools}]
   test-string-tools:
     docker: [{image: "keiitof/maxi:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/string-tools}]
@@ -93,7 +96,7 @@ jobs:
     docker: [{image: "keiitof/maxi:latest"}]
     steps:
       - attach_workspace: {at: .}
-      - run: sam package --template-file modules-node/server/template.yml --output-template-file modules-node/server/output-template.yml --s3-bucket $S3_SERVERAPP_BUCKET
+      - run: sam package --template-file modules-node/server/template.yml --output-template-file modules-node/server/output-template.yml --s3-bucket $S3_BUCKET
       - run: aws cloudformation deploy
               --template-file modules-node/server/output-template.yml
               --stack-name maxiapp-server
@@ -103,13 +106,13 @@ jobs:
     docker: [{image: "keiitof/maxi:latest"}]
     steps:
       - attach_workspace: {at: .}
-      - run: aws s3 sync cdn s3://$S3_CLIENTAPP_BUCKET/
+      - run: aws s3 sync cdn s3://$S3_BUCKET/
               --cache-control "max-age=31536000, public, immutable"
   deploy-data-viewer:
     docker: [{image: "keiitof/maxi:latest"}]
     steps:
       - attach_workspace: {at: .}
-      - run: aws s3 sync modules-dom/data-viewer/output s3://$S3_CLIENTAPP_BUCKET/data-viewer/
+      - run: aws s3 sync modules-dom/data-viewer/output s3://$S3_BUCKET/data-viewer/
               --cache-control "max-age=31536000, public, immutable"
               --exclude "*.html"
 workflows:
@@ -126,6 +129,7 @@ workflows:
       - test-catalog: {requires: [build]}
       - test-date-tools: {requires: [build]}
       - test-number-tools: {requires: [build]}
+      - test-object-tools: {requires: [build]}
       - test-string-tools: {requires: [build]}
       - test-cli-tools: {requires: [build]}
       - test-config-validator: {requires: [build]}
@@ -140,6 +144,7 @@ workflows:
             - test-catalog
             - test-date-tools
             - test-number-tools
+            - test-object-tools
             - test-string-tools
             - test-cli-tools
             - test-config-validator
@@ -175,6 +180,9 @@ workflows:
       - test-number-tools:
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
           requires: [build]
+      - test-object-tools:
+          filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
+          requires: [build]
       - test-string-tools:
           filters: {branches: {ignore: /.*/}, tags: {only: /^v.*/}}
           requires: [build]
@@ -204,6 +212,7 @@ workflows:
             - test-catalog
             - test-date-tools
             - test-number-tools
+            - test-object-tools
             - test-string-tools
             - test-cli-tools
             - test-config-validator

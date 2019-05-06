@@ -1,11 +1,10 @@
 import * as fs from 'fs';
 import {URL} from 'url';
-import {APIGatewayProxyHandler} from 'aws-lambda';
-import {generateCommonHeaders} from './util/generateCommonHeaders';
 import * as catalog from '@maxi-js/catalog';
 import {sanitizeHTMLAttribute} from '@maxi-js/string-tools';
 import {cdnBaseURL, viewerBaseURL, baseTitle, developMode, siteImageURL} from './util/constants';
-import {filterHeaders} from './util/filterHeaders';
+import {createHandler} from './util/createHandler';
+import {IHandler} from './util/types';
 
 export const appHTMLPromise = new Promise<string>((resolve, reject) => {
     const appHTMLPath = '/opt/nodejs/node_modules/@maxi-js/data-viewer/output/index.html';
@@ -34,7 +33,7 @@ export const getObjectsFromPath = (
     return list;
 };
 
-export const handler: APIGatewayProxyHandler = async (event, context) => {
+export const respondAppHTML: IHandler = async (event) => {
     const objects = getObjectsFromPath(event.path);
     const url = new URL(
         0 < objects.length ? `/objects/${objects.map((object) => object.id).join(',')}` : '/',
@@ -56,30 +55,35 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         ? `${objects.map((object) => object.name).join(', ')} | ${baseTitle}`
         : baseTitle,
     );
-    const base = developMode ? new URL(`http://${event.headers.Host.split(':')[0]}:1234/`) : new URL('/data-viewer/', cdnBaseURL);
-    const body = [
-        '<!doctype html>',
-        `<html prefix="og: http://ogp.me/ns#"${developMode ? ' data-develop-mode="1"' : ''}>`,
-        `<base href="${base}">`,
-        '<meta property="og:type" content="website">',
-        `<meta property="og:title" content="${title}">`,
-        `<meta property="og:description" content="${description}">`,
-        `<meta property="og:image" content="${imageURL}">`,
-        `<meta property="og:image:alt" content="${imageURLAlt}">`,
-        '<meta name="twitter:creator:id" content="@wemotter">',
-        `<title>${title}</title>`,
-        `<link rel="canonical" href="${url}">`,
-        ...(await appHTMLPromise).split(/\s*<!doctype[^>]*>\s*/),
-        '</html>',
-    ]
-    .join('\n');
+    let base = new URL('/data-viewer/', cdnBaseURL);
+    if (developMode) {
+        const {host} = event.headers;
+        if (host) {
+            base = new URL(`http://${host.join('').split(':')[0]}:1234/`);
+        }
+    }
     return {
         statusCode: 200,
-        ...filterHeaders({
-            ...generateCommonHeaders({event, context, body}),
+        headers: {
             'content-type': 'text/html; charset=utf-8',
             'cache-control': 'max-age=300, public',
-        }),
-        body,
+        },
+        body: [
+            '<!doctype html>',
+            `<html prefix="og: http://ogp.me/ns#"${developMode ? ' data-develop-mode="1"' : ''}>`,
+            `<base href="${base}">`,
+            '<meta property="og:type" content="website">',
+            `<meta property="og:title" content="${title}">`,
+            `<meta property="og:description" content="${description}">`,
+            `<meta property="og:image" content="${imageURL}">`,
+            `<meta property="og:image:alt" content="${imageURLAlt}">`,
+            '<meta name="twitter:creator:id" content="@wemotter">',
+            `<title>${title}</title>`,
+            `<link rel="canonical" href="${url}">`,
+            ...(await appHTMLPromise).split(/\s*<!doctype[^>]*>\s*/),
+            '</html>',
+        ].join('\n'),
     };
 };
+
+export const handler = createHandler(respondAppHTML);

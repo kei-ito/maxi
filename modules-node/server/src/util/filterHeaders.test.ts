@@ -1,10 +1,10 @@
 import test from 'ava';
 import {IHeader} from './types';
-import {filterHeaders, IHeaders} from './filterHeaders';
+import {filterHeaders} from './filterHeaders';
 
 interface ITest {
     input: IHeader,
-    expected: IHeaders,
+    expected: ReturnType<typeof filterHeaders>,
 }
 
 ([
@@ -78,7 +78,7 @@ interface ITest {
         },
     },
 ] as Array<ITest>).forEach(({input, expected}, index) => {
-    test(`#${index} ${JSON.stringify(input)} → ${JSON.stringify(expected)}`, (t) => {
+    test(`#${index} filterHeaders(${JSON.stringify(input)}) → ${JSON.stringify(expected)}`, (t) => {
         t.deepEqual(filterHeaders(input), expected);
     });
 });
