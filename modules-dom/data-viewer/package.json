@@ -20,9 +20,6 @@
         "lib",
         "output"
     ],
-    "bin": {
-        "validate-packages": "lib/validate-packages.js"
-    },
     "scripts": {
         "cleanup": "rimraf output",
         "dev": "parcel src/index.html --out-dir output",
