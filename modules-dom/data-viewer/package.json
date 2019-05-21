@@ -31,7 +31,7 @@
         "@maxi-js/date-tools": "^1.6.0",
         "@maxi-js/number-tools": "^1.6.0",
         "@maxi-js/string-tools": "^1.6.0",
-        "@types/react": "16.8.17",
+        "@types/react": "16.8.18",
         "@types/react-dom": "16.8.4",
         "autoprefixer": "^9.5.1",
         "parcel-bundler": "1.12.3",
