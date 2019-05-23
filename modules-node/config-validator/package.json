@@ -28,7 +28,7 @@
         "@maxi-js/fs-tools": "^1.6.0",
         "globby": "9.2.0",
         "js-yaml": "3.13.1",
-        "semver": "6.0.0"
+        "semver": "6.1.0"
     },
     "devDependencies": {
         "@types/eslint": "4.16.6",
