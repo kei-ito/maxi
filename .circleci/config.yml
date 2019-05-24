@@ -25,7 +25,7 @@ jobs:
             - dependencies-{{ checksum "package-lock.json" }}
             - dependencies-
       - run: npm ci
-      - run: npx lerna bootstrap --hoist --no-ci
+      - run: npx lerna bootstrap --no-ci
       - save_cache:
           paths:
             - node_modules
