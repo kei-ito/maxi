@@ -20,6 +20,7 @@ os:
   - osx
   - windows
 node_js:
+  - '12'
   - '10'
 before_install:
   - |
