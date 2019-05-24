@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.2](https://github.com/kei-ito/maxi/compare/v1.8.1...v1.8.2) (2019-05-24)
+
+
+### Bug Fixes
+
+* remove unnessesary title ([8479151](https://github.com/kei-ito/maxi/commit/8479151))
+
+
+
+
+
 ## [1.8.1](https://github.com/kei-ito/maxi/compare/v1.8.0...v1.8.1) (2019-05-24)
 
 
