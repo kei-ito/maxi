@@ -16,8 +16,8 @@ export const filterHeaders = (
             headers[key] = values[0];
         }
     }
-    return {
-        headers,
-        multiValueHeaders,
-    };
+    return Object.assign(
+        {headers},
+        0 < Object.keys(multiValueHeaders).length ? {multiValueHeaders} : null,
+    );
 };
