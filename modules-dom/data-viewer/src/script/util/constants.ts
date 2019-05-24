@@ -2,7 +2,7 @@ import {PlotType, Font} from '../types';
 import {dateToMJD} from '@maxi-js/date-tools';
 
 export const SVGNS = 'http://www.w3.org/2000/svg';
-export const developMode = !document.querySelector('base');
+export const developMode = Boolean(document.querySelector('meta[name="preprocessor"]'));
 export const APIBaseURL = new URL(developMode ? `${location.protocol}//${location.hostname}:3000` : `${location.protocol}//${location.host}/`);
 export const AvailablePlotTypes = [PlotType.Point, PlotType.Line];
 export const AvailablePlotTypeTitles = {

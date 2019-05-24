@@ -68,21 +68,21 @@ export const respondAppHTML: IHandler = async (event) => {
             'content-type': 'text/html; charset=utf-8',
             'cache-control': 'max-age=300, public',
         },
-        body: [
-            '<!doctype html>',
-            `<html prefix="og: http://ogp.me/ns#"${developMode ? ' data-develop-mode="1"' : ''}>`,
-            `<base href="${base}">`,
-            '<meta property="og:type" content="website">',
-            `<meta property="og:title" content="${title}">`,
-            `<meta property="og:description" content="${description}">`,
-            `<meta property="og:image" content="${imageURL}">`,
-            `<meta property="og:image:alt" content="${imageURLAlt}">`,
-            '<meta name="twitter:creator:id" content="@wemotter">',
-            `<title>${title}</title>`,
-            `<link rel="canonical" href="${url}">`,
-            ...(await appHTMLPromise).split(/\s*<!doctype[^>]*>\s*/),
-            '</html>',
-        ].join('\n'),
+        body: (await appHTMLPromise).replace(
+            /<meta name="preprocessor">/,
+            () => [
+                '<meta property="og:type" content="website">',
+                `<meta property="og:title" content="${title}">`,
+                `<meta property="og:description" content="${description}">`,
+                `<meta property="og:image" content="${imageURL}">`,
+                `<meta property="og:image:alt" content="${imageURLAlt}">`,
+                '<meta name="twitter:creator:id" content="@wemotter">',
+                `<title>${title}</title>`,
+                `<base href="${base}">`,
+                `<link rel="canonical" href="${url}">`,
+            ]
+            .join(''),
+        ),
     };
 };
 
