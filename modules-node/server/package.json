@@ -30,10 +30,6 @@
         "dev:tsc": "tsc --watch --preserveWatchOutput",
         "dev": "run-p dev:*"
     },
-    "devDependencies": {
-        "@types/aws-lambda": "8.10.26",
-        "@types/node": "12.0.2"
-    },
     "dependencies": {
         "@maxi-js/catalog": "^1.6.0",
         "@maxi-js/data-viewer": "^1.8.0",

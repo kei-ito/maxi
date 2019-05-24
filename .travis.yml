@@ -3,24 +3,13 @@ cache:
   directories:
     - $HOME/.npm
     - node_modules
-    - modules-dom/data-viewer/node_modules
-    - modules-es/catalog/node_modules
-    - modules-es/date-tools/node_modules
-    - modules-es/number-tools/node_modules
-    - modules-es/object-tools/node_modules
-    - modules-es/string-tools/node_modules
-    - modules-node/cli-tools/node_modules
-    - modules-node/config-validator/node_modules
-    - modules-node/fs-tools/node_modules
-    - modules-node/net-tools/node_modules
-    - modules-node/server/node_modules
-    - modules-node/stream-tools/node_modules
 os:
-  - linux
+  # - linux
   - osx
-  - windows
+  # - windows
 node_js:
-  - '10'
+  - '12'
+  # - '10'
 before_install:
   - |
     if [[ $TRAVIS_OS_NAME == windows ]]; then
@@ -32,7 +21,7 @@ before_install:
     fi
 install:
   - npm ci
-  - npx lerna bootstrap --no-ci
+  - npx lerna bootstrap --hoist --no-ci
 script:
   - npm run build
   - npm test
