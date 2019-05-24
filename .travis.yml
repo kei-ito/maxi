@@ -4,9 +4,9 @@ cache:
     - $HOME/.npm
     - node_modules
 os:
-  - linux
+  # - linux
   - osx
-  - windows
+  # - windows
 node_js:
   - '12'
   - '10'
