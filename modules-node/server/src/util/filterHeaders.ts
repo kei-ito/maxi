@@ -3,9 +3,14 @@ import {ensureArray} from '@maxi-js/object-tools';
 import {IHeader} from './types';
 import {isValidToken} from './isValidToken';
 
+export interface IFilteredHeaders {
+    headers?: APIGatewayProxyResult['headers'],
+    multiValueHeaders?: APIGatewayProxyResult['multiValueHeaders'],
+}
+
 export const filterHeaders = (
     header: IHeader,
-) => {
+): IFilteredHeaders => {
     const headers: APIGatewayProxyResult['headers'] = {};
     const multiValueHeaders: APIGatewayProxyResult['multiValueHeaders'] = {};
     for (const key of Object.keys(header)) {
@@ -17,7 +22,8 @@ export const filterHeaders = (
         }
     }
     return Object.assign(
-        {headers},
+        {},
+        0 < Object.keys(headers).length ? {headers} : null,
         0 < Object.keys(multiValueHeaders).length ? {multiValueHeaders} : null,
     );
 };

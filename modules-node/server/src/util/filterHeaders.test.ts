@@ -1,37 +1,28 @@
 import test from 'ava';
 import {IHeader} from './types';
-import {filterHeaders} from './filterHeaders';
+import {filterHeaders, IFilteredHeaders} from './filterHeaders';
 
 interface ITest {
     input: IHeader,
-    expected: ReturnType<typeof filterHeaders>,
+    expected: IFilteredHeaders,
 }
 
 ([
     {
         input: {},
-        expected: {
-            headers: {},
-            multiValueHeaders: {},
-        },
+        expected: {},
     },
     {
         input: {
             foo: null,
         },
-        expected: {
-            headers: {},
-            multiValueHeaders: {},
-        },
+        expected: {},
     },
     {
         input: {
             foo: undefined,
         },
-        expected: {
-            headers: {},
-            multiValueHeaders: {},
-        },
+        expected: {},
     },
     {
         input: {
@@ -41,7 +32,6 @@ interface ITest {
             headers: {
                 foo: 1,
             },
-            multiValueHeaders: {},
         },
     },
     {
@@ -52,7 +42,6 @@ interface ITest {
             headers: {
                 foo: '1',
             },
-            multiValueHeaders: {},
         },
     },
     {
@@ -63,7 +52,6 @@ interface ITest {
             headers: {
                 foo: '1',
             },
-            multiValueHeaders: {},
         },
     },
     {
@@ -71,7 +59,6 @@ interface ITest {
             foo: ['1', 0, undefined, null],
         },
         expected: {
-            headers: {},
             multiValueHeaders: {
                 foo: ['1', 0],
             },
