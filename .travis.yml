@@ -9,7 +9,7 @@ os:
   # - windows
 node_js:
   - '12'
-  - '10'
+  # - '10'
 before_install:
   - |
     if [[ $TRAVIS_OS_NAME == windows ]]; then
