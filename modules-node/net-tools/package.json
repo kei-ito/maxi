@@ -25,7 +25,6 @@
         "test": "ava"
     },
     "devDependencies": {
-        "@maxi-js/stream-tools": "^1.6.0",
-        "@types/node": "12.0.2"
+        "@maxi-js/stream-tools": "^1.6.0"
     }
 }
