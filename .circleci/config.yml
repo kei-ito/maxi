@@ -1,23 +1,23 @@
 version: 2.1
 jobs:
   onBranch:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "alpine:latest"}]
     steps:
       - run: if [[ -z $CIRCLE_BRANCH ]]; then exit 1; fi
   onDevelopBranch:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "alpine:latest"}]
     steps:
       - run: if [[ -z $CIRCLE_BRANCH || $CIRCLE_BRANCH == "master" ]]; then exit 1; fi
   onMasterBranch:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "alpine:latest"}]
     steps:
       - run: if [[ $CIRCLE_BRANCH != "master" ]]; then exit 1; fi
   isTagged:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "alpine:latest"}]
     steps:
       - run: if [[ -z $CIRCLE_TAG ]]; then exit 1; fi
   setup:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps:
       - checkout
       - restore_cache:
@@ -32,63 +32,63 @@ jobs:
           key: dependencies-{{ checksum "package-lock.json" }}
       - persist_to_workspace: {root: ., paths: [.]}
   lint:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps:
       - attach_workspace: {at: .}
       - run: npm run lint
   build:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps:
       - attach_workspace: {at: .}
       - run: npm run build
       - run: git diff --exit-code
       - persist_to_workspace: {root: ., paths: [.]}
   test-configurations:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npm run test:repo}]
   test-data-viewer:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/data-viewer}]
   test-catalog:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/catalog}]
   test-date-tools:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/date-tools}]
   test-number-tools:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/number-tools}]
   test-object-tools:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/object-tools}]
   test-string-tools:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/string-tools}]
   test-cli-tools:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/cli-tools}]
   test-config-validator:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/config-validator}]
   test-fs-tools:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/fs-tools}]
   test-net-tools:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/net-tools}]
   test-server:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/server}]
   test-stream-tools:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps: [{attach_workspace: {at: .}}, {run: npx lerna run test --parallel --scope @maxi-js/stream-tools}]
   report-test-results:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/node:latest"}]
     steps:
       - attach_workspace: {at: .}
       - run: echo 'All tests were passed successfully.'
   deploy-server:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/aws-sam:latest"}]
     steps:
       - attach_workspace: {at: .}
       - run: sam package --template-file modules-node/server/template.yml --output-template-file modules-node/server/output-template.yml --s3-bucket $S3_BUCKET
@@ -98,13 +98,13 @@ jobs:
               --capabilities CAPABILITY_IAM
               --no-fail-on-empty-changeset
   deploy-cdn:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/aws-cli:latest"}]
     steps:
       - attach_workspace: {at: .}
       - run: aws s3 sync cdn s3://$S3_BUCKET/
               --cache-control "max-age=31536000, public, immutable"
   deploy-data-viewer:
-    docker: [{image: "keiitof/maxi:latest"}]
+    docker: [{image: "keiitof/aws-cli:latest"}]
     steps:
       - attach_workspace: {at: .}
       - run: aws s3 sync modules-dom/data-viewer/output s3://$S3_BUCKET/data-viewer/
