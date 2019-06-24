@@ -13,7 +13,7 @@
     "engines": {
         "node": ">=10.0.0"
     },
-    "version": "1.8.2",
+    "version": "1.8.3",
     "license": "Apache-2.0",
     "main": "lib/index.js",
     "files": [
@@ -28,7 +28,7 @@
         "test": "ava"
     },
     "dependencies": {
-        "@maxi-js/config-validator": "^1.8.2",
+        "@maxi-js/config-validator": "^1.8.3",
         "@maxi-js/fs-tools": "^1.8.1",
         "commander": "2.20.0"
     }
