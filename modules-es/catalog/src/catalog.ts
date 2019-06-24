@@ -1,5 +1,5 @@
 import {IObjectData} from './types';
-export const createdAt = '2019-05-03T23:19:38.034Z';
+export const createdAt = '2019-06-24T05:36:40.729Z';
 export const source = {
     title: 'MAXI GSC All-Sky Monitor Index (v3)',
     urls: {html: 'http://maxi.riken.jp/pubdata/v3/'},
@@ -2926,6 +2926,23 @@ map.set('J1338+045', {
             html: 'http://maxi.riken.jp/star_data/J1338+045/J1338+045.html',
             image: 'http://maxi.riken.jp/star_data/J1338+045/J1338+045_00055058g_lc_all.gif',
             data: 'http://maxi.riken.jp/star_data/J1338+045/J1338+045_g_lc_1day_all.dat',
+        },
+    },
+});
+map.set('J1344+197', {
+    id: 'J1344+197',
+    name: 'PQ Gem',
+    category: 'Galactic-Compact-Binary-WD',
+    ra: 206.061,
+    dec: 19.77,
+    l: 4.422,
+    b: 75.844,
+    source: {
+        title: 'PQ Gem',
+        urls: {
+            html: 'http://maxi.riken.jp/star_data/J1344+197/J1344+197.html',
+            image: 'http://maxi.riken.jp/star_data/J1344+197/J1344+197_00055058g_lc_all.gif',
+            data: 'http://maxi.riken.jp/star_data/J1344+197/J1344+197_g_lc_1day_all.dat',
         },
     },
 });
