@@ -26,8 +26,8 @@
     },
     "dependencies": {
         "@maxi-js/fs-tools": "^1.8.1",
-        "globby": "9.2.0",
-        "js-yaml": "3.13.1",
-        "semver": "6.2.0"
+        "globby": "^10.0.1",
+        "js-yaml": "^3.13.1",
+        "semver": "^6.2.0"
     }
 }
