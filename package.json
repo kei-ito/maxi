@@ -24,7 +24,7 @@
         "@typescript-eslint/eslint-plugin": "^1.11.0",
         "@typescript-eslint/parser": "^1.11.0",
         "autoprefixer": "^9.6.1",
-        "ava": "2.2.0",
+        "ava": "2.3.0",
         "eslint": "^6.0.1",
         "globby": "^10.0.1",
         "husky": "^3.0.0",
