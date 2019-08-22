@@ -1,8 +1,8 @@
 import {IObjectData} from './types';
-export const createdAt = '2019-06-24T05:36:40.729Z';
+export const createdAt = '2019-08-22T06:10:48.513Z';
 export const source = {
-    title: 'MAXI GSC All-Sky Monitor Index (v3)',
-    urls: {html: 'http://maxi.riken.jp/pubdata/v3/'},
+    title: 'MAXI GSC All-Sky Monitor Index (v6l)',
+    urls: {html: 'http://maxi.riken.jp/pubdata/v6l/'},
 };
 export const map = new Map<string, IObjectData>();
 map.set('J0006+202', {
@@ -546,6 +546,23 @@ map.set('J0242-000', {
             html: 'http://maxi.riken.jp/star_data/J0242-000/J0242-000.html',
             image: 'http://maxi.riken.jp/star_data/J0242-000/J0242-000_00055058g_lc_all.gif',
             data: 'http://maxi.riken.jp/star_data/J0242-000/J0242-000_00055058g_lc_1day_all.dat',
+        },
+    },
+});
+map.set('J0243+614', {
+    id: 'J0243+614',
+    name: 'Swift J0243.6+6124',
+    category: 'Galactic-Compact-Binary-Pulsar',
+    ra: 40.918,
+    dec: 61.434,
+    l: 135.934,
+    b: 1.429,
+    source: {
+        title: 'Swift J0243.6+6124',
+        urls: {
+            html: 'http://maxi.riken.jp/star_data/J0243+614/J0243+614.html',
+            image: 'http://maxi.riken.jp/star_data/J0243+614/J0243+614_00055058g_lc_all.gif',
+            data: 'http://maxi.riken.jp/star_data/J0243+614/J0243+614_g_lc_1day_all.dat',
         },
     },
 });
@@ -2980,6 +2997,23 @@ map.set('J1347-606', {
         },
     },
 });
+map.set('J1348-632', {
+    id: 'J1348-632',
+    name: 'MAXI J1348-630',
+    category: 'Galactic-Compact-Binary-BH',
+    ra: 207.053,
+    dec: -63.274,
+    l: 309.264,
+    b: -1.102,
+    source: {
+        title: 'MAXI J1348-630',
+        urls: {
+            html: 'http://maxi.riken.jp/star_data/J1348-632/J1348-632.html',
+            image: 'http://maxi.riken.jp/star_data/J1348-632/J1348-632_00055058g_lc_all.gif',
+            data: 'http://maxi.riken.jp/star_data/J1348-632/J1348-632_00055053g_lc_1day_all.dat',
+        },
+    },
+});
 map.set('J1349+265', {
     id: 'J1349+265',
     name: 'Abell 1795',
@@ -3337,6 +3371,23 @@ map.set('J1523+086', {
         },
     },
 });
+map.set('J1535-572', {
+    id: 'J1535-572',
+    name: 'MAXI J1535-571',
+    category: 'Galactic-Compact-Binary-BH',
+    ra: 233.832,
+    dec: -57.23,
+    l: 323.724,
+    b: -1.129,
+    source: {
+        title: 'MAXI J1535-571',
+        urls: {
+            html: 'http://maxi.riken.jp/star_data/J1535-572/J1535-572.html',
+            image: 'http://maxi.riken.jp/star_data/J1535-572/J1535-572_00055058g_lc_all.gif',
+            data: 'http://maxi.riken.jp/star_data/J1535-572/J1535-572_g_lc_1day_all.dat',
+        },
+    },
+});
 map.set('J1542-523', {
     id: 'J1542-523',
     name: '4U 1538-52, QV Nor',
@@ -3368,6 +3419,23 @@ map.set('J1543-564', {
             html: 'http://maxi.riken.jp/star_data/J1543-564/J1543-564.html',
             image: 'http://maxi.riken.jp/star_data/J1543-564/J1543-564_00055058g_lc_all.gif',
             data: 'http://maxi.riken.jp/star_data/J1543-564/J1543-564_g_lc_1day_all.dat',
+        },
+    },
+});
+map.set('J1544-567', {
+    id: 'J1544-567',
+    name: 'XTE J1543-568',
+    category: 'Galactic-Compact-Binary-Pulsar',
+    ra: 236.008,
+    dec: -56.712,
+    l: 324.985,
+    b: -1.42,
+    source: {
+        title: 'XTE J1543-568',
+        urls: {
+            html: 'http://maxi.riken.jp/star_data/J1544-567/J1544-567.html',
+            image: 'http://maxi.riken.jp/star_data/J1544-567/J1544-567_00055058g_lc_all.gif',
+            data: 'http://maxi.riken.jp/star_data/J1544-567/J1544-567_00055053g_lc_1day_all.dat',
         },
     },
 });
@@ -3691,6 +3759,23 @@ map.set('J1629-264', {
             html: 'http://maxi.riken.jp/star_data/J1629-264/J1629-264.html',
             image: 'http://maxi.riken.jp/star_data/J1629-264/J1629-264_00055058g_lc_all.gif',
             data: 'http://maxi.riken.jp/star_data/J1629-264/J1629-264_00055058g_lc_1day_all.dat',
+        },
+    },
+});
+map.set('J1631-478', {
+    id: 'J1631-478',
+    name: 'MAXI J1631-479',
+    category: 'Galactic-Compact-Binary-BH',
+    ra: 247.806,
+    dec: -47.805,
+    l: 336.288,
+    b: 0.315,
+    source: {
+        title: 'MAXI J1631-479',
+        urls: {
+            html: 'http://maxi.riken.jp/star_data/J1631-478/J1631-478.html',
+            image: 'http://maxi.riken.jp/star_data/J1631-478/J1631-478_00055058g_lc_all.gif',
+            data: 'http://maxi.riken.jp/star_data/J1631-478/J1631-478_g_lc_1day_all.dat',
         },
     },
 });
@@ -4306,6 +4391,23 @@ map.set('J1728-203', {
         },
     },
 });
+map.set('J1728-362', {
+    id: 'J1728-362',
+    name: 'Swift J1728.9-3613',
+    category: 'Galactic-Compact-Binary-BH',
+    ra: 262.232,
+    dec: -36.237,
+    l: 351.955,
+    b: -0.954,
+    source: {
+        title: 'Swift J1728.9-3613',
+        urls: {
+            html: 'http://maxi.riken.jp/star_data/J1728-362/J1728-362.html',
+            image: 'http://maxi.riken.jp/star_data/J1728-362/J1728-362_00055058g_lc_all.gif',
+            data: 'http://maxi.riken.jp/star_data/J1728-362/J1728-362_00055054g_lc_1day_all.dat',
+        },
+    },
+});
 map.set('J1731-169', {
     id: 'J1731-169',
     name: 'GX 9+9, V2216 Oph',
@@ -4898,6 +5000,23 @@ map.set('J1810-261', {
             html: 'http://maxi.riken.jp/star_data/J1810-261/J1810-261.html',
             image: 'http://maxi.riken.jp/star_data/J1810-261/J1810-261_00055058g_lc_all.gif',
             data: 'http://maxi.riken.jp/star_data/J1810-261/J1810-261_g_lc_1day_all.dat',
+        },
+    },
+});
+map.set('J1812-223', {
+    id: 'J1812-223',
+    name: 'MAXI J1810-222',
+    category: 'Unknown',
+    ra: 273.123,
+    dec: -22.327,
+    l: 8.747,
+    b: -1.948,
+    source: {
+        title: 'MAXI J1810-222',
+        urls: {
+            html: 'http://maxi.riken.jp/star_data/J1812-223/J1812-223.html',
+            image: 'http://maxi.riken.jp/star_data/J1812-223/J1812-223_00055058g_lc_all.gif',
+            data: 'http://maxi.riken.jp/star_data/J1812-223/J1812-223_g_lc_1day_all.dat',
         },
     },
 });
