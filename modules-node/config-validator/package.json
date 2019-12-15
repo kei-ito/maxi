@@ -28,6 +28,6 @@
         "@maxi-js/fs-tools": "^1.8.1",
         "globby": "^10.0.1",
         "js-yaml": "^3.13.1",
-        "semver": "^6.2.0"
+        "semver": "^7.0.0"
     }
 }
