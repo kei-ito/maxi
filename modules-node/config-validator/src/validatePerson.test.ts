@@ -1,4 +1,4 @@
-import test from 'ava';
+import test, {ThrowsExpectation} from 'ava';
 import {validatePerson} from './validatePerson';
 
 interface ITest {
@@ -6,21 +6,21 @@ interface ITest {
         [key: string]: string | undefined,
     },
     objectName: string,
-    fail: false | string,
+    fail?: ThrowsExpectation,
 }
 
 ([
     {
         person: {},
         objectName: 'foo',
-        fail: /^foo\.email is invalid/,
+        fail: {message: /^foo\.email is invalid/},
     },
     {
         person: {
             email: 'foo@example.com',
         },
         objectName: 'foo',
-        fail: /^foo\.name is invalid/,
+        fail: {message: /^foo\.name is invalid/},
     },
     {
         person: {
@@ -28,7 +28,6 @@ interface ITest {
             name: 'foo',
         },
         objectName: 'foo',
-        fail: false,
     },
     {
         person: {
@@ -37,7 +36,7 @@ interface ITest {
             url: 'example.com',
         },
         objectName: 'foo',
-        fail: /^foo\.url is invalid/,
+        fail: {message: /^foo\.url is invalid/},
     },
     {
         person: {
@@ -46,7 +45,6 @@ interface ITest {
             url: 'https://example.com/',
         },
         objectName: 'foo',
-        fail: false,
     },
 ] as Array<ITest>).forEach(({person, objectName, fail}) => {
     test(`${JSON.stringify(person)} → ${fail || 'pass'}`, (t) => {

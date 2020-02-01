@@ -30,6 +30,6 @@
     "dependencies": {
         "@maxi-js/config-validator": "^1.8.4",
         "@maxi-js/fs-tools": "^1.8.1",
-        "commander": "2.20.3"
+        "commander": "^4.1.0"
     }
 }
